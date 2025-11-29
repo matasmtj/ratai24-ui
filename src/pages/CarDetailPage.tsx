@@ -122,10 +122,6 @@ export function CarDetailPage() {
               <h2 className="text-xl font-semibold mb-4">Specifikacijos</h2>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-sm text-gray-500">VIN</div>
-                  <div className="font-medium">{car.vin}</div>
-                </div>
-                <div>
                   <div className="text-sm text-gray-500">Valstybinis numeris</div>
                   <div className="font-medium">{car.numberPlate}</div>
                 </div>

@@ -39,6 +39,10 @@ export const translations = {
     allGearboxes: 'Visos pavarų dėžės',
     carsFound: 'Rasta automobilių',
     noCarsFound: 'Nerasta automobilių pagal pasirinktus filtrus',
+    resetFilters: 'Atstatyti filtrus',
+    sortBy: 'Rūšiuoti',
+    priceAsc: 'Kaina: mažiausia',
+    priceDesc: 'Kaina: didžiausia',
     available: 'Laisvas',
     leased: 'Išnuomotas',
     maintenance: 'Servise',
@@ -66,6 +70,31 @@ export const translations = {
     confirm: 'Patvirtinti rezervaciją',
     loginToBook: 'Prisijunkite, kad rezervuotumėte',
     
+    // Fuel Types
+    petrol: 'Benzinas',
+    diesel: 'Dyzelis',
+    electric: 'Elektrinis',
+    hybridHev: 'Hibridas (HEV)',
+    hybridPhev: 'Hibridas (PHEV)',
+    
+    // Body Types
+    sedan: 'Sedanas',
+    hatchback: 'Hečbekas',
+    suv: 'SUV',
+    wagon: 'Universalas',
+    coupe: 'Kupė',
+    convertible: 'Kabrioletas',
+    van: 'Mikroautobusas',
+    pickup: 'Pikapas',
+    
+    // Gearbox
+    manual: 'Mechaninė',
+    automatic: 'Automatinė',
+    
+    // Car Details
+    seats: 'vietos',
+    kw: 'kW',
+    
     // Common
     price: 'Kaina',
     pricePerDay: 'Kaina per dieną',
@@ -77,6 +106,7 @@ export const translations = {
     close: 'Uždaryti',
     loading: 'Kraunama...',
     year: 'm.',
+    footer: 'Visos teisės saugomos.',
   },
   en: {
     // Navigation
@@ -118,6 +148,10 @@ export const translations = {
     allGearboxes: 'All Gearboxes',
     carsFound: 'Cars found',
     noCarsFound: 'No cars found with selected filters',
+    resetFilters: 'Reset filters',
+    sortBy: 'Sort by',
+    priceAsc: 'Price: Low to High',
+    priceDesc: 'Price: High to Low',
     available: 'Available',
     leased: 'Leased',
     maintenance: 'Maintenance',
@@ -145,6 +179,31 @@ export const translations = {
     confirm: 'Confirm Reservation',
     loginToBook: 'Login to book',
     
+    // Fuel Types
+    petrol: 'Petrol',
+    diesel: 'Diesel',
+    electric: 'Electric',
+    hybridHev: 'Hybrid (HEV)',
+    hybridPhev: 'Hybrid (PHEV)',
+    
+    // Body Types
+    sedan: 'Sedan',
+    hatchback: 'Hatchback',
+    suv: 'SUV',
+    wagon: 'Wagon',
+    coupe: 'Coupe',
+    convertible: 'Convertible',
+    van: 'Van',
+    pickup: 'Pickup',
+    
+    // Gearbox
+    manual: 'Manual',
+    automatic: 'Automatic',
+    
+    // Car Details
+    seats: 'seats',
+    kw: 'kW',
+    
     // Common
     price: 'Price',
     pricePerDay: 'Price per Day',
@@ -156,6 +215,7 @@ export const translations = {
     close: 'Close',
     loading: 'Loading...',
     year: 'y.',
+    footer: 'All rights reserved.',
   },
   ru: {
     // Navigation
@@ -197,6 +257,10 @@ export const translations = {
     allGearboxes: 'Все коробки передач',
     carsFound: 'Найдено автомобилей',
     noCarsFound: 'Автомобили не найдены с выбранными фильтрами',
+    resetFilters: 'Сбросить фильтры',
+    sortBy: 'Сортировать',
+    priceAsc: 'Цена: по возрастанию',
+    priceDesc: 'Цена: по убыванию',
     available: 'Доступен',
     leased: 'Арендован',
     maintenance: 'На обслуживании',
@@ -224,6 +288,31 @@ export const translations = {
     confirm: 'Подтвердить бронирование',
     loginToBook: 'Войдите, чтобы забронировать',
     
+    // Fuel Types
+    petrol: 'Бензин',
+    diesel: 'Дизель',
+    electric: 'Электрический',
+    hybridHev: 'Гибрид (HEV)',
+    hybridPhev: 'Гибрид (PHEV)',
+    
+    // Body Types
+    sedan: 'Седан',
+    hatchback: 'Хэтчбек',
+    suv: 'Внедорожник',
+    wagon: 'Универсал',
+    coupe: 'Купе',
+    convertible: 'Кабриолет',
+    van: 'Микроавтобус',
+    pickup: 'Пикап',
+    
+    // Gearbox
+    manual: 'Механическая',
+    automatic: 'Автоматическая',
+    
+    // Car Details
+    seats: 'мест',
+    kw: 'кВт',
+    
     // Common
     price: 'Цена',
     pricePerDay: 'Цена за день',
@@ -235,6 +324,7 @@ export const translations = {
     close: 'Закрыть',
     loading: 'Загрузка...',
     year: 'г.',
+    footer: 'Все права защищены.',
   },
 };
 
