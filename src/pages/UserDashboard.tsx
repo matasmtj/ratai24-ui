@@ -1,14 +1,13 @@
-import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useMemo } from 'react';
 import { Layout } from '../components/Layout';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { LoadingSpinner } from '../components/ui/Loading';
-import { Modal } from '../components/ui/Modal';
-import { Input } from '../components/ui/Input';
+import { Select } from '../components/ui/Select';
 import { contractsApi } from '../api/contracts';
 import { carsApi } from '../api/cars';
-import type { Contract, ContractComplete } from '../types/api';
+import type { Contract } from '../types/api';
 import { 
   DocumentTextIcon,
   CalendarIcon,
@@ -17,53 +16,39 @@ import {
   ClockIcon 
 } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export function UserDashboard() {
   const queryClient = useQueryClient();
-  const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
-  const [isCompleteModalOpen, setIsCompleteModalOpen] = useState(false);
-  const [completeData, setCompleteData] = useState({
-    mileageEndKm: '',
-    fuelLevelEndPct: '',
-    damageFee: '0',
-    notes: '',
-  });
+  const { t } = useLanguage();
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
 
-  const { data: contracts, isLoading } = useQuery({
+  const { data: contracts, isLoading, error, isError } = useQuery({
     queryKey: ['my-contracts'],
-    queryFn: contractsApi.getAll,
+    queryFn: contractsApi.getMy, // Use getMy() for user's own contracts
   });
 
-  const completeMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: ContractComplete }) =>
-      contractsApi.complete(id, data),
+  // Debug logging
+  console.log('UserDashboard - isLoading:', isLoading);
+  console.log('UserDashboard - isError:', isError);
+  console.log('UserDashboard - error:', error);
+  console.log('UserDashboard - contracts:', contracts);
+  console.log('UserDashboard - contracts length:', contracts?.length);
+
+  const cancelMutation = useMutation({
+    mutationFn: (id: number) => contractsApi.cancel(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-contracts'] });
-      setIsCompleteModalOpen(false);
-      setSelectedContract(null);
+      // Also invalidate car-contracts to update calendars
+      queryClient.invalidateQueries({ queryKey: ['car-contracts'] });
     },
   });
 
-  const deleteMutation = useMutation({
-    mutationFn: (id: number) => contractsApi.delete(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['my-contracts'] });
-    },
-  });
-
-  const handleComplete = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedContract) return;
-
-    const data: ContractComplete = {
-      mileageEndKm: Number(completeData.mileageEndKm),
-      fuelLevelEndPct: Number(completeData.fuelLevelEndPct),
-      damageFee: Number(completeData.damageFee),
-      notes: completeData.notes || undefined,
-    };
-
-    completeMutation.mutate({ id: selectedContract.id, data });
-  };
+  const paginatedContracts = useMemo(() => {
+    if (!contracts) return [];
+    if (itemsPerPage === -1) return contracts;
+    return contracts.slice(0, itemsPerPage);
+  }, [contracts, itemsPerPage]);
 
   const getStatusBadge = (state: string) => {
     const styles = {
@@ -106,23 +91,57 @@ export function UserDashboard() {
           <p className="text-gray-600">Peržiūrėkite ir valdykite savo automobilių nuomos rezervacijas</p>
         </div>
 
+        {/* Items per page selector */}
+        <Card className="p-4 mb-6">
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">{t('itemsPerPage')}:</label>
+            <div className="w-28">
+              <Select
+                value={itemsPerPage.toString()}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                options={[
+                  { value: '10', label: '10' },
+                  { value: '20', label: '20' },
+                  { value: '50', label: '50' },
+                  { value: '-1', label: t('all') },
+                ]}
+              />
+            </div>
+          </div>
+        </Card>
+
+        {contracts && contracts.length > 0 && (
+          <div className="mb-4 text-sm text-gray-600">
+            {t('showingXofY')
+              .replace('{current}', paginatedContracts.length.toString())
+              .replace('{total}', contracts.length.toString())}
+          </div>
+        )}
+
         {isLoading ? (
           <div className="flex justify-center py-12">
             <LoadingSpinner size="lg" />
           </div>
+        ) : isError ? (
+          <Card className="p-12 text-center">
+            <XCircleIcon className="h-16 w-16 text-red-400 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Klaida kraunant rezervacijas</h3>
+            <p className="text-gray-600 mb-4">
+              {error instanceof Error ? error.message : 'Nepavyko užkrauti rezervacijų. Bandykite dar kartą.'}
+            </p>
+            <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['my-contracts'] })}>
+              Bandyti dar kartą
+            </Button>
+          </Card>
         ) : contracts && contracts.length > 0 ? (
           <div className="space-y-4">
-            {contracts.map((contract) => (
+            {paginatedContracts.map((contract) => (
               <ContractCard
                 key={contract.id}
                 contract={contract}
-                onComplete={() => {
-                  setSelectedContract(contract);
-                  setIsCompleteModalOpen(true);
-                }}
-                onDelete={() => {
+                onCancel={() => {
                   if (confirm('Ar tikrai norite atšaukti šią rezervaciją?')) {
-                    deleteMutation.mutate(contract.id);
+                    cancelMutation.mutate(contract.id);
                   }
                 }}
                 getStatusBadge={getStatusBadge}
@@ -139,80 +158,19 @@ export function UserDashboard() {
           </Card>
         )}
       </div>
-
-      {/* Complete Modal */}
-      <Modal
-        isOpen={isCompleteModalOpen}
-        onClose={() => {
-          setIsCompleteModalOpen(false);
-          setSelectedContract(null);
-        }}
-        title="Užbaigti rezervaciją"
-        size="lg"
-      >
-        <form onSubmit={handleComplete} className="space-y-4">
-          <Input
-            label="Galutinis ridos rodmuo (km)"
-            type="number"
-            value={completeData.mileageEndKm}
-            onChange={(e) => setCompleteData({ ...completeData, mileageEndKm: e.target.value })}
-            required
-          />
-          <Input
-            label="Galutinis kuro lygis (%)"
-            type="number"
-            min="0"
-            max="100"
-            value={completeData.fuelLevelEndPct}
-            onChange={(e) => setCompleteData({ ...completeData, fuelLevelEndPct: e.target.value })}
-            required
-          />
-          <Input
-            label="Žalos mokestis (€)"
-            type="number"
-            min="0"
-            step="0.01"
-            value={completeData.damageFee}
-            onChange={(e) => setCompleteData({ ...completeData, damageFee: e.target.value })}
-          />
-          <Input
-            label="Pastabos (neprivaloma)"
-            value={completeData.notes}
-            onChange={(e) => setCompleteData({ ...completeData, notes: e.target.value })}
-          />
-
-          <div className="flex justify-end space-x-3 pt-4">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={() => {
-                setIsCompleteModalOpen(false);
-                setSelectedContract(null);
-              }}
-            >
-              Atšaukti
-            </Button>
-            <Button type="submit" isLoading={completeMutation.isPending}>
-              Užbaigti rezervaciją
-            </Button>
-          </div>
-        </form>
-      </Modal>
     </Layout>
   );
 }
 
 function ContractCard({
   contract,
-  onComplete,
-  onDelete,
+  onCancel,
   getStatusBadge,
   getStatusIcon,
   getStatusText,
 }: {
   contract: Contract;
-  onComplete: () => void;
-  onDelete: () => void;
+  onCancel: () => void;
   getStatusBadge: (state: string) => string;
   getStatusIcon: (state: string) => React.ReactElement;
   getStatusText: (state: string) => string;
@@ -251,13 +209,8 @@ function ContractCard({
           </div>
         </div>
         <div className="flex space-x-2">
-          {contract.state === 'ACTIVE' && (
-            <Button size="sm" onClick={onComplete}>
-              Užbaigti
-            </Button>
-          )}
           {(contract.state === 'DRAFT' || contract.state === 'ACTIVE') && (
-            <Button size="sm" variant="danger" onClick={onDelete}>
+            <Button size="sm" variant="danger" onClick={onCancel}>
               Atšaukti
             </Button>
           )}

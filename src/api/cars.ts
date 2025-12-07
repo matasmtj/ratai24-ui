@@ -1,10 +1,14 @@
 import api from '../lib/api';
-import type { Car, CarCreate } from '../types/api';
+import type { Car, CarCreate, CarImage } from '../types/api';
 
 export const carsApi = {
   getAll: async (cityId?: number): Promise<Car[]> => {
     const params = cityId ? { cityId } : {};
     const response = await api.get<Car[]>('/cars', { params });
+    console.log('Cars API response:', response.data);
+    if (response.data.length > 0) {
+      console.log('First car images:', response.data[0].images);
+    }
     return response.data;
   },
 
@@ -30,6 +34,33 @@ export const carsApi = {
 
   getContracts: async (id: number) => {
     const response = await api.get(`/cars/${id}/contracts`);
+    return response.data;
+  },
+
+  // Image management
+  uploadImages: async (carId: number, files: File[]): Promise<{ message: string; images: CarImage[] }> => {
+    const formData = new FormData();
+    files.forEach(file => {
+      console.log('Appending file:', file.name, file.size, 'bytes');
+      formData.append('file', file);
+    });
+    console.log('FormData entries:', Array.from(formData.entries()).map(([key, value]) => ({ key, value })));
+    const response = await api.post(`/cars/${carId}/images`, formData);
+    return response.data;
+  },
+
+  getImages: async (carId: number): Promise<{ images: CarImage[] }> => {
+    const response = await api.get(`/cars/${carId}/images`);
+    return response.data;
+  },
+
+  setMainImage: async (carId: number, imageId: number): Promise<{ message: string; image: CarImage }> => {
+    const response = await api.put(`/cars/${carId}/images/${imageId}/main`);
+    return response.data;
+  },
+
+  deleteImage: async (carId: number, imageId: number): Promise<{ message: string; image: CarImage }> => {
+    const response = await api.delete(`/cars/${carId}/images/${imageId}`);
     return response.data;
   },
 };

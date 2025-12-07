@@ -9,7 +9,8 @@ import {
   UserCircleIcon,
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
-  LanguageIcon
+  LanguageIcon,
+  PhoneIcon
 } from '@heroicons/react/24/outline';
 import { Menu } from '@headlessui/react';
 import type { Language } from '../i18n/translations';
@@ -48,6 +49,13 @@ export function Navbar() {
               >
                 <TruckIcon className="h-5 w-5 mr-1" />
                 {t('cars')}
+              </Link>
+              <Link
+                to="/contacts"
+                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+              >
+                <PhoneIcon className="h-5 w-5 mr-1" />
+                {t('contacts')}
               </Link>
             </div>
           </div>

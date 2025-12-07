@@ -24,6 +24,16 @@ export interface CityCreate {
   country: string;
 }
 
+// Car Image
+export interface CarImage {
+  id: number;
+  carId: number;
+  filename: string;
+  url: string;
+  isMain: boolean;
+  createdAt: string;
+}
+
 // Car
 export interface Car {
   id: number;
@@ -42,6 +52,7 @@ export interface Car {
   gearbox: Gearbox;
   state: CarState;
   odometerKm: number;
+  images?: CarImage[];
 }
 
 export interface CarCreate {
@@ -62,6 +73,13 @@ export interface CarCreate {
   odometerKm?: number;
 }
 
+// User
+export interface User {
+  id: number;
+  email: string;
+  role: UserRole;
+}
+
 // Contract
 export interface Contract {
   id: number;
@@ -77,6 +95,8 @@ export interface Contract {
   fuelLevelEndPct: number | null;
   extraFees: number;
   notes: string | null;
+  user?: User; // Populated user data (admin endpoint)
+  car?: Car; // Populated car data (admin endpoint)
 }
 
 export interface ContractCreate {
@@ -86,6 +106,21 @@ export interface ContractCreate {
   mileageStartKm: number;
   fuelLevelStartPct: number;
   notes?: string;
+}
+
+// Contact
+export interface Contact {
+  id: number;
+  email: string;
+  phone: string;
+  operationAreas: string; // Comma-separated list of cities/regions
+  updatedAt: string;
+}
+
+export interface ContactUpdate {
+  email: string;
+  phone: string;
+  operationAreas: string;
 }
 
 export interface ContractUpdate {

@@ -9,11 +9,13 @@ import { CarsPage } from './pages/CarsPage';
 import { CarDetailPage } from './pages/CarDetailPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { ContactsPage } from './pages/ContactsPage';
 import { UserDashboard } from './pages/UserDashboard';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminCitiesPage } from './pages/admin/AdminCitiesPage';
 import { AdminCarsPage } from './pages/admin/AdminCarsPage';
 import { AdminContractsPage } from './pages/admin/AdminContractsPage';
+import { AdminContactsPage } from './pages/AdminContactsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,6 +37,7 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/cars" element={<CarsPage />} />
             <Route path="/cars/:id" element={<CarDetailPage />} />
+            <Route path="/contacts" element={<ContactsPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
 
@@ -57,10 +60,11 @@ function App() {
                 </ProtectedRoute>
               }
             >
-              <Route index element={<Navigate to="/admin/cities" replace />} />
+              <Route index element={<Navigate to="/admin/cars" replace />} />
               <Route path="cities" element={<AdminCitiesPage />} />
               <Route path="cars" element={<AdminCarsPage />} />
               <Route path="contracts" element={<AdminContractsPage />} />
+              <Route path="contacts" element={<AdminContactsPage />} />
             </Route>
 
             {/* Catch all */}

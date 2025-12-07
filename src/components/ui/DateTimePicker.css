@@ -1,0 +1,93 @@
+/* Custom styling for DateTimePicker */
+.blocked-date {
+  background-color: #fee2e2 !important;
+  color: #991b1b !important;
+  text-decoration: line-through;
+  cursor: not-allowed !important;
+}
+
+.blocked-date:hover {
+  background-color: #fecaca !important;
+}
+
+/* Disabled dates styling */
+.react-calendar__tile:disabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Current selected date */
+.react-calendar__tile--active {
+  background-color: #3b82f6 !important;
+  color: white !important;
+}
+
+.react-calendar__tile--active:enabled:hover,
+.react-calendar__tile--active:enabled:focus {
+  background-color: #2563eb !important;
+}
+
+/* Today's date */
+.react-calendar__tile--now {
+  background-color: #dbeafe;
+}
+
+.react-calendar__tile--now:enabled:hover,
+.react-calendar__tile--now:enabled:focus {
+  background-color: #bfdbfe;
+}
+
+/* Hover effect for available dates */
+.react-calendar__tile:enabled:hover,
+.react-calendar__tile:enabled:focus {
+  background-color: #e5e7eb;
+}
+
+/* Calendar container */
+.react-calendar {
+  border: none !important;
+  font-family: inherit;
+  width: 350px !important;
+  max-width: 90vw;
+  line-height: 1.5;
+}
+
+/* Month and year navigation */
+.react-calendar__navigation button {
+  min-width: 44px;
+  background: none;
+  font-size: 16px;
+  margin-top: 8px;
+}
+
+.react-calendar__navigation button:enabled:hover,
+.react-calendar__navigation button:enabled:focus {
+  background-color: #e5e7eb;
+}
+
+/* Day names */
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  padding: 0.5rem;
+}
+
+/* Tile (date) styling */
+.react-calendar__tile {
+  max-width: 100%;
+  padding: 10px 6px;
+  background: none;
+  text-align: center;
+  line-height: 16px;
+}
+
+.react-calendar__tile abbr {
+  font-size: 0.875rem;
+}

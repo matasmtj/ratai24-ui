@@ -124,10 +124,21 @@ export function HomePage() {
             {t('popularCars')}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {featuredCars.map((car) => (
+            {featuredCars.map((car) => {
+              const mainImage = car.images?.find(img => img.isMain);
+              
+              return (
               <Card key={car.id} hover className="overflow-hidden">
                 <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                  <TruckIcon className="h-24 w-24 text-gray-400" />
+                  {mainImage ? (
+                    <img 
+                      src={mainImage.url} 
+                      alt={`${car.make} ${car.model}`}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <TruckIcon className="h-24 w-24 text-gray-400" />
+                  )}
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-semibold mb-2">
@@ -144,7 +155,7 @@ export function HomePage() {
                   </div>
                 </div>
               </Card>
-            ))}
+            )})}
           </div>
           <div className="text-center mt-8">
             <Link to="/cars">

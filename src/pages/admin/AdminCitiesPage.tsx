@@ -5,14 +5,18 @@ import { Button } from '../../components/ui/Button';
 import { LoadingSpinner } from '../../components/ui/Loading';
 import { Modal } from '../../components/ui/Modal';
 import { Input } from '../../components/ui/Input';
+import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
+import { useLanguage } from '../../contexts/LanguageContext';
 import { citiesApi } from '../../api/cities';
 import type { City, CityCreate } from '../../types/api';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 export function AdminCitiesPage() {
   const queryClient = useQueryClient();
+  const { t } = useLanguage();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCity, setEditingCity] = useState<City | null>(null);
+  const [deleteCityId, setDeleteCityId] = useState<number | null>(null);
   const [formData, setFormData] = useState<CityCreate>({
     name: '',
     country: '',
@@ -43,6 +47,7 @@ export function AdminCitiesPage() {
     mutationFn: citiesApi.delete,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cities'] });
+      setDeleteCityId(null);
     },
   });
 
@@ -73,18 +78,22 @@ export function AdminCitiesPage() {
   };
 
   const handleDelete = (id: number) => {
-    if (confirm('Ar tikrai norite ištrinti šį miestą?')) {
-      deleteMutation.mutate(id);
+    setDeleteCityId(id);
+  };
+
+  const confirmDelete = () => {
+    if (deleteCityId) {
+      deleteMutation.mutate(deleteCityId);
     }
   };
 
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">Miestai</h2>
+        <h2 className="text-xl font-semibold">{t('cities')}</h2>
         <Button onClick={() => handleOpenModal()}>
           <PlusIcon className="h-5 w-5 mr-2" />
-          Pridėti miestą
+          {t('addCity')}
         </Button>
       </div>
 
@@ -115,24 +124,24 @@ export function AdminCitiesPage() {
         </div>
       ) : (
         <Card className="p-12 text-center">
-          <p className="text-gray-600">Nerasta miestų</p>
+          <p className="text-gray-600">{t('noCitiesFound')}</p>
         </Card>
       )}
 
       <Modal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
-        title={editingCity ? 'Redaguoti miestą' : 'Pridėti miestą'}
+        title={editingCity ? t('editCity') : t('addCity')}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
-            label="Pavadinimas"
+            label={t('city')}
             value={formData.name}
             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
           />
           <Input
-            label="Šalis (kodas)"
+            label="Country code"
             value={formData.country}
             onChange={(e) => setFormData({ ...formData, country: e.target.value })}
             required
@@ -141,14 +150,25 @@ export function AdminCitiesPage() {
           />
           <div className="flex justify-end space-x-3 pt-4">
             <Button type="button" variant="secondary" onClick={handleCloseModal}>
-              Atšaukti
+              {t('cancel')}
             </Button>
             <Button type="submit" isLoading={createMutation.isPending || updateMutation.isPending}>
-              {editingCity ? 'Išsaugoti' : 'Pridėti'}
+              {editingCity ? t('save') : t('add')}
             </Button>
           </div>
         </form>
       </Modal>
+      
+      <ConfirmDialog
+        isOpen={deleteCityId !== null}
+        onClose={() => setDeleteCityId(null)}
+        onConfirm={confirmDelete}
+        title={t('delete')}
+        message={t('confirmDeleteCity')}
+        confirmText={t('delete')}
+        cancelText={t('cancel')}
+        isLoading={deleteMutation.isPending}
+      />
     </div>
   );
 }
