@@ -219,17 +219,19 @@ export function CarDetailPage() {
                 <h1 className="text-3xl font-bold text-gray-900">
                   {car.make} {car.model}
                 </h1>
-                <span
-                  className={`px-3 py-1 rounded-full text-sm font-medium ${
-                    car.state === 'AVAILABLE'
-                      ? 'bg-green-100 text-green-800'
-                      : car.state === 'LEASED'
-                      ? 'bg-yellow-100 text-yellow-800'
-                      : 'bg-red-100 text-red-800'
-                  }`}
-                >
-                  {car.state === 'AVAILABLE' ? t('available') : car.state === 'LEASED' ? t('leased') : t('maintenance')}
-                </span>
+                {role === 'ADMIN' && (
+                  <span
+                    className={`px-3 py-1 rounded-full text-sm font-medium ${
+                      car.state === 'AVAILABLE'
+                        ? 'bg-green-100 text-green-800'
+                        : car.state === 'LEASED'
+                        ? 'bg-yellow-100 text-yellow-800'
+                        : 'bg-red-100 text-red-800'
+                    }`}
+                  >
+                    {car.state === 'AVAILABLE' ? t('available') : car.state === 'LEASED' ? t('leased') : t('maintenance')}
+                  </span>
+                )}
               </div>
               <p className="text-xl text-gray-600">{car.year} m.</p>
             </div>

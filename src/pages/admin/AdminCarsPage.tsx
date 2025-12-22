@@ -71,6 +71,8 @@ export function AdminCarsPage() {
     setSortBy('');
   };
 
+  const hasActiveFilters = searchTerm || cityFilter || stateFilter || sortBy;
+
   const paginatedCars = useMemo(() => {
     const carsPerRow = 3; // Grid has 3 columns
     const totalCars = rowsPerPage === -1 ? filteredAndSortedCars.length : rowsPerPage * carsPerRow;
@@ -112,15 +114,17 @@ export function AdminCarsPage() {
             <FunnelIcon className="h-5 w-5 text-gray-500 mr-2" />
             <h3 className="text-lg font-semibold">{t('filters')}</h3>
           </div>
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={handleResetFilters}
-            className="text-gray-600 hover:text-gray-900"
-          >
-            <XMarkIcon className="h-4 w-4 mr-1" />
-            {t('resetFilters')}
-          </Button>
+          {hasActiveFilters && (
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              onClick={handleResetFilters}
+              className="text-gray-600 hover:text-gray-900"
+            >
+              <XMarkIcon className="h-4 w-4 mr-1" />
+              {t('resetFilters')}
+            </Button>
+          )}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Input
@@ -444,9 +448,9 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
             options={carYears.map(y => String(y))}
             required 
           />
-          <Input label={t('pricePerDayField')} type="number" value={formData.pricePerDay} onChange={(e) => setFormData({ ...formData, pricePerDay: e.target.value })} required />
+          <Input label={t('pricePerDayField')} type="number" value={formData.pricePerDay || ''} onChange={(e) => setFormData({ ...formData, pricePerDay: e.target.value })} required />
           <Select label={t('city')} value={formData.cityId} onChange={(e) => setFormData({ ...formData, cityId: Number(e.target.value) })} options={cities.map(c => ({ value: c.id, label: c.name }))} />
-          <Input label={t('seatsCount')} type="number" value={formData.seatCount} onChange={(e) => setFormData({ ...formData, seatCount: e.target.value })} />
+          <Input label={t('seatsCount')} type="number" value={formData.seatCount || ''} onChange={(e) => setFormData({ ...formData, seatCount: e.target.value })} />
           <Select label={t('fuel')} value={formData.fuelType} onChange={(e) => setFormData({ ...formData, fuelType: e.target.value as any })} options={[
             { value: 'PETROL', label: t('petrol') },
             { value: 'DIESEL', label: t('diesel') },
@@ -454,7 +458,7 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
             { value: 'HYBRID_HEV', label: t('hybridHev') },
             { value: 'HYBRID_PHEV', label: t('hybridPhev') },
           ]} />
-          <Input label={t('power')} type="number" value={formData.powerKW} onChange={(e) => setFormData({ ...formData, powerKW: e.target.value })} required />
+          <Input label={t('power')} type="number" value={formData.powerKW || ''} onChange={(e) => setFormData({ ...formData, powerKW: e.target.value })} required />
           <Input label={t('engineCapacity')} type="number" step="0.1" value={formData.engineCapacityL || ''} onChange={(e) => setFormData({ ...formData, engineCapacityL: e.target.value })} />
           <Select label={t('bodyTypeField')} value={formData.bodyType} onChange={(e) => setFormData({ ...formData, bodyType: e.target.value as any })} options={[
             { value: 'SEDAN', label: t('sedan') },
@@ -471,7 +475,7 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
             { value: 'LEASED', label: t('leased') },
             { value: 'MAINTENANCE', label: t('maintenance') },
           ]} />
-          <Input label={t('mileage')} type="number" value={formData.odometerKm} onChange={(e) => setFormData({ ...formData, odometerKm: e.target.value })} />
+          <Input label={t('mileage')} type="number" value={formData.odometerKm || ''} onChange={(e) => setFormData({ ...formData, odometerKm: e.target.value })} />
         </div>
         <div className="flex justify-end space-x-3 pt-4">
           <Button type="button" variant="secondary" onClick={onClose}>{t('cancel')}</Button>

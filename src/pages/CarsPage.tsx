@@ -8,6 +8,7 @@ import { Select } from '../components/ui/Select';
 import { LoadingSpinner } from '../components/ui/Loading';
 import { Button } from '../components/ui/Button';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 import { getFuelTypeKey, getGearboxKey } from '../lib/translationHelpers';
 import { carsApi } from '../api/cars';
 import { citiesApi } from '../api/cities';
@@ -22,6 +23,7 @@ import {
 export function CarsPage() {
   const [searchParams] = useSearchParams();
   const { t } = useLanguage();
+  const { role } = useAuth();
   const [selectedCity, setSelectedCity] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [fuelFilter, setFuelFilter] = useState<string>('');
@@ -274,9 +276,11 @@ export function CarsPage() {
                       <h3 className="text-xl font-semibold">
                         {car.make} {car.model}
                       </h3>
-                      <span className="text-sm px-2 py-1 bg-green-100 text-green-800 rounded">
-                        {t('available')}
-                      </span>
+                      {role === 'ADMIN' && (
+                        <span className="text-sm px-2 py-1 bg-green-100 text-green-800 rounded">
+                          {t('available')}
+                        </span>
+                      )}
                     </div>
                     <p className="text-gray-600 mb-4">{car.year} {t('year')}</p>
                     

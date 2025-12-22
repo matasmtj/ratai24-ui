@@ -333,7 +333,7 @@ export function AdminContractDetailModal({
               type="number"
               value={completeFormData.mileageEndKm || ''}
               onChange={(e) => {
-                const val = e.target.value === '' ? contract.mileageStartKm : parseInt(e.target.value);
+                const val = e.target.value === '' ? '' : parseInt(e.target.value);
                 setCompleteFormData({ ...completeFormData, mileageEndKm: val });
               }}
               min={contract.mileageStartKm}
@@ -357,10 +357,10 @@ export function AdminContractDetailModal({
             <Input
               label={t('fuelLevelEnd')}
               type="number"
-              value={completeFormData.fuelLevelEndPct || ''}
+              value={completeFormData.fuelLevelEndPct ?? ''}
               onChange={(e) => {
-                const val = e.target.value === '' ? 100 : parseInt(e.target.value);
-                setCompleteFormData({ ...completeFormData, fuelLevelEndPct: Math.max(0, Math.min(100, val)) });
+                const val = e.target.value === '' ? '' : Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
+                setCompleteFormData({ ...completeFormData, fuelLevelEndPct: val });
               }}
               min={0}
               max={100}
@@ -396,8 +396,8 @@ export function AdminContractDetailModal({
               <Input
                 label={t('damageFee')}
                 type="number"
-                value={completeFormData.damageFee || 0}
-                onChange={(e) => setCompleteFormData({ ...completeFormData, damageFee: parseFloat(e.target.value) || 0 })}
+                value={completeFormData.damageFee ?? ''}
+                onChange={(e) => setCompleteFormData({ ...completeFormData, damageFee: e.target.value === '' ? 0 : parseFloat(e.target.value) })}
                 min={0}
                 step={0.01}
               />
