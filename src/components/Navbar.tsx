@@ -94,12 +94,20 @@ export function Navbar() {
             {isAuthenticated ? (
               <>
                 {role === 'USER' && (
-                  <Link to="/dashboard">
-                    <Button variant="ghost" size="sm">
-                      <DocumentTextIcon className="h-5 w-5 mr-1" />
-                      {t('myReservations')}
-                    </Button>
-                  </Link>
+                  <>
+                    <Link to="/dashboard">
+                      <Button variant="ghost" size="sm">
+                        <DocumentTextIcon className="h-5 w-5 mr-1" />
+                        {t('myReservations')}
+                      </Button>
+                    </Link>
+                    <Link to="/profile">
+                      <Button variant="ghost" size="sm">
+                        <UserCircleIcon className="h-5 w-5 mr-1" />
+                        {t('myProfile')}
+                      </Button>
+                    </Link>
+                  </>
                 )}
                 {role === 'ADMIN' && (
                   <Link to="/admin">

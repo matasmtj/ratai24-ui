@@ -1,19 +1,26 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { ReCaptcha, type ReCaptchaHandle } from '../components/ui/ReCaptcha';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
 import { UserPlusIcon } from '@heroicons/react/24/outline';
 
 export function RegisterPage() {
   const navigate = useNavigate();
   const { register } = useAuth();
+  const { t } = useLanguage();
+  const recaptchaRef = useRef<ReCaptchaHandle>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     confirmPassword: '',
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -23,12 +30,24 @@ export function RegisterPage() {
     setError('');
 
     if (formData.password !== formData.confirmPassword) {
-      setError('Slaptažodžiai nesutampa');
+      setError(t('passwordsDontMatch'));
       return;
     }
 
     if (formData.password.length < 8) {
-      setError('Slaptažodis turi būti bent 8 simbolių');
+      setError(t('minPasswordLength'));
+      return;
+    }
+
+    if (!formData.phoneNumber.trim()) {
+      setError(t('phoneRequired'));
+      return;
+    }
+
+    // Verify reCAPTCHA
+    const recaptchaToken = recaptchaRef.current?.getValue();
+    if (!recaptchaToken) {
+      setError(t('completeRecaptcha'));
       return;
     }
 
@@ -38,12 +57,16 @@ export function RegisterPage() {
       await register({
         email: formData.email,
         password: formData.password,
+        firstName: formData.firstName || undefined,
+        lastName: formData.lastName || undefined,
+        phoneNumber: formData.phoneNumber,
       });
       
-      alert('Registracija sėkminga! Dabar galite prisijungti.');
+      alert(t('profileUpdated'));
       navigate('/login');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Registracija nepavyko. Bandykite dar kartą.');
+      setError(err.response?.data?.error || t('profileUpdateFailed'));
+      recaptchaRef.current?.reset();
     } finally {
       setIsLoading(false);
     }
@@ -57,8 +80,8 @@ export function RegisterPage() {
             <div className="flex justify-center mb-4">
               <UserPlusIcon className="h-12 w-12 text-primary-600" />
             </div>
-            <h1 className="text-2xl font-bold text-gray-900">Registruotis</h1>
-            <p className="text-gray-600 mt-2">Sukurkite naują paskyrą</p>
+            <h1 className="text-2xl font-bold text-gray-900">{t('registerTitle')}</h1>
+            <p className="text-gray-600 mt-2">{t('registerSubtitle')}</p>
           </div>
 
           {error && (
@@ -69,7 +92,7 @@ export function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
-              label="El. paštas"
+              label={t('email')}
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -77,31 +100,55 @@ export function RegisterPage() {
               placeholder="jusu@pastas.lt"
             />
             <Input
-              label="Slaptažodis"
+              label={t('firstName')}
+              value={formData.firstName}
+              onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+              placeholder={t('firstName')}
+            />
+            <Input
+              label={t('lastName')}
+              value={formData.lastName}
+              onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+              placeholder={t('lastName')}
+            />
+            <Input
+              label={t('phoneNumber')}
+              type="tel"
+              value={formData.phoneNumber}
+              onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+              required
+              placeholder="+370..."
+            />
+            <Input
+              label={t('password')}
               type="password"
               value={formData.password}
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
-              placeholder="Bent 8 simboliai"
+              placeholder={t('minPasswordLength')}
             />
             <Input
-              label="Patvirtinti slaptažodį"
+              label={t('confirmPassword')}
               type="password"
               value={formData.confirmPassword}
               onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
               required
             />
 
+            <div className="pt-2">
+              <ReCaptcha ref={recaptchaRef} />
+            </div>
+
             <Button type="submit" className="w-full" isLoading={isLoading}>
-              Registruotis
+              {t('register')}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">
-              Jau turite paskyrą?{' '}
+              {t('haveAccount')}{' '}
               <Link to="/login" className="text-primary-600 hover:text-primary-700 font-medium">
-                Prisijungti
+                {t('login')}
               </Link>
             </p>
           </div>

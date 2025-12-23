@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { ReCaptcha, type ReCaptchaHandle } from '../components/ui/ReCaptcha';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
@@ -12,6 +13,7 @@ export function LoginPage() {
   const navigate = useNavigate();
   const { login } = useAuth();
   const { t } = useLanguage();
+  const recaptchaRef = useRef<ReCaptchaHandle>(null);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -22,6 +24,14 @@ export function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+
+    // Verify reCAPTCHA
+    const recaptchaToken = recaptchaRef.current?.getValue();
+    if (!recaptchaToken) {
+      setError(t('completeRecaptcha'));
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -29,6 +39,7 @@ export function LoginPage() {
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Prisijungimas nepavyko. Patikrinkite įvestus duomenis.');
+      recaptchaRef.current?.reset();
     } finally {
       setIsLoading(false);
     }
@@ -68,6 +79,10 @@ export function LoginPage() {
               onChange={(e) => setFormData({ ...formData, password: e.target.value })}
               required
             />
+
+            <div className="pt-2">
+              <ReCaptcha ref={recaptchaRef} />
+            </div>
 
             <Button type="submit" className="w-full" isLoading={isLoading}>
               {t('login')}

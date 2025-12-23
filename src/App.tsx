@@ -11,11 +11,13 @@ import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ContactsPage } from './pages/ContactsPage';
 import { UserDashboard } from './pages/UserDashboard';
+import { UserProfilePage } from './pages/UserProfilePage';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminCitiesPage } from './pages/admin/AdminCitiesPage';
 import { AdminCarsPage } from './pages/admin/AdminCarsPage';
 import { AdminContractsPage } from './pages/admin/AdminContractsPage';
 import { AdminContactsPage } from './pages/AdminContactsPage';
+import { AdminUsersPage } from './pages/admin/AdminUsersPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -50,6 +52,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute requiredRole="USER">
+                  <UserProfilePage />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Admin Routes */}
             <Route
@@ -65,6 +75,7 @@ function App() {
               <Route path="cars" element={<AdminCarsPage />} />
               <Route path="contracts" element={<AdminContractsPage />} />
               <Route path="contacts" element={<AdminContactsPage />} />
+              <Route path="users" element={<AdminUsersPage />} />
             </Route>
 
             {/* Catch all */}

@@ -77,7 +77,38 @@ export interface CarCreate {
 export interface User {
   id: number;
   email: string;
+  firstName: string | null;
+  lastName: string | null;
+  phoneNumber: string | null;
   role: UserRole;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface UserUpdate {
+  email?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  phoneNumber?: string | null;
+  password?: string;
+}
+
+export interface UserCreate {
+  email: string;
+  password: string;
+  firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+  role?: UserRole;
+}
+
+export interface UserAdminUpdate {
+  email?: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  phoneNumber?: string | null;
+  password?: string;
+  role?: UserRole;
 }
 
 // Contract
