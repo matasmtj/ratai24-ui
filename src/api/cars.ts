@@ -63,4 +63,9 @@ export const carsApi = {
     const response = await api.delete(`/cars/${carId}/images/${imageId}`);
     return response.data;
   },
+
+  reorderImages: async (carId: number, imageIds: number[]): Promise<{ message: string; images: CarImage[] }> => {
+    const response = await api.put(`/cars/${carId}/images/reorder`, { imageIds });
+    return response.data;
+  },
 };

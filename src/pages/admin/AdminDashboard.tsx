@@ -20,7 +20,7 @@ export function AdminDashboard() {
     { name: t('contracts'), href: '/admin/contracts', icon: DocumentTextIcon },
     { name: t('cities'), href: '/admin/cities', icon: MapPinIcon },
     { name: t('contacts'), href: '/admin/contacts', icon: PhoneIcon },
-    { name: 'Users', href: '/admin/users', icon: UsersIcon },
+    { name: t('users'), href: '/admin/users', icon: UsersIcon },
   ];
 
   return (

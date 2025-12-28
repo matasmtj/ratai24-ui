@@ -8,17 +8,20 @@ import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
+import { ImageLightbox } from '../../components/ui/ImageLightbox';
 import { carMakes, carModels, carYears } from '../../data/carData';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { carsApi } from '../../api/cars';
 import { citiesApi } from '../../api/cities';
 import type { Car, CarCreate } from '../../types/api';
-import { PlusIcon, PencilIcon, TrashIcon, TruckIcon, PhotoIcon, FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, PencilIcon, TrashIcon, TruckIcon, PhotoIcon, FunnelIcon, XMarkIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { CarImagesManager } from '../../components/admin/CarImagesManager';
+import { useNavigate } from 'react-router-dom';
 
 export function AdminCarsPage() {
   const queryClient = useQueryClient();
   const { t } = useLanguage();
+  const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCar, setEditingCar] = useState<Car | null>(null);
   const [imagesModalCarId, setImagesModalCarId] = useState<number | null>(null);
@@ -28,6 +31,8 @@ export function AdminCarsPage() {
   const [stateFilter, setStateFilter] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('');
   const [rowsPerPage, setRowsPerPage] = useState<number>(3); // 3 rows x 3 columns = 9 cars
+  const [lightboxCarId, setLightboxCarId] = useState<number | null>(null);
+  const [lightboxImageIndex, setLightboxImageIndex] = useState(0);
 
   const { data: cities } = useQuery({
     queryKey: ['cities'],
@@ -204,7 +209,13 @@ export function AdminCarsPage() {
             
             return (
             <Card key={car.id} className="overflow-hidden">
-              <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
+              <div 
+                className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative cursor-pointer"
+                onClick={() => {
+                  setLightboxCarId(car.id);
+                  setLightboxImageIndex(0);
+                }}
+              >
                 {mainImage ? (
                   <img 
                     src={mainImage.url} 
@@ -234,7 +245,20 @@ export function AdminCarsPage() {
                   </span>
                 </div>
                 <div className="flex space-x-2">
-                  <Button size="sm" variant="ghost" className="flex-1" onClick={() => {
+                  <Button 
+                    size="sm" 
+                    variant="ghost" 
+                    className="flex-1"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/cars/${car.id}`);
+                    }}
+                    title={t('view')}
+                  >
+                    <EyeIcon className="h-4 w-4" />
+                  </Button>
+                  <Button size="sm" variant="ghost" className="flex-1" onClick={(e) => {
+                    e.stopPropagation();
                     setEditingCar(car);
                     setIsModalOpen(true);
                   }}>
@@ -244,11 +268,17 @@ export function AdminCarsPage() {
                     size="sm" 
                     variant="ghost" 
                     className="flex-1"
-                    onClick={() => setImagesModalCarId(car.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setImagesModalCarId(car.id);
+                    }}
                   >
                     <PhotoIcon className="h-4 w-4" />
                   </Button>
-                  <Button size="sm" variant="ghost" onClick={() => handleDelete(car.id)}>
+                  <Button size="sm" variant="ghost" onClick={(e) => {
+                    e.stopPropagation();
+                    handleDelete(car.id);
+                  }}>
                     <TrashIcon className="h-4 w-4 text-red-600" />
                   </Button>
                 </div>
@@ -280,6 +310,19 @@ export function AdminCarsPage() {
           onClose={() => setImagesModalCarId(null)}
         />
       )}
+      
+      {/* Image Lightbox */}
+      {lightboxCarId && (() => {
+        const lightboxCar = cars?.find(c => c.id === lightboxCarId);
+        return lightboxCar?.images && lightboxCar.images.length > 0 ? (
+          <ImageLightbox
+            images={lightboxCar.images}
+            initialIndex={lightboxImageIndex}
+            isOpen={true}
+            onClose={() => setLightboxCarId(null)}
+          />
+        ) : null;
+      })()}
       
       <ConfirmDialog
         isOpen={deleteCarId !== null}

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { carsApi } from '../../api/cars';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
 import { LoadingSpinner } from '../ui/Loading';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
+import { ImageLightbox } from '../ui/ImageLightbox';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { PhotoIcon, TrashIcon, StarIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
@@ -21,11 +22,30 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
   const [deleteImageId, setDeleteImageId] = useState<number | null>(null);
+  const [lightboxImageIndex, setLightboxImageIndex] = useState<number | null>(null);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [localImages, setLocalImages] = useState<typeof images>([]);
 
   const { data: imagesData, isLoading } = useQuery({
     queryKey: ['car-images', carId],
     queryFn: () => carsApi.getImages(carId),
     enabled: isOpen,
+  });
+
+  const images = imagesData?.images || [];
+
+  // Update local images when data changes
+  useEffect(() => {
+    setLocalImages(images);
+  }, [images]);
+
+  const reorderMutation = useMutation({
+    mutationFn: (imageIds: number[]) => carsApi.reorderImages(carId, imageIds),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['car-images', carId] });
+      queryClient.invalidateQueries({ queryKey: ['cars'] });
+      queryClient.invalidateQueries({ queryKey: ['car', carId] });
+    },
   });
 
   const uploadMutation = useMutation({
@@ -110,7 +130,53 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
     }
   };
 
-  const images = imagesData?.images || [];
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index);
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === index) return;
+    
+    const newImages = [...localImages];
+    const draggedImage = newImages[draggedIndex];
+    newImages.splice(draggedIndex, 1);
+    newImages.splice(index, 0, draggedImage);
+    
+    setLocalImages(newImages);
+    setDraggedIndex(index);
+  };
+
+  const handleDragEnd = () => {
+    if (draggedIndex !== null) {
+      const imageIds = localImages.map(img => img.id);
+      reorderMutation.mutate(imageIds);
+      // Set first image as main automatically
+      if (localImages.length > 0 && !localImages[0].isMain) {
+        setMainMutation.mutate(localImages[0].id);
+      }
+    }
+    setDraggedIndex(null);
+  };
+
+  const moveImage = (index: number, direction: 'left' | 'right') => {
+    const newIndex = direction === 'left' ? index - 1 : index + 1;
+    if (newIndex < 0 || newIndex >= localImages.length) return;
+    
+    const newImages = [...localImages];
+    const temp = newImages[index];
+    newImages[index] = newImages[newIndex];
+    newImages[newIndex] = temp;
+    
+    setLocalImages(newImages);
+    const imageIds = newImages.map(img => img.id);
+    reorderMutation.mutate(imageIds);
+    
+    // Set first image as main automatically
+    if (newImages.length > 0 && !newImages[0].isMain) {
+      setMainMutation.mutate(newImages[0].id);
+    }
+  };
 
   return (
     <>
@@ -183,18 +249,64 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
             <p className="text-center text-gray-500 py-8">{t('noImagesUploaded')}</p>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {images.map((image) => (
-                <div key={image.id} className="relative group">
-                  <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+              {localImages.map((image, index) => (
+                <div 
+                  key={image.id} 
+                  className="relative group"
+                  draggable
+                  onDragStart={() => handleDragStart(index)}
+                  onDragOver={(e) => handleDragOver(e, index)}
+                  onDragEnd={handleDragEnd}
+                >
+                  <div 
+                    className="aspect-video bg-gray-100 rounded-lg overflow-hidden cursor-move"
+                    onClick={() => setLightboxImageIndex(index)}
+                  >
                     <img
                       src={image.url}
                       alt={`Car image ${image.id}`}
                       className="w-full h-full object-cover"
                     />
                   </div>
+                  
+                  {/* Arrow buttons for reordering */}
+                  <div className="absolute top-2 left-2 flex gap-1">
+                    {index > 0 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          moveImage(index, 'left');
+                        }}
+                        className="p-1.5 rounded-full bg-white/90 text-gray-700 hover:bg-primary-500 hover:text-white transition-colors"
+                        title={t('moveLeft')}
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                      </button>
+                    )}
+                    {index < localImages.length - 1 && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          moveImage(index, 'right');
+                        }}
+                        className="p-1.5 rounded-full bg-white/90 text-gray-700 hover:bg-primary-500 hover:text-white transition-colors"
+                        title={t('moveRight')}
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
+
                   <div className="absolute top-2 right-2 flex gap-1">
                     <button
-                      onClick={() => handleSetMain(image.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleSetMain(image.id);
+                      }}
                       className={`p-1.5 rounded-full ${
                         image.isMain
                           ? 'bg-yellow-500 text-white'
@@ -209,14 +321,17 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
                       )}
                     </button>
                     <button
-                      onClick={() => handleDelete(image.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(image.id);
+                      }}
                       className="p-1.5 rounded-full bg-white/90 text-red-600 hover:bg-red-600 hover:text-white transition-colors"
                       title={t('deleteImage')}
                     >
                       <TrashIcon className="h-4 w-4" />
                     </button>
                   </div>
-                  {image.isMain && (
+                  {index === 0 && (
                     <div className="absolute bottom-2 left-2 px-2 py-1 bg-yellow-500 text-white text-xs font-semibold rounded">
                       {t('mainImage')}
                     </div>
@@ -228,6 +343,16 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
         </div>
       </div>
     </Modal>
+    
+    {/* Image Lightbox */}
+    {lightboxImageIndex !== null && images.length > 0 && (
+      <ImageLightbox
+        images={images}
+        initialIndex={lightboxImageIndex}
+        isOpen={true}
+        onClose={() => setLightboxImageIndex(null)}
+      />
+    )}
     
     <ConfirmDialog
       isOpen={deleteImageId !== null}

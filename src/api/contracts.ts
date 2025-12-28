@@ -7,7 +7,6 @@ export const contractsApi = {
     console.log('contractsApi.getAll - Making request to /contracts');
     try {
       const response = await api.get<Contract[]>('/contracts');
-      console.log('contractsApi.getAll - Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('contractsApi.getAll - Error:', error);
@@ -20,7 +19,6 @@ export const contractsApi = {
     console.log('contractsApi.getMy - Making request to /contracts/my');
     try {
       const response = await api.get<Contract[]>('/contracts/my');
-      console.log('contractsApi.getMy - Response:', response.data);
       return response.data;
     } catch (error) {
       console.error('contractsApi.getMy - Error:', error);

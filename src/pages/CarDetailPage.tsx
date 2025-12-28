@@ -6,6 +6,7 @@ import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { LoadingPage } from '../components/ui/Loading';
 import { DateTimePicker } from '../components/ui/DateTimePicker';
+import { ImageLightbox } from '../components/ui/ImageLightbox';
 import { carsApi } from '../api/cars';
 import { citiesApi } from '../api/cities';
 import { useAuth } from '../contexts/AuthContext';
@@ -33,6 +34,7 @@ export function CarDetailPage() {
   const { isAuthenticated, role } = useAuth();
   const [isBookingModalOpen, setIsBookingModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [bookingData, setBookingData] = useState({
     startDate: '',
     startTime: '09',
@@ -151,7 +153,7 @@ export function CarDetailPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Car Image Gallery */}
           <div>
-            <Card className="overflow-hidden relative">
+            <Card className="overflow-hidden relative cursor-pointer" onClick={() => setIsLightboxOpen(true)}>
               <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                 {currentImage ? (
                   <img 
@@ -166,13 +168,19 @@ export function CarDetailPage() {
               {carImages.length > 1 && (
                 <>
                   <button
-                    onClick={previousImage}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      previousImage();
+                    }}
                     className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-colors"
                   >
                     <ChevronLeftIcon className="h-6 w-6 text-gray-800" />
                   </button>
                   <button
-                    onClick={nextImage}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      nextImage();
+                    }}
                     className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-colors"
                   >
                     <ChevronRightIcon className="h-6 w-6 text-gray-800" />
@@ -181,7 +189,10 @@ export function CarDetailPage() {
                     {carImages.map((_, index) => (
                       <button
                         key={index}
-                        onClick={() => setCurrentImageIndex(index)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setCurrentImageIndex(index);
+                        }}
                         className={`w-2 h-2 rounded-full transition-colors ${
                           index === currentImageIndex ? 'bg-white' : 'bg-white/50'
                         }`}
@@ -196,7 +207,10 @@ export function CarDetailPage() {
                 {carImages.slice(0, 5).map((image, index) => (
                   <button
                     key={image.id}
-                    onClick={() => setCurrentImageIndex(index)}
+                    onClick={() => {
+                      setCurrentImageIndex(index);
+                      setIsLightboxOpen(true);
+                    }}
                     className={`aspect-video rounded-lg overflow-hidden border-2 transition-colors ${
                       index === currentImageIndex ? 'border-primary-600' : 'border-gray-200 hover:border-gray-300'
                     }`}
@@ -378,6 +392,14 @@ export function CarDetailPage() {
           </div>
         </form>
       </Modal>
+
+      {/* Image Lightbox */}
+      <ImageLightbox
+        images={carImages}
+        initialIndex={currentImageIndex}
+        isOpen={isLightboxOpen}
+        onClose={() => setIsLightboxOpen(false)}
+      />
     </Layout>
   );
 }

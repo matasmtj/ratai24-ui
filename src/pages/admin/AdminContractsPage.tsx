@@ -8,6 +8,7 @@ import { LoadingSpinner } from '../../components/ui/Loading';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { contractsApi } from '../../api/contracts';
 import { carsApi } from '../../api/cars';
+import { usersApi } from '../../api/users';
 import { format } from 'date-fns';
 import { CheckCircleIcon, XCircleIcon, FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { AdminContractDetailModal } from '../../components/admin/AdminContractDetailModal';
@@ -221,15 +222,23 @@ function ContractCard({
   onClickContract: (contract: any) => void;
   t: (key: any) => string;
 }) {
-  const { data: car } = useQuery({
+  const { data: car, isError: carError } = useQuery({
     queryKey: ['car', contract.carId],
     queryFn: () => carsApi.getById(contract.carId),
+    retry: false,
+  });
+
+  const { data: user, isError: userError } = useQuery({
+    queryKey: ['user', contract.userId],
+    queryFn: () => usersApi.getById(contract.userId),
+    enabled: !!contract.userId,
+    retry: false,
   });
 
   return (
     <Card 
       className="p-6 cursor-pointer hover:shadow-lg transition-shadow"
-      onClick={() => onClickContract({ ...contract, car })}
+      onClick={() => onClickContract({ ...contract, car, user })}
     >
       <div className="flex justify-between items-start">
         <div className="flex-1">
@@ -243,8 +252,17 @@ function ContractCard({
             </span>
           </div>
           <div className="text-sm text-gray-600 space-y-1">
-            <div>{t('carLabel')}: {car ? `${car.make} ${car.model}` : `#${contract.carId}`}</div>
-            <div>{t('userLabel')}: #{contract.userId}</div>
+            <div>
+              {t('carLabel')}: {car ? `${car.make} ${car.model}` : carError ? <span className="text-red-600 italic">(Deleted Car #{contract.carId})</span> : `#${contract.carId}`}
+            </div>
+            <div>
+              {t('userLabel')}: #{contract.userId}
+              {user?.email ? (
+                <span className="ml-2 text-gray-800 font-medium">({user.email})</span>
+              ) : userError ? (
+                <span className="ml-2 text-red-600 italic">(Deleted User)</span>
+              ) : null}
+            </div>
             <div>
               {t('datesLabel')}: {format(new Date(contract.startDate), 'yyyy-MM-dd HH:mm')} -{' '}
               {format(new Date(contract.endDate), 'yyyy-MM-dd HH:mm')}

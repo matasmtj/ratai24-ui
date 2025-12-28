@@ -52,6 +52,7 @@ export interface Car {
   gearbox: Gearbox;
   state: CarState;
   odometerKm: number;
+  isActive?: boolean;
   images?: CarImage[];
 }
 
@@ -79,8 +80,10 @@ export interface User {
   email: string;
   firstName: string | null;
   lastName: string | null;
+  phone: string | null;
   phoneNumber: string | null;
   role: UserRole;
+  isActive?: boolean;
   createdAt: string;
   updatedAt: string;
 }

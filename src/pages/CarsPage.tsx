@@ -259,51 +259,51 @@ export function CarsPage() {
                 const mainImage = car.images?.find(img => img.isMain);
                 
                 return (
-                <Card key={car.id} hover className="overflow-hidden">
-                  <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                    {mainImage ? (
-                      <img 
-                        src={mainImage.url} 
-                        alt={`${car.make} ${car.model}`}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <TruckIcon className="h-24 w-24 text-gray-400" />
-                    )}
-                  </div>
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-xl font-semibold">
-                        {car.make} {car.model}
-                      </h3>
-                      {role === 'ADMIN' && (
-                        <span className="text-sm px-2 py-1 bg-green-100 text-green-800 rounded">
-                          {t('available')}
-                        </span>
+                <Link key={car.id} to={`/cars/${car.id}`} className="block">
+                  <Card hover className="overflow-hidden h-full">
+                    <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                      {mainImage ? (
+                        <img 
+                          src={mainImage.url} 
+                          alt={`${car.make} ${car.model}`}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <TruckIcon className="h-24 w-24 text-gray-400" />
                       )}
                     </div>
-                    <p className="text-gray-600 mb-4">{car.year} {t('year')}</p>
-                    
-                    <div className="space-y-1 mb-4 text-sm text-gray-600">
-                      <div>{t(getFuelTypeKey(car.fuelType) as any)}</div>
-                      <div>{t(getGearboxKey(car.gearbox) as any)}</div>
-                      <div>{car.powerKW} {t('kw')}</div>
-                      <div>{car.seatCount} {t('seats')}</div>
-                    </div>
-
-                    <div className="flex justify-between items-center pt-4 border-t">
-                      <div>
-                        <div className="text-sm text-gray-500">{t('pricePerDay')}</div>
-                        <div className="text-2xl font-bold text-primary-600">
-                          €{car.pricePerDay}
-                        </div>
+                    <div className="p-6">
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="text-xl font-semibold">
+                          {car.make} {car.model}
+                        </h3>
+                        {role === 'ADMIN' && (
+                          <span className="text-sm px-2 py-1 bg-green-100 text-green-800 rounded">
+                            {t('available')}
+                          </span>
+                        )}
                       </div>
-                      <Link to={`/cars/${car.id}`}>
-                        <Button size="sm">{t('view')}</Button>
-                      </Link>
+                      <p className="text-gray-600 mb-4">{car.year} {t('year')}</p>
+                      
+                      <div className="space-y-1 mb-4 text-sm text-gray-600">
+                        <div>{t(getFuelTypeKey(car.fuelType) as any)}</div>
+                        <div>{t(getGearboxKey(car.gearbox) as any)}</div>
+                        <div>{car.powerKW} {t('kw')}</div>
+                        <div>{car.seatCount} {t('seats')}</div>
+                      </div>
+
+                      <div className="flex justify-between items-center pt-4 border-t">
+                        <div>
+                          <div className="text-sm text-gray-500">{t('pricePerDay')}</div>
+                          <div className="text-2xl font-bold text-primary-600">
+                            €{car.pricePerDay}
+                          </div>
+                        </div>
+                        <Button size="sm" onClick={(e) => e.preventDefault()}>{t('view')}</Button>
+                      </div>
                     </div>
-                  </div>
-                </Card>
+                  </Card>
+                </Link>
               )})}
             </div>
           </>
