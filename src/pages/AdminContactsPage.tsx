@@ -4,9 +4,12 @@ import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { LoadingPage } from '../components/ui/Loading';
+import { Select } from '../components/ui/Select';
 import { useLanguage } from '../contexts/LanguageContext';
 import { contactsApi } from '../api/contacts';
-import type { ContactUpdate } from '../types/api';
+import { citiesApi } from '../api/cities';
+import type { ContactUpdate, OperationArea } from '../types/api';
+import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 export function AdminContactsPage() {
   const { t } = useLanguage();
@@ -15,7 +18,13 @@ export function AdminContactsPage() {
   const [formData, setFormData] = useState<ContactUpdate>({
     email: '',
     phone: '',
-    operationAreas: '',
+    operationAreas: [],
+  });
+
+  // Fetch cities for selection
+  const { data: cities } = useQuery({
+    queryKey: ['cities'],
+    queryFn: citiesApi.getAll,
   });
 
   const { data: contact, isLoading } = useQuery({
@@ -50,12 +59,20 @@ export function AdminContactsPage() {
     },
   });
 
-  const handleEdit = () => {
+  const handleEdit = (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
     if (contact) {
+      // Map backend operationAreasDetails to form format (operationAreas)
+      const operationAreas: OperationArea[] = (contact.operationAreasDetails || []).map(detail => ({
+        id: detail.id, // Preserve ID to prevent recreation
+        cityId: detail.cityId,
+        address: detail.address || ''
+      }));
       setFormData({
         email: contact.email,
         phone: contact.phone,
-        operationAreas: contact.operationAreas,
+        operationAreas,
       });
       setIsEditing(true);
     }
@@ -64,12 +81,42 @@ export function AdminContactsPage() {
   const handleCancel = () => {
     setIsEditing(false);
     if (contact) {
+      // Map backend operationAreasDetails to form format (operationAreas)
+      const operationAreas: OperationArea[] = (contact.operationAreasDetails || []).map(detail => ({
+        id: detail.id, // Preserve ID to prevent recreation
+        cityId: detail.cityId,
+        address: detail.address || ''
+      }));
       setFormData({
         email: contact.email,
         phone: contact.phone,
-        operationAreas: contact.operationAreas,
+        operationAreas,
       });
     }
+  };
+
+  const addOperationArea = () => {
+    setFormData({
+      ...formData,
+      operationAreas: [...formData.operationAreas, { cityId: 0, address: '' }],
+    });
+  };
+
+  const removeOperationArea = (index: number) => {
+    setFormData({
+      ...formData,
+      operationAreas: formData.operationAreas.filter((_, i) => i !== index),
+    });
+  };
+
+  const updateOperationArea = (index: number, field: 'cityId' | 'address', value: number | string) => {
+    const updated = [...formData.operationAreas];
+    if (field === 'cityId') {
+      updated[index] = { ...updated[index], cityId: value as number };
+    } else {
+      updated[index] = { ...updated[index], address: value as string };
+    }
+    setFormData({ ...formData, operationAreas: updated });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -114,18 +161,69 @@ export function AdminContactsPage() {
               />
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('operationAreas')}
-                </label>
-                <textarea
-                  className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-                  rows={3}
-                  value={formData.operationAreas}
-                  onChange={(e) => setFormData({ ...formData, operationAreas: e.target.value })}
-                  placeholder={t('operationAreasPlaceholder')}
-                  required
-                />
-                <p className="mt-1 text-sm text-gray-500">{t('operationAreasHelp')}</p>
+                <div className="flex items-center justify-between mb-2">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t('operationAreas')}
+                  </label>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={addOperationArea}
+                  >
+                    <PlusIcon className="h-4 w-4 mr-1" />
+                    {t('addArea')}
+                  </Button>
+                </div>
+
+                {formData.operationAreas.length === 0 ? (
+                  <div className="text-sm text-gray-500 text-center py-4 border-2 border-dashed border-gray-300 rounded-lg">
+                    {t('noOperationAreasYet')}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {formData.operationAreas.map((area, index) => (
+                      <Card key={index} className="p-4">
+                        <div className="flex gap-3">
+                          <div className="flex-1">
+                            <Select
+                              label={t('city')}
+                              value={area.cityId.toString()}
+                              onChange={(e) => updateOperationArea(index, 'cityId', parseInt(e.target.value))}
+                              options={[
+                                { value: '0', label: t('selectCity') },
+                                ...(cities || []).map(city => ({
+                                  value: city.id.toString(),
+                                  label: `${city.name}, ${city.country}`
+                                }))
+                              ]}
+                              required
+                            />
+                          </div>
+                          <div className="flex-1">
+                            <Input
+                              label={t('address') + ' (' + t('optional') + ')'}
+                              type="text"
+                              value={area.address || ''}
+                              onChange={(e) => updateOperationArea(index, 'address', e.target.value)}
+                              placeholder={t('addressPlaceholder')}
+                            />
+                          </div>
+                          <div className="flex items-end">
+                            <Button
+                              type="button"
+                              size="sm"
+                              variant="ghost"
+                              onClick={() => removeOperationArea(index)}
+                            >
+                              <TrashIcon className="h-4 w-4 text-red-600" />
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
 
@@ -169,19 +267,90 @@ export function AdminContactsPage() {
               />
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  {t('operationAreas')}
-                </label>
-                <textarea
-                  className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 disabled:bg-gray-50 disabled:text-gray-500"
-                  rows={3}
-                  value={isEditing ? formData.operationAreas : contact?.operationAreas || ''}
-                  onChange={(e) => setFormData({ ...formData, operationAreas: e.target.value })}
-                  disabled={!isEditing}
-                  placeholder={t('operationAreasPlaceholder')}
-                  required
-                />
-                <p className="mt-1 text-sm text-gray-500">{t('operationAreasHelp')}</p>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-medium text-gray-700">
+                    {t('operationAreas')}
+                  </label>
+                  {isEditing && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      onClick={addOperationArea}
+                    >
+                      <PlusIcon className="h-4 w-4 mr-1" />
+                      {t('addArea')}
+                    </Button>
+                  )}
+                </div>
+
+                {isEditing ? (
+                  formData.operationAreas.length === 0 ? (
+                    <div className="text-sm text-gray-500 py-4 text-center border-2 border-dashed border-gray-300 rounded-lg">
+                      {t('noOperationAreasYet')}
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {formData.operationAreas.map((area, index) => (
+                        <Card key={index} className="p-4">
+                          <div className="flex gap-3">
+                            <div className="flex-1">
+                              <Select
+                                label={t('city')}
+                                value={area.cityId.toString()}
+                                onChange={(e) => updateOperationArea(index, 'cityId', parseInt(e.target.value))}
+                                options={[
+                                  { value: '0', label: t('selectCity') },
+                                  ...(cities || []).map(city => ({
+                                    value: city.id.toString(),
+                                    label: `${city.name}, ${city.country}`
+                                  }))
+                                ]}
+                                required
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <Input
+                                label={t('address') + ' (' + t('optional') + ')'}
+                                type="text"
+                                value={area.address || ''}
+                                onChange={(e) => updateOperationArea(index, 'address', e.target.value)}
+                                placeholder={t('addressPlaceholder')}
+                              />
+                            </div>
+                            <div className="flex items-end">
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => removeOperationArea(index)}
+                              >
+                                <TrashIcon className="h-4 w-4 text-red-600" />
+                              </Button>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                    </div>
+                  )
+                ) : (
+                  <div className="space-y-2">
+                    {!contact?.operationAreasDetails || contact.operationAreasDetails.length === 0 ? (
+                      <div className="text-sm text-gray-500">{t('noOperationAreasYet')}</div>
+                    ) : (
+                      contact.operationAreasDetails.map((detail) => (
+                        <div key={detail.id} className="p-3 bg-gray-50 rounded-lg">
+                          <div className="font-medium text-gray-900">
+                            {detail.cityName}, {detail.country}
+                          </div>
+                          {detail.address && (
+                            <div className="text-sm text-gray-600 mt-1">{detail.address}</div>
+                          )}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                )}
               </div>
 
               {contact && (
@@ -193,7 +362,14 @@ export function AdminContactsPage() {
 
             <div className="mt-6 flex gap-3">
               {!isEditing ? (
-                <Button type="button" onClick={handleEdit}>
+                <Button 
+                  type="button" 
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleEdit();
+                  }}
+                >
                   {t('edit')}
                 </Button>
               ) : (

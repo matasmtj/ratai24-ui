@@ -4,6 +4,7 @@ import { Card } from '../components/ui/Card';
 import { LoadingPage } from '../components/ui/Loading';
 import { useLanguage } from '../contexts/LanguageContext';
 import { contactsApi } from '../api/contacts';
+import { citiesApi } from '../api/cities';
 import {
   EnvelopeIcon,
   PhoneIcon,
@@ -18,6 +19,11 @@ export function ContactsPage() {
     queryFn: contactsApi.get,
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     retry: 1,
+  });
+
+  const { data: allCities } = useQuery({
+    queryKey: ['cities'],
+    queryFn: citiesApi.getAll,
   });
 
   if (isLoading) return <LoadingPage />;
@@ -36,8 +42,6 @@ export function ContactsPage() {
     );
   }
 
-  const operationAreas = contact.operationAreas.split(',').map(area => area.trim()) || [];
-
   return (
     <Layout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -46,18 +50,15 @@ export function ContactsPage() {
           <p className="text-xl text-gray-600">{t('contactDescription')}</p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           <Card className="p-8 text-center">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 mb-4">
               <EnvelopeIcon className="h-8 w-8 text-primary-600" />
             </div>
             <h3 className="text-lg font-semibold mb-2">{t('email')}</h3>
-            <a 
-              href={`mailto:${contact?.email}`}
-              className="text-primary-600 hover:text-primary-700 break-all"
-            >
-              {contact?.email}
-            </a>
+            <div className="text-gray-600 break-all">
+              <b>{contact?.email}</b>
+            </div>
           </Card>
 
           <Card className="p-8 text-center">
@@ -65,23 +66,35 @@ export function ContactsPage() {
               <PhoneIcon className="h-8 w-8 text-primary-600" />
             </div>
             <h3 className="text-lg font-semibold mb-2">{t('phone')}</h3>
-            <a 
-              href={`tel:${contact?.phone}`}
-              className="text-primary-600 hover:text-primary-700"
-            >
-              {contact?.phone}
-            </a>
-          </Card>
-
-          <Card className="p-8 text-center">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary-100 mb-4">
-              <MapPinIcon className="h-8 w-8 text-primary-600" />
+            <div className="text-gray-600">
+              <b>{contact?.phone}</b>
             </div>
-            <h3 className="text-lg font-semibold mb-2">{t('operationAreas')}</h3>
-            <div className="text-gray-600 space-y-1">
-              {operationAreas.map((area, index) => (
-                <div key={index}>{area}</div>
-              ))}
+          </Card>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 mb-12">
+          <Card className="p-8">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary-100">
+                <MapPinIcon className="h-6 w-6 text-primary-600" />
+              </div>
+              <h3 className="text-xl font-semibold">{t('operationAreas')}</h3>
+            </div>
+            <div className="space-y-3">
+              {!contact.operationAreasDetails || contact.operationAreasDetails.length === 0 ? (
+                <p className="text-gray-500">{t('noOperationAreasYet')}</p>
+              ) : (
+                contact.operationAreasDetails.map((detail) => (
+                  <div key={detail.id} className="p-4 bg-gray-50 rounded-lg">
+                    <div className="font-medium text-gray-900">
+                      {detail.cityName}, {detail.country}
+                    </div>
+                    {detail.address && (
+                      <div className="text-sm text-gray-600 mt-1">{detail.address}</div>
+                    )}
+                  </div>
+                ))
+              )}
             </div>
           </Card>
         </div>

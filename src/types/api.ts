@@ -143,18 +143,34 @@ export interface ContractCreate {
 }
 
 // Contact
+export interface OperationArea {
+  id?: number; // Include ID for updates to prevent recreation
+  cityId: number;
+  address?: string;
+}
+
+export interface OperationAreaDetail {
+  id: number;
+  cityId: number;
+  cityName: string;
+  country: string;
+  address?: string;
+}
+
 export interface Contact {
   id: number;
   email: string;
   phone: string;
-  operationAreas: string; // Comma-separated list of cities/regions
+  operationAreas: string; // Comma-separated city names
+  operationAreasDetails: OperationAreaDetail[];
+  createdAt: string;
   updatedAt: string;
 }
 
 export interface ContactUpdate {
   email: string;
   phone: string;
-  operationAreas: string;
+  operationAreas: OperationArea[];
 }
 
 export interface ContractUpdate {

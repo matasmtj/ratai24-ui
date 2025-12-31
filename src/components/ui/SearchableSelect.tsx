@@ -3,14 +3,20 @@ import { Combobox } from '@headlessui/react';
 import { CheckIcon, ChevronDownIcon } from '@heroicons/react/20/solid';
 import clsx from 'clsx';
 
+interface Option {
+  value: string;
+  label: string;
+}
+
 interface SearchableSelectProps {
   label: string;
-  value: string;
-  onChange: (value: string) => void;
-  options: string[];
+  value: string | string[];
+  onChange: (value: string | string[]) => void;
+  options: Option[] | string[];
   placeholder?: string;
   required?: boolean;
   disabled?: boolean;
+  multiple?: boolean;
 }
 
 export function SearchableSelect({
@@ -21,27 +27,46 @@ export function SearchableSelect({
   placeholder = 'Select...',
   required = false,
   disabled = false,
+  multiple = false,
 }: SearchableSelectProps) {
   const [query, setQuery] = useState('');
 
+  // Normalize options to always be Option[]
+  const normalizedOptions: Option[] = useMemo(() => {
+    return options.map(opt => 
+      typeof opt === 'string' ? { value: opt, label: opt } : opt
+    );
+  }, [options]);
+
   const filteredOptions = useMemo(() => {
     if (query === '') {
-      return options;
+      return normalizedOptions;
     }
-    return options.filter((option) =>
-      option.toLowerCase().includes(query.toLowerCase())
+    return normalizedOptions.filter((option) =>
+      option.label.toLowerCase().includes(query.toLowerCase())
     );
-  }, [options, query]);
+  }, [normalizedOptions, query]);
 
-  const handleChange = (newValue: string | null) => {
+  const handleChange = (newValue: string | string[] | null) => {
     if (newValue !== null) {
       onChange(newValue);
     }
   };
 
+  const getDisplayValue = (val: string | string[]) => {
+    if (multiple && Array.isArray(val)) {
+      if (val.length === 0) return '';
+      const labels = val.map(v => 
+        normalizedOptions.find(opt => opt.value === v)?.label || v
+      );
+      return labels.join(', ');
+    }
+    return normalizedOptions.find(opt => opt.value === val)?.label || val;
+  };
+
   return (
     <div>
-      <Combobox value={value} onChange={handleChange} disabled={disabled}>
+      <Combobox value={value} onChange={handleChange} disabled={disabled} multiple={multiple}>
         <Combobox.Label className="block text-sm font-medium text-gray-700 mb-1">
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
@@ -55,7 +80,7 @@ export function SearchableSelect({
               'sm:text-sm'
             )}
             onChange={(event) => setQuery(event.target.value)}
-            displayValue={(option: string) => option}
+            displayValue={getDisplayValue}
             placeholder={placeholder}
             required={required}
           />
@@ -67,8 +92,8 @@ export function SearchableSelect({
             <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
               {filteredOptions.map((option) => (
                 <Combobox.Option
-                  key={option}
-                  value={option}
+                  key={option.value}
+                  value={option.value}
                   className={({ active }) =>
                     clsx(
                       'relative cursor-pointer select-none py-2 pl-3 pr-9',
@@ -79,7 +104,7 @@ export function SearchableSelect({
                   {({ active, selected }) => (
                     <>
                       <span className={clsx('block truncate', selected && 'font-semibold')}>
-                        {option}
+                        {option.label}
                       </span>
 
                       {selected && (

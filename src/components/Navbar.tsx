@@ -28,8 +28,8 @@ export function Navbar() {
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
+        <div className="flex justify-between items-center h-16 gap-2">
+          <div className="flex items-center flex-shrink-0">
             <Link to="/" className="flex items-center">
               <TruckIcon className="h-8 w-8 text-primary-600" />
               <span className="ml-2 text-xl font-bold text-gray-900">Ratai24</span>
@@ -60,7 +60,7 @@ export function Navbar() {
             </div>
           </div>
 
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center gap-2 flex-shrink-0">
             {/* Language Switcher */}
             <Menu as="div" className="relative">
               <Menu.Button className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md">
@@ -96,42 +96,42 @@ export function Navbar() {
                 {role === 'USER' && (
                   <>
                     <Link to="/dashboard">
-                      <Button variant="ghost" size="sm">
-                        <DocumentTextIcon className="h-5 w-5 mr-1" />
-                        {t('myReservations')}
+                      <Button variant="ghost" size="sm" className="flex items-center">
+                        <DocumentTextIcon className="h-5 w-5" />
+                        <span className="hidden sm:inline ml-1">{t('myReservations')}</span>
                       </Button>
                     </Link>
                     <Link to="/profile">
-                      <Button variant="ghost" size="sm">
-                        <UserCircleIcon className="h-5 w-5 mr-1" />
-                        {t('myProfile')}
+                      <Button variant="ghost" size="sm" className="flex items-center">
+                        <UserCircleIcon className="h-5 w-5" />
+                        <span className="hidden sm:inline ml-1">{t('myProfile')}</span>
                       </Button>
                     </Link>
                   </>
                 )}
                 {role === 'ADMIN' && (
                   <Link to="/admin">
-                    <Button variant="ghost" size="sm">
-                      <Cog6ToothIcon className="h-5 w-5 mr-1" />
-                      {t('administration')}
+                    <Button variant="ghost" size="sm" className="flex items-center">
+                      <Cog6ToothIcon className="h-5 w-5" />
+                      <span className="hidden sm:inline ml-1">{t('administration')}</span>
                     </Button>
                   </Link>
                 )}
-                <Button variant="ghost" size="sm" onClick={handleLogout}>
-                  <ArrowRightOnRectangleIcon className="h-5 w-5 mr-1" />
-                  {t('logout')}
+                <Button variant="ghost" size="sm" onClick={handleLogout} className="flex items-center">
+                  <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                  <span className="hidden sm:inline ml-1">{t('logout')}</span>
                 </Button>
               </>
             ) : (
               <>
                 <Link to="/login">
-                  <Button variant="ghost" size="sm">
-                    <UserCircleIcon className="h-5 w-5 mr-1" />
-                    {t('login')}
+                  <Button variant="ghost" size="sm" className="flex items-center">
+                    <UserCircleIcon className="h-5 w-5" />
+                    <span className="hidden sm:inline ml-1">{t('login')}</span>
                   </Button>
                 </Link>
                 <Link to="/register">
-                  <Button size="sm">{t('register')}</Button>
+                  <Button size="sm" className="whitespace-nowrap">{t('register')}</Button>
                 </Link>
               </>
             )}
