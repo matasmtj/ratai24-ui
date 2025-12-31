@@ -1,5 +1,6 @@
 # Ratai24 - Automobilių nuomos sistema
-
+For testing & demo purposes, a site was published wit hlimited resources, but needs to wait a bit for server-side to load:
+https://ratai24-ui.onrender.com/
 Modern car rental platform built with React, TypeScript, and Tailwind CSS.
 
 ## Features
