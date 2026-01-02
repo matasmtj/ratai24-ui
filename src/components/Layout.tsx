@@ -1,8 +1,10 @@
-import { type ReactNode } from 'react';
+import { type ReactNode, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { useLanguage } from '../contexts/LanguageContext';
-import { TruckIcon, EnvelopeIcon } from '@heroicons/react/24/outline';
+import { TruckIcon, EnvelopeIcon, PhoneIcon, MapPinIcon } from '@heroicons/react/24/outline';
+import { contactsApi } from '../api/contacts';
+import type { Contact } from '../types/api';
 
 interface LayoutProps {
   children: ReactNode;
@@ -10,13 +12,23 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const { t } = useLanguage();
+  const [contactInfo, setContactInfo] = useState<Contact | null>(null);
+
+  useEffect(() => {
+    const fetchContactInfo = async () => {
+      const data = await contactsApi.get();
+      setContactInfo(data);
+    };
+    fetchContactInfo();
+  }, []);
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <Navbar />
       <main className="flex-grow">{children}</main>
       <footer className="bg-gray-900 text-gray-300 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Company Info */}
             <div className="col-span-1">
               <div className="flex items-center mb-4">
@@ -45,39 +57,40 @@ export function Layout({ children }: LayoutProps) {
               </ul>
             </div>
 
-            {/* Legal */}
-            <div>
-              <h3 className="text-white font-semibold mb-4">{t('information')}</h3>
-              <ul className="space-y-2">
-                <li>
-                  <a href="#" className="text-sm hover:text-white transition-colors">
-                    {t('aboutUs')}
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-sm hover:text-white transition-colors">
-                    {t('termsOfService')}
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="text-sm hover:text-white transition-colors">
-                    {t('privacyPolicy')}
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Contact */}
+            {/* Contact Information */}
             <div>
               <h3 className="text-white font-semibold mb-4">{t('contactInfo')}</h3>
-              <ul className="space-y-2">
-                <li className="flex items-center text-sm">
-                  <EnvelopeIcon className="h-5 w-5 mr-2" />
-                  <a href="/contacts" className="hover:text-white transition-colors">
-                    {t('viewContacts')}
-                  </a>
-                </li>
-              </ul>
+              {contactInfo ? (
+                <ul className="space-y-2">
+                  <li className="flex items-start text-sm">
+                    <EnvelopeIcon className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+                    <a>
+                      {contactInfo.email}
+                    </a>
+                  </li>
+                  <li className="flex items-start text-sm">
+                    <PhoneIcon className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+                    <a>
+                      {contactInfo.phone}
+                    </a>
+                  </li>
+                  {contactInfo.operationAreas && (
+                    <li className="flex items-start text-sm">
+                      <MapPinIcon className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+                      <span>{contactInfo.operationAreas}</span>
+                    </li>
+                  )}
+                </ul>
+              ) : (
+                <ul className="space-y-2">
+                  <li className="flex items-center text-sm">
+                    <EnvelopeIcon className="h-5 w-5 mr-2" />
+                    <Link to="/contacts" className="hover:text-white transition-colors">
+                      {t('viewContacts')}
+                    </Link>
+                  </li>
+                </ul>
+              )}
             </div>
           </div>
 
