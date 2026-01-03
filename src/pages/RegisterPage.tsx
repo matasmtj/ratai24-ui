@@ -57,9 +57,6 @@ export function RegisterPage() {
       await register({
         email: formData.email,
         password: formData.password,
-        firstName: formData.firstName || undefined,
-        lastName: formData.lastName || undefined,
-        phoneNumber: formData.phoneNumber,
       });
       
       alert(t('profileUpdated'));

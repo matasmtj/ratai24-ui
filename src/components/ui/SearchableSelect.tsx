@@ -80,7 +80,7 @@ export function SearchableSelect({
               'sm:text-sm'
             )}
             onChange={(event) => setQuery(event.target.value)}
-            displayValue={getDisplayValue}
+            displayValue={(val: string | string[]) => Array.isArray(val) ? val.join(', ') : (getDisplayValue(val) as string)}
             placeholder={placeholder}
             required={required}
           />

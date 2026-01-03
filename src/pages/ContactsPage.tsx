@@ -4,7 +4,6 @@ import { Card } from '../components/ui/Card';
 import { LoadingPage } from '../components/ui/Loading';
 import { useLanguage } from '../contexts/LanguageContext';
 import { contactsApi } from '../api/contacts';
-import { citiesApi } from '../api/cities';
 import {
   EnvelopeIcon,
   PhoneIcon,
@@ -19,11 +18,6 @@ export function ContactsPage() {
     queryFn: contactsApi.get,
     staleTime: 5 * 60 * 1000, // Cache for 5 minutes
     retry: 1,
-  });
-
-  const { data: allCities } = useQuery({
-    queryKey: ['cities'],
-    queryFn: citiesApi.getAll,
   });
 
   if (isLoading) return <LoadingPage />;

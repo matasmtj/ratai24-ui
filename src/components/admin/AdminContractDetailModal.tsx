@@ -333,7 +333,7 @@ export function AdminContractDetailModal({
               type="number"
               value={completeFormData.mileageEndKm || ''}
               onChange={(e) => {
-                const val = e.target.value === '' ? '' : parseInt(e.target.value);
+                const val = e.target.value === '' ? 0 : parseInt(e.target.value);
                 setCompleteFormData({ ...completeFormData, mileageEndKm: val });
               }}
               min={contract.mileageStartKm}
@@ -359,7 +359,7 @@ export function AdminContractDetailModal({
               type="number"
               value={completeFormData.fuelLevelEndPct ?? ''}
               onChange={(e) => {
-                const val = e.target.value === '' ? '' : Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
+                const val = e.target.value === '' ? 0 : Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
                 setCompleteFormData({ ...completeFormData, fuelLevelEndPct: val });
               }}
               min={0}

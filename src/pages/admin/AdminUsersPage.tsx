@@ -10,7 +10,7 @@ import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { usersApi } from '../../api/users';
 import type { User, UserCreate, UserAdminUpdate } from '../../types/api';
-import { PlusIcon, PencilIcon, TrashIcon, UserIcon, MagnifyingGlassIcon } from '@heroicons/react/24/outline';
+import { PlusIcon, PencilIcon, TrashIcon, UserIcon } from '@heroicons/react/24/outline';
 
 export function AdminUsersPage() {
   const queryClient = useQueryClient();

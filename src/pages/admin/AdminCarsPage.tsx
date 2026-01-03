@@ -470,14 +470,14 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
           <SearchableSelect 
             label={t('manufacturer')} 
             value={formData.make} 
-            onChange={(value) => setFormData({ ...formData, make: value, model: '' })} 
+            onChange={(value) => setFormData({ ...formData, make: Array.isArray(value) ? value[0] : value, model: '' })} 
             options={carMakes}
             required 
           />
           <SearchableSelect 
             label={t('model')} 
             value={formData.model} 
-            onChange={(value) => setFormData({ ...formData, model: value })} 
+            onChange={(value) => setFormData({ ...formData, model: Array.isArray(value) ? value[0] : value })} 
             options={formData.make ? (carModels[formData.make] || []) : []}
             disabled={!formData.make}
             required 
