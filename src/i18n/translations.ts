@@ -3,11 +3,15 @@ export const translations = {
     // Navigation
     home: 'Pradžia',
     cars: 'Automobiliai',
+    carLease: 'Automobilių nuoma',
+    carSale: 'Automobilių pardavimas',
+    parts: 'Dalys',
     login: 'Prisijungti',
     register: 'Registruotis',
     logout: 'Atsijungti',
     myReservations: 'Mano Rezervacijos',
     administration: 'Administravimas',
+    myProfile: 'Mano profilis',
     
     // Home Page
     heroTitle: 'Automobilių nuoma Lietuvoje',
@@ -30,9 +34,12 @@ export const translations = {
     
     // Cars Page
     carCatalog: 'Automobilių katalogas',
+    carSaleCatalog: 'Automobilių pardavimo katalogas',
     findPerfectCar: 'Raskite tobulą automobilį savo kelionei',
+    findPerfectCarForSale: 'Raskite tobulą automobilį įsigijimui',
     filters: 'Filtrai',
     advancedFilters: 'Išplėstiniai filtrai',
+    hideAdvancedFilters: 'Slėpti išplėstinius filtrus',
     search: 'Paieška (make/model)',
     allCities: 'Visi miestai',
     allFuel: 'Visas kuras',
@@ -55,9 +62,15 @@ export const translations = {
     sortBy: 'Rūšiuoti',
     priceAsc: 'Kaina: mažiausia',
     priceDesc: 'Kaina: didžiausia',
+    salePriceAsc: 'Pardavimo kaina: mažiausia',
+    salePriceDesc: 'Pardavimo kaina: didžiausia',
     available: 'Laisvas',
     leased: 'Išnuomotas',
     maintenance: 'Servise',
+    alsoForSale: 'Taip pat parduodamas',
+    alsoForLease: 'Taip pat nuomojamas',
+    forMoreInfoContactSeller: 'Norint sužinoti daugiau informacijos apie automobilį, susisiekite su pardavėju.',
+    contactSeller: 'Susisiekti su pardavėju',
     
     // Auth
     loginTitle: 'Prisijungti',
@@ -187,13 +200,22 @@ export const translations = {
     engineCapacity: 'Variklio tūris (L)',
     bodyTypeField: 'Kėbulo tipas',
     gearboxField: 'Pavarų dėžė',
+    colour: 'Spalva',
     status: 'Būsena',
     mileage: 'Rida (km)',
+    availability: 'Prieinamumas',
+    availableForLease: 'Galima nuomotis',
+    availableForSale: 'Galima pirkti',
+    saleInformation: 'Pardavimo informacija',
+    salePriceField: 'Pardavimo kaina (€)',
+    saleDescription: 'Pardavimo aprašymas',
+    saleDescriptionPlaceholder: 'Pvz., gerai prižiūrėtas, vienas savininkas, pilna aptarnavimo istorija',
     
     // Image Manager
     manageImages: 'Valdyti nuotraukas',
     uploadImages: 'Įkelti nuotraukas',
     uploadImagesDesc: 'PNG, JPG, GIF, WebP iki 5MB kiekviena (maks. 10 nuotraukų)',
+    dropFilesHere: 'Nutemkite failus čia',
     selectFiles: 'Pasirinkti failus',
     filesSelected: 'failų pasirinkta',
     uploadButton: 'Įkelti',
@@ -304,6 +326,23 @@ export const translations = {
     showingXofY: 'Rodoma {current} iš {total}',
     all: 'Visi',
     
+    // User Dashboard / My Reservations
+    myReservationsTitle: 'Mano rezervacijos',
+    myReservationsSubtitle: 'Peržiūrėkite ir valdykite savo automobilių nuomos rezervacijas',
+    errorLoadingReservations: 'Klaida kraunant rezervacijas',
+    failedToLoadReservations: 'Nepavyko užkrauti rezervacijų. Bandykite dar kartą.',
+    tryAgain: 'Bandyti dar kartą',
+    confirmCancelReservationUser: 'Ar tikrai norite atšaukti šią rezervaciją?',
+    noReservations: 'Neturite rezervacijų',
+    noReservationsDescription: 'Pradėkite ieškoti automobilių ir sukurkite savo pirmąją rezervaciją',
+    carNumber: 'Automobilis #',
+    startingMileage: 'Pradinis ridos rodmuo',
+    endingMileage: 'Galutinis ridos rodmuo',
+    priceLabel: 'Kaina',
+    extraFeesLabel: 'Papildomi mokesčiai',
+    emailPlaceholder: 'jusu@pastas.lt',
+    loginFailed: 'Prisijungimas nepavyko. Patikrinkite įvestus duomenis.',
+    
     // Admin Cars Filters
     searchCars: 'Ieškoti automobilių (gamintojas, modelis, numeris)',
     makeAsc: 'Gamintojas: A-Z',
@@ -365,7 +404,6 @@ export const translations = {
     completeRecaptcha: 'Užbaikite reCAPTCHA patikrinimą',
     
     // User Profile
-    myProfile: 'Mano profilis',
     editProfile: 'Redaguoti profilį',
     profileInformation: 'Profilio informacija',
     updateProfile: 'Atnaujinti profilį',
@@ -377,16 +415,29 @@ export const translations = {
     passwordsDontMatch: 'Slaptažodžiai nesutampa',
     phoneRequired: 'Telefono numeris yra privalomas',
     invalidPhone: 'Neteisingas telefono numeris',
+    
+    // Parts Page
+    partsMarketplace: 'Automobilių dalių turgus',
+    partsComingSoon: 'Automobilių dalys - greitai',
+    partsComingSoonDescription: 'Mes ruošiame automobilių dalių turgų, kur galėsite rasti aukštos kokybės naudotas ir naujas dalis savo automobiliui.',
+    viewDetails: 'Peržiūrėti išsamiau',
+    backToCars: 'Grįžti į automobilių sąrašą',
+    sellerComment: 'Pardavėjo komentaras',
+    salePrice: 'Pardavimo kaina',
   },
   en: {
     // Navigation
     home: 'Home',
     cars: 'Cars',
+    carLease: 'Car Lease',
+    carSale: 'Car Sale',
+    parts: 'Parts',
     login: 'Login',
     register: 'Register',
     logout: 'Logout',
     myReservations: 'My Reservations',
     administration: 'Administration',
+    myProfile: 'My Profile',
     
     // Home Page
     heroTitle: 'Car Rental in Lithuania',
@@ -409,9 +460,12 @@ export const translations = {
     
     // Cars Page
     carCatalog: 'Car Catalog',
+    carSaleCatalog: 'Car Sale Catalog',
     findPerfectCar: 'Find the perfect car for your journey',
+    findPerfectCarForSale: 'Find the perfect car to purchase',
     filters: 'Filters',
     advancedFilters: 'Advanced Filters',
+    hideAdvancedFilters: 'Hide Advanced Filters',
     search: 'Search (make/model)',
     allCities: 'All Cities',
     allFuel: 'All Fuel Types',
@@ -434,9 +488,15 @@ export const translations = {
     sortBy: 'Sort By',
     priceAsc: 'Price: Low to High',
     priceDesc: 'Price: High to Low',
+    salePriceAsc: 'Sale Price: Low to High',
+    salePriceDesc: 'Sale Price: High to Low',
     available: 'Available',
     leased: 'Leased',
     maintenance: 'Maintenance',
+    alsoForSale: 'Also for sale',
+    alsoForLease: 'Also for lease',
+    forMoreInfoContactSeller: 'For more information about this car, please contact the seller.',
+    contactSeller: 'Contact Seller',
     
     // Auth
     loginTitle: 'Login',
@@ -566,13 +626,22 @@ export const translations = {
     engineCapacity: 'Engine Capacity (L)',
     bodyTypeField: 'Body Type',
     gearboxField: 'Gearbox',
+    colour: 'Colour',
     status: 'Status',
     mileage: 'Mileage (km)',
+    availability: 'Availability',
+    availableForLease: 'Available for lease',
+    availableForSale: 'Available for sale',
+    saleInformation: 'Sale Information',
+    salePriceField: 'Sale Price (€)',
+    saleDescription: 'Sale Description',
+    saleDescriptionPlaceholder: 'E.g., well-maintained, single owner, full service history',
     
     // Image Manager
     manageImages: 'Manage Images',
     uploadImages: 'Upload Images',
     uploadImagesDesc: 'PNG, JPG, GIF, WebP up to 5MB each (max 10 images)',
+    dropFilesHere: 'Drop files here',
     selectFiles: 'Select Files',
     filesSelected: 'files selected',
     uploadButton: 'Upload',
@@ -683,6 +752,23 @@ export const translations = {
     showingXofY: 'Showing {current} of {total}',
     all: 'All',
     
+    // User Dashboard / My Reservations
+    myReservationsTitle: 'My Reservations',
+    myReservationsSubtitle: 'View and manage your car rental reservations',
+    errorLoadingReservations: 'Error loading reservations',
+    failedToLoadReservations: 'Failed to load reservations. Please try again.',
+    tryAgain: 'Try Again',
+    confirmCancelReservationUser: 'Are you sure you want to cancel this reservation?',
+    noReservations: 'No Reservations',
+    noReservationsDescription: 'Start browsing cars and create your first reservation',
+    carNumber: 'Car #',
+    startingMileage: 'Starting mileage',
+    endingMileage: 'Ending mileage',
+    priceLabel: 'Price',
+    extraFeesLabel: 'Extra fees',
+    emailPlaceholder: 'your@email.com',
+    loginFailed: 'Login failed. Please check your credentials.',
+    
     // Admin Cars Filters
     searchCars: 'Search cars (make, model, plate)',
     makeAsc: 'Make: A-Z',
@@ -744,7 +830,6 @@ export const translations = {
     completeRecaptcha: 'Complete the reCAPTCHA verification',
     
     // User Profile
-    myProfile: 'My Profile',
     editProfile: 'Edit Profile',
     profileInformation: 'Profile Information',
     updateProfile: 'Update Profile',
@@ -756,11 +841,23 @@ export const translations = {
     passwordsDontMatch: 'Passwords do not match',
     phoneRequired: 'Phone number is required',
     invalidPhone: 'Invalid phone number',
+    
+    // Parts Page
+    partsMarketplace: 'Car Parts Marketplace',
+    partsComingSoon: 'Car Parts - Coming Soon',
+    partsComingSoonDescription: 'We are preparing a car parts marketplace where you can find high-quality used and new parts for your vehicle.',
+    viewDetails: 'View Details',
+    backToCars: 'Back to Cars',
+    sellerComment: 'Seller Comment',
+    salePrice: 'Sale Price',
   },
   ru: {
     // Navigation
     home: 'Главная',
     cars: 'Автомобили',
+    carLease: 'Аренда автомобилей',
+    carSale: 'Продажа автомобилей',
+    parts: 'Запчасти',
     login: 'Войти',
     register: 'Регистрация',
     logout: 'Выйти',
@@ -788,9 +885,12 @@ export const translations = {
     
     // Cars Page
     carCatalog: 'Каталог автомобилей',
+    carSaleCatalog: 'Каталог продажи автомобилей',
     findPerfectCar: 'Найдите идеальный автомобиль для вашего путешествия',
+    findPerfectCarForSale: 'Найдите идеальный автомобиль для покупки',
     filters: 'Фильтры',
     advancedFilters: 'Расширенные фильтры',
+    hideAdvancedFilters: 'Скрыть расширенные фильтры',
     search: 'Поиск (марка/модель)',
     allCities: 'Все города',
     allFuel: 'Все типы топлива',
@@ -813,9 +913,15 @@ export const translations = {
     sortBy: 'Сортировать',
     priceAsc: 'Цена: по возрастанию',
     priceDesc: 'Цена: по убыванию',
+    salePriceAsc: 'Цена продажи: по возрастанию',
+    salePriceDesc: 'Цена продажи: по убыванию',
     available: 'Доступен',
     leased: 'Арендован',
     maintenance: 'Обслуживание',
+    alsoForSale: 'Также продается',
+    alsoForLease: 'Также сдается в аренду',
+    forMoreInfoContactSeller: 'Для получения дополнительной информации об этом автомобиле, пожалуйста, свяжитесь с продавцом.',
+    contactSeller: 'Связаться с продавцом',
     
     // Auth
     loginTitle: 'Войти',
@@ -945,13 +1051,22 @@ export const translations = {
     engineCapacity: 'Объем двигателя (л)',
     bodyTypeField: 'Тип кузова',
     gearboxField: 'Коробка передач',
+    colour: 'Цвет',
     status: 'Статус',
     mileage: 'Пробег (км)',
+    availability: 'Доступность',
+    availableForLease: 'Доступно для аренды',
+    availableForSale: 'Доступно для продажи',
+    saleInformation: 'Информация о продаже',
+    salePriceField: 'Цена продажи (€)',
+    saleDescription: 'Описание продажи',
+    saleDescriptionPlaceholder: 'Напр., хорошо обслуживался, один владелец, полная история обслуживания',
     
     // Image Manager
     manageImages: 'Управление изображениями',
     uploadImages: 'Загрузить изображения',
     uploadImagesDesc: 'PNG, JPG, GIF, WebP до 5МБ каждый (макс. 10 изображений)',
+    dropFilesHere: 'Перетащите файлы сюда',
     selectFiles: 'Выбрать файлы',
     filesSelected: 'файлов выбрано',
     uploadButton: 'Загрузить',
@@ -1060,6 +1175,23 @@ export const translations = {
     rowsPerPage: 'Строк на странице',
     showingXofY: 'Показано {current} из {total}',
     all: 'Все',
+    
+    // User Dashboard / My Reservations
+    myReservationsTitle: 'Мои бронирования',
+    myReservationsSubtitle: 'Просматривайте и управляйте вашими бронированиями автомобилей',
+    errorLoadingReservations: 'Ошибка загрузки бронирований',
+    failedToLoadReservations: 'Не удалось загрузить бронирования. Попробуйте еще раз.',
+    tryAgain: 'Попробовать снова',
+    confirmCancelReservationUser: 'Вы уверены, что хотите отменить это бронирование?',
+    noReservations: 'Нет бронирований',
+    noReservationsDescription: 'Начните поиск автомобилей и создайте ваше первое бронирование',
+    carNumber: 'Автомобиль №',
+    startingMileage: 'Начальный пробег',
+    endingMileage: 'Конечный пробег',
+    priceLabel: 'Цена',
+    extraFeesLabel: 'Дополнительные сборы',
+    emailPlaceholder: 'ваш@email.ru',
+    loginFailed: 'Ошибка входа. Проверьте введенные данные.',
     closeModal: 'Закрыть',
     
     // Admin Cars Filters
@@ -1123,7 +1255,6 @@ export const translations = {
     completeRecaptcha: 'Завершите проверку reCAPTCHA',
     
     // User Profile
-    myProfile: 'Мой профиль',
     editProfile: 'Редактировать профиль',
     profileInformation: 'Информация профиля',
     updateProfile: 'Обновить профиль',
@@ -1135,6 +1266,15 @@ export const translations = {
     passwordsDontMatch: 'Пароли не совпадают',
     phoneRequired: 'Номер телефона обязателен',
     invalidPhone: 'Неверный номер телефона',
+    
+    // Parts Page
+    partsMarketplace: 'Рынок автомобильных запчастей',
+    partsComingSoon: 'Автомобильные запчасти - скоро',
+    partsComingSoonDescription: 'Мы готовим рынок автомобильных запчастей, где вы сможете найти высококачественные бывшие в употреблении и новые запчасти для вашего автомобиля.',
+    viewDetails: 'Подробнее',
+    backToCars: 'Назад к списку',
+    sellerComment: 'Комментарий продавца',
+    salePrice: 'Цена продажи',
   },
 };
 

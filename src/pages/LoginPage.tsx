@@ -6,7 +6,7 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { ReCaptcha, type ReCaptchaHandle } from '../components/ui/ReCaptcha';
 import { useAuth } from '../contexts/AuthContext';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../contexts/useLanguage';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
 
 export function LoginPage() {
@@ -38,7 +38,7 @@ export function LoginPage() {
       await login(formData);
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Prisijungimas nepavyko. Patikrinkite įvestus duomenis.');
+      setError(err.response?.data?.error || t('loginFailed'));
       recaptchaRef.current?.reset();
     } finally {
       setIsLoading(false);
@@ -70,7 +70,7 @@ export function LoginPage() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
-              placeholder="jusu@pastas.lt"
+              placeholder={t('emailPlaceholder')}
             />
             <Input
               label={t('password')}

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { carsApi } from '../../api/cars';
 import { Button } from '../ui/Button';
@@ -6,7 +6,7 @@ import { Modal } from '../ui/Modal';
 import { LoadingSpinner } from '../ui/Loading';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { ImageLightbox } from '../ui/ImageLightbox';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useLanguage } from '../../contexts/useLanguage';
 import { PhotoIcon, TrashIcon, StarIcon } from '@heroicons/react/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/react/24/solid';
 
@@ -24,7 +24,7 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
   const [deleteImageId, setDeleteImageId] = useState<number | null>(null);
   const [lightboxImageIndex, setLightboxImageIndex] = useState<number | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
-  const [localImages, setLocalImages] = useState<typeof images>([]);
+  const [isDraggingFile, setIsDraggingFile] = useState(false);
 
   const { data: imagesData, isLoading } = useQuery({
     queryKey: ['car-images', carId],
@@ -33,11 +33,6 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
   });
 
   const images = imagesData?.images || [];
-
-  // Update local images when data changes
-  useEffect(() => {
-    setLocalImages(images);
-  }, [images]);
 
   const reorderMutation = useMutation({
     mutationFn: (imageIds: number[]) => carsApi.reorderImages(carId, imageIds),
@@ -134,48 +129,75 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
     setDraggedIndex(index);
   };
 
-  const handleDragOver = (e: React.DragEvent, index: number) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
-    if (draggedIndex === null || draggedIndex === index) return;
-    
-    const newImages = [...localImages];
-    const draggedImage = newImages[draggedIndex];
-    newImages.splice(draggedIndex, 1);
-    newImages.splice(index, 0, draggedImage);
-    
-    setLocalImages(newImages);
-    setDraggedIndex(index);
   };
 
-  const handleDragEnd = () => {
-    if (draggedIndex !== null) {
-      const imageIds = localImages.map(img => img.id);
-      reorderMutation.mutate(imageIds);
-      // Set first image as main automatically
-      if (localImages.length > 0 && !localImages[0].isMain) {
-        setMainMutation.mutate(localImages[0].id);
-      }
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex === null || draggedIndex === dropIndex) {
+      setDraggedIndex(null);
+      return;
     }
+    
+    const newImages = [...images];
+    const draggedImage = newImages[draggedIndex];
+    newImages.splice(draggedIndex, 1);
+    newImages.splice(dropIndex, 0, draggedImage);
+    
+    const imageIds = newImages.map(img => img.id);
+    reorderMutation.mutate(imageIds);
     setDraggedIndex(null);
+  };
+
+  // File drag and drop handlers
+  const handleFileDragEnter = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingFile(true);
+  };
+
+  const handleFileDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingFile(false);
+  };
+
+  const handleFileDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleFileDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingFile(false);
+    
+    const files = Array.from(e.dataTransfer.files).filter(file => 
+      file.type.startsWith('image/')
+    );
+    
+    if (files.length > 10) {
+      alert(t('maxImagesWarning'));
+      return;
+    }
+    
+    if (files.length > 0) {
+      setSelectedFiles(files);
+    }
   };
 
   const moveImage = (index: number, direction: 'left' | 'right') => {
     const newIndex = direction === 'left' ? index - 1 : index + 1;
-    if (newIndex < 0 || newIndex >= localImages.length) return;
+    if (newIndex < 0 || newIndex >= images.length) return;
     
-    const newImages = [...localImages];
+    const newImages = [...images];
     const temp = newImages[index];
     newImages[index] = newImages[newIndex];
     newImages[newIndex] = temp;
     
-    setLocalImages(newImages);
     const imageIds = newImages.map(img => img.id);
     reorderMutation.mutate(imageIds);
-    
-    // Set first image as main automatically
-    if (newImages.length > 0 && !newImages[0].isMain) {
-      setMainMutation.mutate(newImages[0].id);
-    }
   };
 
   return (
@@ -183,16 +205,28 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
       <Modal isOpen={isOpen} onClose={onClose} title={t('manageImages')} size="2xl">
         <div className="space-y-6">
           {/* Upload Section */}
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+          <div 
+            className={`border-2 border-dashed rounded-lg p-6 transition-colors ${
+              isDraggingFile 
+                ? 'border-primary-500 bg-primary-50' 
+                : 'border-gray-300 bg-white'
+            }`}
+            onDragEnter={handleFileDragEnter}
+            onDragLeave={handleFileDragLeave}
+            onDragOver={handleFileDragOver}
+            onDrop={handleFileDrop}
+          >
             <div className="text-center">
-              <PhotoIcon className="mx-auto h-12 w-12 text-gray-400" />
+              <PhotoIcon className={`mx-auto h-12 w-12 ${
+                isDraggingFile ? 'text-primary-500' : 'text-gray-400'
+              }`} />
               <div className="mt-4 flex flex-col items-center gap-3">
                 <div>
                   <span className="block text-sm font-medium text-gray-900">
                     {t('uploadImages')}
                   </span>
                   <span className="block text-xs text-gray-500 mt-1">
-                    {t('uploadImagesDesc')}
+                    {isDraggingFile ? t('dropFilesHere') : t('uploadImagesDesc')}
                   </span>
                 </div>
                 
@@ -249,14 +283,14 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
             <p className="text-center text-gray-500 py-8">{t('noImagesUploaded')}</p>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {localImages.map((image, index) => (
+              {images.map((image, index) => (
                 <div 
                   key={image.id} 
                   className="relative group"
                   draggable
                   onDragStart={() => handleDragStart(index)}
-                  onDragOver={(e) => handleDragOver(e, index)}
-                  onDragEnd={handleDragEnd}
+                  onDragOver={handleDragOver}
+                  onDrop={(e) => handleDrop(e, index)}
                 >
                   <div 
                     className="aspect-video bg-gray-100 rounded-lg overflow-hidden cursor-move"
@@ -285,7 +319,7 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
                         </svg>
                       </button>
                     )}
-                    {index < localImages.length - 1 && (
+                    {index < images.length - 1 && (
                       <button
                         onClick={(e) => {
                           e.stopPropagation();

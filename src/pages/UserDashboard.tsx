@@ -16,7 +16,7 @@ import {
   ClockIcon 
 } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../contexts/useLanguage';
 
 export function UserDashboard() {
   const queryClient = useQueryClient();
@@ -75,10 +75,10 @@ export function UserDashboard() {
 
   const getStatusText = (state: string) => {
     const translations = {
-      DRAFT: 'Juodraštis',
-      ACTIVE: 'Aktyvi',
-      COMPLETED: 'Užbaigta',
-      CANCELLED: 'Atšaukta',
+      DRAFT: t('draft'),
+      ACTIVE: t('active'),
+      COMPLETED: t('completed'),
+      CANCELLED: t('cancelled'),
     };
     return translations[state as keyof typeof translations] || state;
   };
@@ -87,8 +87,8 @@ export function UserDashboard() {
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Mano rezervacijos</h1>
-          <p className="text-gray-600">Peržiūrėkite ir valdykite savo automobilių nuomos rezervacijas</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('myReservationsTitle')}</h1>
+          <p className="text-gray-600">{t('myReservationsSubtitle')}</p>
         </div>
 
         {/* Items per page selector */}
@@ -125,12 +125,12 @@ export function UserDashboard() {
         ) : isError ? (
           <Card className="p-12 text-center">
             <XCircleIcon className="h-16 w-16 text-red-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Klaida kraunant rezervacijas</h3>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('errorLoadingReservations')}</h3>
             <p className="text-gray-600 mb-4">
-              {error instanceof Error ? error.message : 'Nepavyko užkrauti rezervacijų. Bandykite dar kartą.'}
+              {error instanceof Error ? error.message : t('failedToLoadReservations')}
             </p>
             <Button onClick={() => queryClient.invalidateQueries({ queryKey: ['my-contracts'] })}>
-              Bandyti dar kartą
+              {t('tryAgain')}
             </Button>
           </Card>
         ) : contracts && contracts.length > 0 ? (
@@ -140,7 +140,7 @@ export function UserDashboard() {
                 key={contract.id}
                 contract={contract}
                 onCancel={() => {
-                  if (confirm('Ar tikrai norite atšaukti šią rezervaciją?')) {
+                  if (confirm(t('confirmCancelReservationUser'))) {
                     cancelMutation.mutate(contract.id);
                   }
                 }}
@@ -153,8 +153,8 @@ export function UserDashboard() {
         ) : (
           <Card className="p-12 text-center">
             <DocumentTextIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Neturite rezervacijų</h3>
-            <p className="text-gray-600">Pradėkite ieškoti automobilių ir sukurkite savo pirmąją rezervaciją</p>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">{t('noReservations')}</h3>
+            <p className="text-gray-600">{t('noReservationsDescription')}</p>
           </Card>
         )}
       </div>
@@ -175,6 +175,7 @@ function ContractCard({
   getStatusIcon: (state: string) => React.ReactElement;
   getStatusText: (state: string) => string;
 }) {
+  const { t } = useLanguage();
   const { data: car } = useQuery({
     queryKey: ['car', contract.carId],
     queryFn: () => carsApi.getById(contract.carId),
@@ -186,7 +187,7 @@ function ContractCard({
         <div className="flex-1">
           <div className="flex items-center mb-2">
             <h3 className="text-lg font-semibold mr-3">
-              {car ? `${car.make} ${car.model}` : `Automobilis #${contract.carId}`}
+              {car ? `${car.make} ${car.model}` : `${t('carNumber')}${contract.carId}`}
             </h3>
             <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(contract.state)}`}>
               {getStatusIcon(contract.state)}
@@ -201,17 +202,17 @@ function ContractCard({
                 {format(new Date(contract.endDate), 'yyyy-MM-dd HH:mm')}
               </span>
             </div>
-            <div>Pradinis ridos rodmuo: {contract.mileageStartKm} km</div>
-            {contract.mileageEndKm && <div>Galutinis ridos rodmuo: {contract.mileageEndKm} km</div>}
-            <div>Kaina: €{contract.totalPrice}</div>
-            {contract.extraFees > 0 && <div>Papildomi mokesčiai: €{contract.extraFees}</div>}
-            {contract.notes && <div className="italic">Pastabos: {contract.notes}</div>}
+            <div>{t('startingMileage')}: {contract.mileageStartKm} km</div>
+            {contract.mileageEndKm && <div>{t('endingMileage')}: {contract.mileageEndKm} km</div>}
+            <div>{t('priceLabel')}: €{contract.totalPrice}</div>
+            {contract.extraFees > 0 && <div>{t('extraFeesLabel')}: €{contract.extraFees}</div>}
+            {contract.notes && <div className="italic">{t('notesLabel')}: {contract.notes}</div>}
           </div>
         </div>
         <div className="flex space-x-2">
           {(contract.state === 'DRAFT' || contract.state === 'ACTIVE') && (
             <Button size="sm" variant="danger" onClick={onCancel}>
-              Atšaukti
+              {t('cancelButton')}
             </Button>
           )}
         </div>

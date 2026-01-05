@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Layout } from '../components/Layout';
 import { Card } from '../components/ui/Card';
 import { LoadingPage } from '../components/ui/Loading';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../contexts/useLanguage';
 import { contactsApi } from '../api/contacts';
 import {
   EnvelopeIcon,

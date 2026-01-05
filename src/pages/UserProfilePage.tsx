@@ -3,7 +3,7 @@ import { Layout } from '../components/Layout';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../contexts/useLanguage';
 import { usersApi } from '../api/users';
 import type { User } from '../types/api';
 import { UserCircleIcon } from '@heroicons/react/24/outline';

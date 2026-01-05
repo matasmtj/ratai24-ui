@@ -5,7 +5,7 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { DateTimePicker } from '../ui/DateTimePicker';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useLanguage } from '../../contexts/useLanguage';
 import { contractsApi } from '../../api/contracts';
 import type { Contract, ContractUpdate, ContractComplete, Car } from '../../types/api';
 import { format } from 'date-fns';

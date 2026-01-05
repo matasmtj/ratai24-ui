@@ -5,7 +5,7 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { LoadingPage } from '../components/ui/Loading';
 import { Select } from '../components/ui/Select';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../contexts/useLanguage';
 import { contactsApi } from '../api/contacts';
 import { citiesApi } from '../api/cities';
 import type { ContactUpdate, OperationArea } from '../types/api';

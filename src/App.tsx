@@ -6,7 +6,10 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 // Pages
 import { HomePage } from './pages/HomePage';
 import { CarsPage } from './pages/CarsPage';
+import { CarSalePage } from './pages/CarSalePage';
+import { PartsPage } from './pages/PartsPage';
 import { CarDetailPage } from './pages/CarDetailPage';
+import { CarSaleDetailPage } from './pages/CarSaleDetailPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ContactsPage } from './pages/ContactsPage';
@@ -38,6 +41,9 @@ function App() {
             {/* Public Routes */}
             <Route path="/" element={<HomePage />} />
             <Route path="/cars" element={<CarsPage />} />
+            <Route path="/car-sale" element={<CarSalePage />} />
+            <Route path="/car-sale/:id" element={<CarSaleDetailPage />} />
+            <Route path="/parts" element={<PartsPage />} />
             <Route path="/cars/:id" element={<CarDetailPage />} />
             <Route path="/contacts" element={<ContactsPage />} />
             <Route path="/login" element={<LoginPage />} />

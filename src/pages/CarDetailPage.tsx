@@ -10,7 +10,7 @@ import { ImageLightbox } from '../components/ui/ImageLightbox';
 import { carsApi } from '../api/cars';
 import { citiesApi } from '../api/cities';
 import { useAuth } from '../contexts/AuthContext';
-import { useLanguage } from '../contexts/LanguageContext';
+import { useLanguage } from '../contexts/useLanguage';
 import { Modal } from '../components/ui/Modal';
 import { Input } from '../components/ui/Input';
 import { contractsApi } from '../api/contracts';

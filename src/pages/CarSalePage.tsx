@@ -8,7 +8,6 @@ import { Select } from '../components/ui/Select';
 import { LoadingSpinner } from '../components/ui/Loading';
 import { Button } from '../components/ui/Button';
 import { useLanguage } from '../contexts/useLanguage';
-import { useAuth } from '../contexts/AuthContext';
 import { getFuelTypeKey, getGearboxKey } from '../lib/translationHelpers';
 import { carsApi } from '../api/cars';
 import { citiesApi } from '../api/cities';
@@ -20,10 +19,9 @@ import {
   ChevronUpIcon
 } from '@heroicons/react/24/outline';
 
-export function CarsPage() {
+export function CarSalePage() {
   const [searchParams] = useSearchParams();
   const { t } = useLanguage();
-  const { role } = useAuth();
   const [selectedCity, setSelectedCity] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [fuelFilter, setFuelFilter] = useState<string>('');
@@ -49,8 +47,8 @@ export function CarsPage() {
   });
 
   const { data: cars, isLoading } = useQuery({
-    queryKey: ['cars', selectedCity],
-    queryFn: () => carsApi.getAll(selectedCity ? Number(selectedCity) : undefined),
+    queryKey: ['cars-for-sale', selectedCity],
+    queryFn: () => carsApi.getAllForSale(selectedCity ? Number(selectedCity) : undefined),
   });
 
   const filteredAndSortedCars = cars?.filter((car) => {
@@ -66,13 +64,12 @@ export function CarsPage() {
       (engineCapacityFilter === '2.0-3.0' && car.engineCapacityL > 2.0 && car.engineCapacityL <= 3.0) ||
       (engineCapacityFilter === '>3.0' && car.engineCapacityL > 3.0);
     const matchesSeats = !seatCountFilter || car.seatCount.toString() === seatCountFilter;
-    const matchesAvailable = car.state === 'AVAILABLE';
 
-    return matchesSearch && matchesFuel && matchesBody && matchesGearbox && matchesEngine && matchesSeats && matchesAvailable;
+    return matchesSearch && matchesFuel && matchesBody && matchesGearbox && matchesEngine && matchesSeats;
   }).sort((a, b) => {
     if (!sortBy) return 0;
-    if (sortBy === 'priceAsc') return a.pricePerDay - b.pricePerDay;
-    if (sortBy === 'priceDesc') return b.pricePerDay - a.pricePerDay;
+    if (sortBy === 'priceAsc') return (a.salePrice || 0) - (b.salePrice || 0);
+    if (sortBy === 'priceDesc') return (b.salePrice || 0) - (a.salePrice || 0);
     return 0;
   });
 
@@ -98,47 +95,18 @@ export function CarsPage() {
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('carCatalog')}</h1>
-          <p className="text-gray-600">{t('findPerfectCar')}</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('carSaleCatalog')}</h1>
+          <p className="text-gray-600">{t('findPerfectCarForSale')}</p>
         </div>
 
         {/* Filters */}
-        <Card className="p-6 mb-8">
-          {/* Always Visible: Search and Sort */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div className="md:col-span-2">
-              <Input
-                placeholder={t('search')}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+        <Card className="p-6 mb-6">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center">
+              <FunnelIcon className="h-5 w-5 text-gray-500 mr-2" />
+              <h3 className="text-lg font-semibold">{t('filters')}</h3>
             </div>
-            <Select
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              options={[
-                { value: '', label: t('sortBy') },
-                { value: 'priceAsc', label: t('priceAsc') },
-                { value: 'priceDesc', label: t('priceDesc') },
-              ]}
-            />
-          </div>
-
-          {/* Toggle Advanced Filters Button */}
-          <div className="flex items-center justify-between border-t pt-4">
-            <button
-              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
-              className="flex items-center text-gray-700 hover:text-gray-900 font-medium"
-            >
-              <FunnelIcon className="h-5 w-5 mr-2" />
-              {t('advancedFilters')}
-              {showAdvancedFilters ? (
-                <ChevronUpIcon className="h-5 w-5 ml-2" />
-              ) : (
-                <ChevronDownIcon className="h-5 w-5 ml-2" />
-              )}
-            </button>
-            {(selectedCity || fuelFilter || bodyFilter || gearboxFilter || engineCapacityFilter || seatCountFilter) && (
+            {(searchTerm || selectedCity || fuelFilter || bodyFilter || gearboxFilter || engineCapacityFilter || seatCountFilter || sortBy) && (
               <Button 
                 variant="ghost" 
                 size="sm" 
@@ -150,18 +118,50 @@ export function CarsPage() {
               </Button>
             )}
           </div>
+          
+          {/* Basic Filters */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <Input
+              placeholder={t('search')}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Select
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              options={[
+                { value: '', label: t('allCities') },
+                ...(cities?.map((city) => ({ value: city.id.toString(), label: city.name })) || []),
+              ]}
+            />
+            <Select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              options={[
+                { value: '', label: t('sortBy') },
+                { value: 'priceAsc', label: t('salePriceAsc') },
+                { value: 'priceDesc', label: t('salePriceDesc') },
+              ]}
+            />
+          </div>
 
-          {/* Advanced Filters - Collapsible */}
+          {/* Advanced Filters Toggle */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+            className="mb-4"
+          >
+            {showAdvancedFilters ? (
+              <><ChevronUpIcon className="h-4 w-4 mr-1" /> {t('hideAdvancedFilters')}</>
+            ) : (
+              <><ChevronDownIcon className="h-4 w-4 mr-1" /> {t('advancedFilters')}</>
+            )}
+          </Button>
+
+          {/* Advanced Filters */}
           {showAdvancedFilters && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 pt-4 border-t">
-              <Select
-                value={selectedCity}
-                onChange={(e) => setSelectedCity(e.target.value)}
-                options={[
-                  { value: '', label: t('allCities') },
-                  ...(cities?.map((city) => ({ value: city.id.toString(), label: city.name })) || []),
-                ]}
-              />
+            <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <Select
                 value={fuelFilter}
                 onChange={(e) => setFuelFilter(e.target.value)}
@@ -225,7 +225,7 @@ export function CarsPage() {
           )}
           
           {/* Rows per page selector */}
-          <div className="flex items-center gap-2 mt-4 pt-4 border-t">
+          <div className="flex items-center gap-2 mt-4">
             <label className="text-sm font-medium text-gray-700 whitespace-nowrap">{t('rowsPerPage')}:</label>
             <div className="w-20">
               <Select
@@ -249,19 +249,18 @@ export function CarsPage() {
           </div>
         ) : filteredAndSortedCars && filteredAndSortedCars.length > 0 ? (
           <>
-            <div className="mb-6 text-gray-600">
-              {t('showingXofY')
-                .replace('{current}', paginatedCars.length.toString())
-                .replace('{total}', filteredAndSortedCars.length.toString())}
+            <div className="mb-4 text-gray-600">
+              {t('carsFound')}: {paginatedCars.length} / {filteredAndSortedCars.length}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {paginatedCars.map((car) => {
                 const mainImage = car.images?.find(img => img.isMain);
-                
+                const cityName = cities?.find(c => c.id === car.cityId)?.name || '';
+
                 return (
-                <Link key={car.id} to={`/cars/${car.id}`} className="block">
-                  <Card hover className="overflow-hidden h-full">
-                    <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
+                  <Link key={car.id} to={`/car-sale/${car.id}`} className="block">
+                    <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
+                      <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
                       {mainImage ? (
                         <img 
                           src={mainImage.url} 
@@ -269,54 +268,88 @@ export function CarsPage() {
                           className="w-full h-full object-cover"
                         />
                       ) : (
-                        <TruckIcon className="h-24 w-24 text-gray-400" />
+                        <TruckIcon className="h-16 w-16 text-gray-400" />
                       )}
-                      {car.availableForSale && (
-                        <div className="absolute top-2 left-2 bg-green-600 text-white px-2 py-1 rounded text-xs font-medium">
-                          {t('alsoForSale')}
+                      {car.availableForLease && (
+                        <div className="absolute top-2 left-2 bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
+                          {t('alsoForLease')}
                         </div>
                       )}
                     </div>
                     <div className="p-6">
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="text-xl font-semibold">
-                          {car.make} {car.model}
-                        </h3>
-                        {role === 'ADMIN' && (
-                          <span className="text-sm px-2 py-1 bg-green-100 text-green-800 rounded">
-                            {t('available')}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-gray-600 mb-4">{car.year} {t('year')}</p>
-                      
-                      <div className="space-y-1 mb-4 text-sm text-gray-600">
-                        <div>{t(getFuelTypeKey(car.fuelType) as any)}</div>
-                        <div>{t(getGearboxKey(car.gearbox) as any)}</div>
-                        <div>{car.powerKW} {t('kw')}</div>
-                        <div>{car.seatCount} {t('seats')}</div>
-                      </div>
-
-                      <div className="flex justify-between items-center pt-4 border-t">
                         <div>
-                          <div className="text-sm text-gray-500">{t('pricePerDay')}</div>
+                          <h3 className="font-bold text-xl text-gray-900 mb-1">
+                            {car.make} {car.model}
+                          </h3>
+                          <p className="text-sm text-gray-600">{car.year} {t('year')}</p>
+                        </div>
+                        <div className="text-right">
                           <div className="text-2xl font-bold text-primary-600">
-                            €{car.pricePerDay}
+                            €{car.salePrice?.toLocaleString()}
                           </div>
                         </div>
-                        <Button size="sm">{t('view')}</Button>
+                      </div>
+
+                      <div className="space-y-2 mb-4 text-sm text-gray-600">
+                        <div className="flex items-center justify-between">
+                          <span>{t('fuelType')}:</span>
+                          <span className="font-medium">{t(getFuelTypeKey(car.fuelType) as any)}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>{t('gearboxType')}:</span>
+                          <span className="font-medium">{t(getGearboxKey(car.gearbox) as any)}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>{t('power')}:</span>
+                          <span className="font-medium">{car.powerKW} {t('kw')}</span>
+                        </div>
+                        {car.engineCapacityL && (
+                          <div className="flex items-center justify-between">
+                            <span>{t('engineCapacity')}:</span>
+                            <span className="font-medium">{car.engineCapacityL}L</span>
+                          </div>
+                        )}
+                        <div className="flex items-center justify-between">
+                          <span>{t('seats')}:</span>
+                          <span className="font-medium">{car.seatCount}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>{t('mileageLabel')}:</span>
+                          <span className="font-medium">{car.odometerKm.toLocaleString()} km</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span>{t('location')}:</span>
+                          <span className="font-medium">{cityName}</span>
+                        </div>
+                      </div>
+
+                      {car.saleDescription && (
+                        <div className="mb-4 p-3 bg-gray-50 rounded text-sm text-gray-700 line-clamp-3">
+                          {car.saleDescription}
+                        </div>
+                      )}
+
+                      <div className="border-t pt-4">
+                        <Button variant="primary" size="sm" className="w-full">
+                          {t('viewDetails')}
+                        </Button>
                       </div>
                     </div>
-                  </Card>
-                </Link>
-              )})}
+                    </Card>
+                  </Link>
+                );
+              })}
             </div>
           </>
         ) : (
-          <div className="text-center py-12">
+          <Card className="p-12 text-center">
             <TruckIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600 text-lg">{t('noCarsFound')}</p>
-          </div>
+            <p className="text-gray-600 text-lg mb-2">{t('noCarsFound')}</p>
+            <Button variant="ghost" onClick={handleResetFilters}>
+              {t('resetFilters')}
+            </Button>
+          </Card>
         )}
       </div>
     </Layout>

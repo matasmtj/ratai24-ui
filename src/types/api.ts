@@ -43,6 +43,10 @@ export interface Car {
   model: string;
   year: number;
   pricePerDay: number;
+  availableForLease?: boolean;
+  availableForSale?: boolean;
+  salePrice?: number | null;
+  saleDescription?: string | null;
   cityId: number;
   seatCount: number;
   fuelType: FuelType;
@@ -50,6 +54,7 @@ export interface Car {
   engineCapacityL: number | null;
   bodyType: BodyType;
   gearbox: Gearbox;
+  colour?: string | null;
   state: CarState;
   odometerKm: number;
   isActive?: boolean;
@@ -63,6 +68,10 @@ export interface CarCreate {
   model: string;
   year: number;
   pricePerDay: number;
+  availableForLease?: boolean;
+  availableForSale?: boolean;
+  salePrice?: number | null;
+  saleDescription?: string | null;
   cityId: number;
   seatCount?: number;
   fuelType: FuelType;
@@ -70,6 +79,7 @@ export interface CarCreate {
   engineCapacityL?: number | null;
   bodyType: BodyType;
   gearbox: Gearbox;
+  colour?: string | null;
   state?: CarState;
   odometerKm?: number;
 }

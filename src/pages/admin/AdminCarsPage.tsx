@@ -10,7 +10,7 @@ import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { ImageLightbox } from '../../components/ui/ImageLightbox';
 import { carMakes, carModels, carYears } from '../../data/carData';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useLanguage } from '../../contexts/useLanguage';
 import { carsApi } from '../../api/cars';
 import { citiesApi } from '../../api/cities';
 import type { Car, CarCreate } from '../../types/api';
@@ -348,7 +348,7 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
   const { t } = useLanguage();
   
   // Form state with string values for number inputs to prevent 0 prefix bug
-  type FormState = Omit<CarCreate, 'year' | 'pricePerDay' | 'cityId' | 'seatCount' | 'powerKW' | 'engineCapacityL' | 'odometerKm'> & {
+  type FormState = Omit<CarCreate, 'year' | 'pricePerDay' | 'cityId' | 'seatCount' | 'powerKW' | 'engineCapacityL' | 'odometerKm' | 'salePrice'> & {
     year: number;
     pricePerDay: string | number;
     cityId: number;
@@ -356,6 +356,7 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
     powerKW: string | number;
     engineCapacityL: string | number | null;
     odometerKm: string | number;
+    salePrice: string | number | null;
   };
   
   const [formData, setFormData] = useState<FormState>({
@@ -365,6 +366,10 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
     model: '',
     year: new Date().getFullYear(),
     pricePerDay: '50',
+    availableForLease: true,
+    availableForSale: false,
+    salePrice: null,
+    saleDescription: null,
     cityId: cities[0]?.id || 1,
     seatCount: '5',
     fuelType: 'PETROL',
@@ -386,6 +391,10 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
         model: car.model,
         year: car.year,
         pricePerDay: car.pricePerDay.toString(),
+        availableForLease: car.availableForLease ?? true,
+        availableForSale: car.availableForSale ?? false,
+        salePrice: car.salePrice?.toString() || null,
+        saleDescription: car.saleDescription || null,
         cityId: car.cityId,
         seatCount: car.seatCount.toString(),
         fuelType: car.fuelType,
@@ -405,6 +414,10 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
         model: '',
         year: new Date().getFullYear(),
         pricePerDay: '50',
+        availableForLease: true,
+        availableForSale: false,
+        salePrice: null,
+        saleDescription: null,
         cityId: cities[0]?.id || 1,
         seatCount: '5',
         fuelType: 'PETROL',
@@ -441,6 +454,11 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
     const submitData: CarCreate = {
       ...formData,
       pricePerDay: typeof formData.pricePerDay === 'string' ? Number(formData.pricePerDay) : formData.pricePerDay,
+      salePrice: formData.salePrice === null || formData.salePrice === '' 
+        ? null 
+        : typeof formData.salePrice === 'string' 
+          ? Number(formData.salePrice) 
+          : formData.salePrice,
       seatCount: typeof formData.seatCount === 'string' ? Number(formData.seatCount) : formData.seatCount,
       powerKW: typeof formData.powerKW === 'string' ? Number(formData.powerKW) : formData.powerKW,
       engineCapacityL: formData.engineCapacityL === null || formData.engineCapacityL === '' 
@@ -466,6 +484,59 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
       size="xl"
     >
       <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
+        {/* Availability Section */}
+        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+          <h4 className="font-semibold text-blue-900 mb-3">{t('availability')}</h4>
+          <div className="grid grid-cols-2 gap-4">
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.availableForLease}
+                onChange={(e) => setFormData({ ...formData, availableForLease: e.target.checked })}
+                className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+              />
+              <span className="text-sm font-medium text-gray-700">{t('availableForLease')}</span>
+            </label>
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.availableForSale}
+                onChange={(e) => setFormData({ ...formData, availableForSale: e.target.checked })}
+                className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+              />
+              <span className="text-sm font-medium text-gray-700">{t('availableForSale')}</span>
+            </label>
+          </div>
+        </div>
+
+        {/* Sale Section - only show if availableForSale is checked */}
+        {formData.availableForSale && (
+          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
+            <h4 className="font-semibold text-green-900 mb-3">{t('saleInformation')}</h4>
+            <div className="grid grid-cols-2 gap-4">
+              <Input 
+                label={t('salePriceField')} 
+                type="number" 
+                value={formData.salePrice || ''} 
+                onChange={(e) => setFormData({ ...formData, salePrice: e.target.value })} 
+                required={formData.availableForSale}
+              />
+              <div className="col-span-2">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  {t('saleDescription')} ({t('optional')})
+                </label>
+                <textarea
+                  value={formData.saleDescription || ''}
+                  onChange={(e) => setFormData({ ...formData, saleDescription: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  rows={3}
+                  placeholder={t('saleDescriptionPlaceholder')}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-2 gap-4">
           <SearchableSelect 
             label={t('manufacturer')} 

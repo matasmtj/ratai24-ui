@@ -6,7 +6,7 @@ import { LoadingSpinner } from '../../components/ui/Loading';
 import { Modal } from '../../components/ui/Modal';
 import { Input } from '../../components/ui/Input';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useLanguage } from '../../contexts/useLanguage';
 import { citiesApi } from '../../api/cities';
 import type { City, CityCreate } from '../../types/api';
 import { PlusIcon, PencilIcon, TrashIcon } from '@heroicons/react/24/outline';

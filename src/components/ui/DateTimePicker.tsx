@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Calendar, { type CalendarProps } from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import './DateTimePicker.css';
-import { useLanguage } from '../../contexts/LanguageContext';
+import { useLanguage } from '../../contexts/useLanguage';
 
 interface DateTimePickerProps {
   label: string;

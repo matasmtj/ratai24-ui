@@ -12,6 +12,17 @@ export const carsApi = {
     return response.data;
   },
 
+  getAllForSale: async (cityId?: number): Promise<Car[]> => {
+    const params = cityId ? { cityId } : {};
+    const response = await api.get<Car[]>('/cars/for-sale', { params });
+    return response.data;
+  },
+
+  getForSaleById: async (id: number): Promise<Car> => {
+    const response = await api.get<Car>(`/cars/for-sale/${id}`);
+    return response.data;
+  },
+
   getById: async (id: number): Promise<Car> => {
     const response = await api.get<Car>(`/cars/${id}`);
     return response.data;
@@ -40,12 +51,17 @@ export const carsApi = {
   // Image management
   uploadImages: async (carId: number, files: File[]): Promise<{ message: string; images: CarImage[] }> => {
     const formData = new FormData();
-    files.forEach(file => {
-      console.log('Appending file:', file.name, file.size, 'bytes');
-      formData.append('file', file);
+    
+    files.forEach((file) => {
+      formData.append('images', file);
     });
-    console.log('FormData entries:', Array.from(formData.entries()).map(([key, value]) => ({ key, value })));
-    const response = await api.post(`/cars/${carId}/images`, formData);
+    
+    // Delete Content-Type header to let axios set it with boundary for multipart/form-data
+    const response = await api.post(`/cars/${carId}/images`, formData, {
+      headers: {
+        'Content-Type': undefined,
+      },
+    });
     return response.data;
   },
 
