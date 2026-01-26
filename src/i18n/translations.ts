@@ -94,6 +94,7 @@ export const translations = {
     cancel: 'Atšaukti',
     confirm: 'Patvirtinti rezervaciją',
     loginToBook: 'Prisijunkite, kad rezervuotumėte',
+    endDateMustBeAfterStart: 'Grąžinimo laikas turi būti vėlesnis nei paėmimo laikas. Jei nuomojatės vienai dienai, užtikrinkite, kad grąžinimo valanda būtų vėlesnė.',
     
     // Fuel Types
     petrol: 'Benzinas',
@@ -520,6 +521,7 @@ export const translations = {
     cancel: 'Cancel',
     confirm: 'Confirm Reservation',
     loginToBook: 'Login to book',
+    endDateMustBeAfterStart: 'Return time must be later than pickup time. For same-day rentals, please ensure the return hour is after the pickup hour.',
     
     // Fuel Types
     petrol: 'Petrol',
@@ -945,6 +947,7 @@ export const translations = {
     cancel: 'Отмена',
     confirm: 'Подтвердить бронирование',
     loginToBook: 'Войдите, чтобы забронировать',
+    endDateMustBeAfterStart: 'Время возврата должно быть позже времени получения. Для однодневной аренды убедитесь, что час возврата позже часа получения.',
     
     // Fuel Types
     petrol: 'Бензин',

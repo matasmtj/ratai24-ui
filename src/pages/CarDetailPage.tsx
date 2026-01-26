@@ -43,6 +43,7 @@ export function CarDetailPage() {
     notes: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingError, setBookingError] = useState<string | null>(null);
 
   const { data: car, isLoading } = useQuery({
     queryKey: ['car', id],
@@ -66,11 +67,19 @@ export function CarDetailPage() {
     e.preventDefault();
     if (!car) return;
 
+    setBookingError(null);
     setIsSubmitting(true);
     try {
       // Combine date and time (hour) into ISO datetime
       const startDateTime = new Date(`${bookingData.startDate}T${bookingData.startTime.padStart(2, '0')}:00:00`);
       const endDateTime = new Date(`${bookingData.endDate}T${bookingData.endTime.padStart(2, '0')}:00:00`);
+      
+      // Validate that end date/time is after start date/time
+      if (endDateTime <= startDateTime) {
+        setBookingError(t('endDateMustBeAfterStart'));
+        setIsSubmitting(false);
+        return;
+      }
       
       const contractData: ContractCreate = {
         carId: car.id,
@@ -316,7 +325,10 @@ export function CarDetailPage() {
                     {isAuthenticated && role === 'USER' ? (
                       <Button
                         size="lg"
-                        onClick={() => setIsBookingModalOpen(true)}
+                        onClick={() => {
+                          setIsBookingModalOpen(true);
+                          setBookingError(null);
+                        }}
                       >
                         <CalendarIcon className="h-5 w-5 mr-2" />
                         {t('reserveCar')}
@@ -342,6 +354,16 @@ export function CarDetailPage() {
         size="xl"
       >
         <form onSubmit={handleBooking} className="space-y-4">
+          {/* Error message */}
+          {bookingError && (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+              <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+              </svg>
+              <p className="text-sm text-red-800 font-medium">{bookingError}</p>
+            </div>
+          )}
+          
           {/* Reserved dates info */}
           {blockedDates.length > 0 && (
             <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm">
@@ -367,7 +389,7 @@ export function CarDetailPage() {
             selectedTime={bookingData.endTime}
             onDateChange={(date) => setBookingData({ ...bookingData, endDate: date })}
             onTimeChange={(time) => setBookingData({ ...bookingData, endTime: time })}
-            minDate={bookingData.startDate ? new Date(bookingData.startDate) : getMinDate()}
+            minDate={getMinDate()}
             blockedDates={blockedDates}
             required
           />
