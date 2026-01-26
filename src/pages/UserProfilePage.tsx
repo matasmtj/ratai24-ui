@@ -3,6 +3,7 @@ import { Layout } from '../components/Layout';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { Alert } from '../components/ui/Alert';
 import { useLanguage } from '../contexts/useLanguage';
 import { usersApi } from '../api/users';
 import type { User } from '../types/api';
@@ -119,14 +120,14 @@ export function UserProfilePage() {
 
         <Card className="p-6">
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
-              {error}
+            <div className="mb-4">
+              <Alert type="error" message={error} onClose={() => setError('')} />
             </div>
           )}
 
           {success && (
-            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
-              {success}
+            <div className="mb-4">
+              <Alert type="success" message={success} onClose={() => setSuccess('')} />
             </div>
           )}
 

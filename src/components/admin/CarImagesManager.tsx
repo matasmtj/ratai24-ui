@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { carsApi } from '../../api/cars';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
+import { Alert } from '../ui/Alert';
 import { LoadingSpinner } from '../ui/Loading';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { ImageLightbox } from '../ui/ImageLightbox';
@@ -21,6 +22,7 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
   const { t } = useLanguage();
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [deleteImageId, setDeleteImageId] = useState<number | null>(null);
   const [lightboxImageIndex, setLightboxImageIndex] = useState<number | null>(null);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
@@ -50,6 +52,7 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
       queryClient.invalidateQueries({ queryKey: ['cars'] });
       queryClient.invalidateQueries({ queryKey: ['car', carId] });
       setSelectedFiles([]);
+      setError(null);
       setUploading(false);
     },
     onError: (error: any) => {
@@ -70,7 +73,7 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
         errorMessage += 'Please check the console for details.';
       }
       
-      alert(errorMessage);
+      setError(errorMessage);
       setUploading(false);
     },
   });
@@ -98,10 +101,11 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
     if (e.target.files) {
       const files = Array.from(e.target.files);
       if (files.length > 10) {
-        alert(t('maxImagesWarning'));
+        setError(t('maxImagesWarning'));
         return;
       }
       setSelectedFiles(files);
+      setError(null);
     }
   };
 
@@ -178,12 +182,13 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
     );
     
     if (files.length > 10) {
-      alert(t('maxImagesWarning'));
+      setError(t('maxImagesWarning'));
       return;
     }
     
     if (files.length > 0) {
       setSelectedFiles(files);
+      setError(null);
     }
   };
 
@@ -204,6 +209,11 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
     <>
       <Modal isOpen={isOpen} onClose={onClose} title={t('manageImages')} size="2xl">
         <div className="space-y-6">
+          {/* Error Alert */}
+          {error && (
+            <Alert type="error" message={error} onClose={() => setError(null)} />
+          )}
+          
           {/* Upload Section */}
           <div 
             className={`border-2 border-dashed rounded-lg p-6 transition-colors ${

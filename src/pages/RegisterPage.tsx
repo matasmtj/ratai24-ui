@@ -4,6 +4,7 @@ import { Layout } from '../components/Layout';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
+import { Alert } from '../components/ui/Alert';
 import { ReCaptcha, type ReCaptchaHandle } from '../components/ui/ReCaptcha';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/useLanguage';
@@ -23,6 +24,7 @@ export function RegisterPage() {
     phoneNumber: '',
   });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -59,8 +61,8 @@ export function RegisterPage() {
         password: formData.password,
       });
       
-      alert(t('profileUpdated'));
-      navigate('/login');
+      setSuccess(t('profileUpdated'));
+      setTimeout(() => navigate('/login'), 2000);
     } catch (err: any) {
       setError(err.response?.data?.error || t('profileUpdateFailed'));
       recaptchaRef.current?.reset();
@@ -82,8 +84,14 @@ export function RegisterPage() {
           </div>
 
           {error && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
-              {error}
+            <div className="mb-4">
+              <Alert type="error" message={error} onClose={() => setError('')} />
+            </div>
+          )}
+          
+          {success && (
+            <div className="mb-4">
+              <Alert type="success" message={success} />
             </div>
           )}
 

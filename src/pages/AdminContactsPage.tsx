@@ -5,6 +5,7 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { LoadingPage } from '../components/ui/Loading';
 import { Select } from '../components/ui/Select';
+import { Alert } from '../components/ui/Alert';
 import { useLanguage } from '../contexts/useLanguage';
 import { contactsApi } from '../api/contacts';
 import { citiesApi } from '../api/cities';
@@ -15,6 +16,7 @@ export function AdminContactsPage() {
   const { t } = useLanguage();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<ContactUpdate>({
     email: '',
     phone: '',
@@ -38,12 +40,13 @@ export function AdminContactsPage() {
     mutationFn: contactsApi.update,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      setError(null);
       setIsEditing(false);
     },
     onError: (error: any) => {
       console.error('Contact update error:', error);
       const errorMsg = error?.response?.data?.error || error?.response?.data?.message || error.message;
-      alert(`Failed to update contact: ${errorMsg}`);
+      setError(`Failed to update contact: ${errorMsg}`);
     },
   });
 
@@ -51,11 +54,12 @@ export function AdminContactsPage() {
     mutationFn: contactsApi.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      setError(null);
     },
     onError: (error: any) => {
       console.error('Contact create error:', error);
       const errorMsg = error?.response?.data?.error || error?.response?.data?.message || error.message;
-      alert(`Failed to create contact: ${errorMsg}`);
+      setError(`Failed to create contact: ${errorMsg}`);
     },
   });
 
@@ -244,6 +248,12 @@ export function AdminContactsPage() {
         <h1 className="text-3xl font-bold text-gray-900">{t('contactManagement')}</h1>
         <p className="text-gray-600 mt-2">{t('manageContactInfo')}</p>
       </div>
+
+      {error && (
+        <div className="mb-6">
+          <Alert type="error" message={error} onClose={() => setError(null)} />
+        </div>
+      )}
 
         <Card className="p-6">
           <form onSubmit={handleSubmit}>

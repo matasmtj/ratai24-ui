@@ -5,6 +5,7 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { DateTimePicker } from '../ui/DateTimePicker';
+import { Alert } from '../ui/Alert';
 import { useLanguage } from '../../contexts/useLanguage';
 import { contractsApi } from '../../api/contracts';
 import type { Contract, ContractUpdate, ContractComplete, Car } from '../../types/api';
@@ -28,6 +29,7 @@ export function AdminContractDetailModal({
   const { t } = useLanguage();
   const queryClient = useQueryClient();
   const [mode, setMode] = useState<ModalMode>('view');
+  const [error, setError] = useState<string | null>(null);
   
   const [editFormData, setEditFormData] = useState<ContractUpdate>({
     startDate: contract.startDate,
@@ -122,12 +124,13 @@ export function AdminContractDetailModal({
       queryClient.invalidateQueries({ queryKey: ['admin-contracts'] });
       // Update the local state with the new data
       Object.assign(contract, updatedContract);
+      setError(null);
       setMode('view');
     },
     onError: (error: any) => {
       console.error('Update error:', error);
       const errorMsg = error?.response?.data?.error || error?.response?.data?.message || t('errorUpdatingReservation');
-      alert(`${t('errorUpdatingReservation')}\n\n${errorMsg}`);
+      setError(`${t('errorUpdatingReservation')}: ${errorMsg}`);
     },
   });
 
@@ -141,7 +144,7 @@ export function AdminContractDetailModal({
     onError: (error: any) => {
       console.error('Complete error:', error);
       const errorMsg = error?.response?.data?.error || error?.response?.data?.message || t('errorCompletingReservation');
-      alert(`${t('errorCompletingReservation')}\n\n${errorMsg}`);
+      setError(`${t('errorCompletingReservation')}: ${errorMsg}`);
     },
   });
 
@@ -162,6 +165,7 @@ export function AdminContractDetailModal({
   });
 
   const handleEdit = () => {
+    setError(null);
     const startD = new Date(contract.startDate);
     setEditStartDate(`${startD.getFullYear()}-${String(startD.getMonth() + 1).padStart(2, '0')}-${String(startD.getDate()).padStart(2, '0')}`);
     setEditStartTime(String(startD.getHours()).padStart(2, '0'));
@@ -195,6 +199,7 @@ export function AdminContractDetailModal({
   };
 
   const handleComplete = () => {
+    setError(null);
     setCompleteFormData({
       mileageEndKm: contract.mileageEndKm || contract.mileageStartKm,
       fuelLevelEndPct: contract.fuelLevelEndPct || 100,
@@ -205,15 +210,16 @@ export function AdminContractDetailModal({
   };
 
   const handleSaveComplete = () => {
+    setError(null);
     // Validate required fields
     if (!completeFormData.mileageEndKm || completeFormData.mileageEndKm < contract.mileageStartKm) {
-      alert(t('invalidEndMileage') || 'End mileage must be greater than or equal to start mileage');
+      setError(t('invalidEndMileage') || 'End mileage must be greater than or equal to start mileage');
       return;
     }
     
     if (completeFormData.fuelLevelEndPct === null || completeFormData.fuelLevelEndPct === undefined || 
         completeFormData.fuelLevelEndPct < 0 || completeFormData.fuelLevelEndPct > 100) {
-      alert(t('invalidFuelLevel') || 'Fuel level must be between 0 and 100');
+      setError(t('invalidFuelLevel') || 'Fuel level must be between 0 and 100');
       return;
     }
     
@@ -261,6 +267,11 @@ export function AdminContractDetailModal({
   return (
     <Modal isOpen={isOpen} onClose={handleModalClose} title={`${t('reservationNumber')} #${contract.id}`} size="xl">
       <div className="space-y-6">
+        {/* Error Alert */}
+        {error && (
+          <Alert type="error" message={error} onClose={() => setError(null)} />
+        )}
+        
         {/* Status Badge */}
         <div className="flex items-center justify-between">
           <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(mode === 'edit' ? editFormData.state! : contract.state)}`}>

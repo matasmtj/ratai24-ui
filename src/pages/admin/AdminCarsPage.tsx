@@ -6,6 +6,7 @@ import { LoadingSpinner } from '../../components/ui/Loading';
 import { Modal } from '../../components/ui/Modal';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
+import { Alert } from '../../components/ui/Alert';
 import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { ImageLightbox } from '../../components/ui/ImageLightbox';
@@ -346,6 +347,28 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
 }) {
   const queryClient = useQueryClient();
   const { t } = useLanguage();
+  const [error, setError] = useState<string | null>(null);
+  
+  // VIN validation function
+  const validateVIN = (vin: string): { valid: boolean; error?: string } => {
+    if (!vin) return { valid: false, error: t('vinRequired') || 'VIN is required' };
+    
+    // Remove whitespace
+    const cleanVIN = vin.trim().toUpperCase();
+    
+    // VIN must be exactly 17 characters
+    if (cleanVIN.length !== 17) {
+      return { valid: false, error: t('vinLength') || 'VIN must be exactly 17 characters' };
+    }
+    
+    // VIN should only contain alphanumeric characters (excluding I, O, Q)
+    const vinPattern = /^[A-HJ-NPR-Z0-9]{17}$/;
+    if (!vinPattern.test(cleanVIN)) {
+      return { valid: false, error: t('vinInvalidChars') || 'VIN contains invalid characters. Use only letters (except I, O, Q) and numbers' };
+    }
+    
+    return { valid: true };
+  };
   
   // Form state with string values for number inputs to prevent 0 prefix bug
   type FormState = Omit<CarCreate, 'year' | 'pricePerDay' | 'cityId' | 'seatCount' | 'powerKW' | 'engineCapacityL' | 'odometerKm' | 'salePrice'> & {
@@ -435,7 +458,12 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
     mutationFn: carsApi.create,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cars'] });
+      setError(null);
       onClose();
+    },
+    onError: (error: any) => {
+      const errorMsg = error?.response?.data?.error || error?.message || 'Failed to create car';
+      setError(errorMsg);
     },
   });
 
@@ -443,12 +471,25 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
     mutationFn: ({ id, data }: { id: number; data: Partial<CarCreate> }) => carsApi.update(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cars'] });
+      setError(null);
       onClose();
+    },
+    onError: (error: any) => {
+      const errorMsg = error?.response?.data?.error || error?.message || 'Failed to update car';
+      setError(errorMsg);
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+    
+    // Validate VIN
+    const vinValidation = validateVIN(formData.vin);
+    if (!vinValidation.valid) {
+      setError(vinValidation.error!);
+      return;
+    }
     
     // Convert string values to numbers for API
     const submitData: CarCreate = {
@@ -484,6 +525,11 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
       size="xl"
     >
       <form onSubmit={handleSubmit} className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
+        {/* Error Alert */}
+        {error && (
+          <Alert type="error" message={error} onClose={() => setError(null)} />
+        )}
+        
         {/* Availability Section */}
         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
           <h4 className="font-semibold text-blue-900 mb-3">{t('availability')}</h4>
@@ -553,7 +599,26 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
             disabled={!formData.make}
             required 
           />
-          <Input label={t('vin')} value={formData.vin} onChange={(e) => setFormData({ ...formData, vin: e.target.value })} required />
+          <Input 
+            label={t('vin')} 
+            value={formData.vin} 
+            onChange={(e) => {
+              const newVin = e.target.value.toUpperCase();
+              setFormData({ ...formData, vin: newVin });
+              // Clear error when user starts typing
+              if (error) setError(null);
+            }}
+            onBlur={() => {
+              // Validate on blur to give immediate feedback
+              const vinValidation = validateVIN(formData.vin);
+              if (!vinValidation.valid && formData.vin) {
+                setError(vinValidation.error!);
+              }
+            }}
+            maxLength={17}
+            placeholder="17 characters (e.g., 1HGBH41JXMN109186)"
+            required 
+          />
           <Input label={t('numberPlate')} value={formData.numberPlate} onChange={(e) => setFormData({ ...formData, numberPlate: e.target.value })} required />
           <SearchableSelect 
             label={t('yearField')} 

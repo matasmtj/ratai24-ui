@@ -6,6 +6,7 @@ import { LoadingSpinner } from '../../components/ui/Loading';
 import { Modal } from '../../components/ui/Modal';
 import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
+import { Alert } from '../../components/ui/Alert';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { useLanguage } from '../../contexts/useLanguage';
 import { usersApi } from '../../api/users';
@@ -193,6 +194,7 @@ function UserFormModal({
 }) {
   const queryClient = useQueryClient();
   const { t } = useLanguage();
+  const [error, setError] = useState<string | null>(null);
   
   const [formData, setFormData] = useState<UserCreate | UserAdminUpdate>({
     email: user?.email || '',
@@ -207,11 +209,12 @@ function UserFormModal({
     mutationFn: usersApi.createUser,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      setError(null);
       onClose();
     },
     onError: (error: any) => {
       console.error('Create user error:', error);
-      alert(t('userCreateError') || 'Failed to create user');
+      setError(t('userCreateError') || 'Failed to create user');
     },
   });
 
@@ -220,16 +223,18 @@ function UserFormModal({
       usersApi.updateUser(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['users'] });
+      setError(null);
       onClose();
     },
     onError: (error: any) => {
       console.error('Update user error:', error);
-      alert(t('userUpdateError') || 'Failed to update user');
+      setError(t('userUpdateError') || 'Failed to update user');
     },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     if (user) {
       // Update existing user
@@ -250,7 +255,7 @@ function UserFormModal({
     } else {
       // Create new user
       if (!formData.password) {
-        alert(t('passwordRequired') || 'Password is required for new users');
+        setError(t('passwordRequired') || 'Password is required for new users');
         return;
       }
       createMutation.mutate(formData as UserCreate);
@@ -265,6 +270,10 @@ function UserFormModal({
       size="lg"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
+        {error && (
+          <Alert type="error" message={error} onClose={() => setError(null)} />
+        )}
+        
         <Input
           label={t('email')}
           type="email"
