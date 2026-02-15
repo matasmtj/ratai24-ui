@@ -21,8 +21,6 @@ import {
   PencilIcon, 
   TrashIcon, 
   WrenchScrewdriverIcon, 
-  PhotoIcon, 
-  FunnelIcon, 
   XMarkIcon, 
   EyeIcon 
 } from '@heroicons/react/24/outline';
@@ -195,8 +193,9 @@ export function AdminPartsPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
           <SearchableSelect
+            label={t('manufacturer')}
             value={makeFilter}
-            onChange={setMakeFilter}
+            onChange={(value) => setMakeFilter(typeof value === 'string' ? value : value[0] || '')}
             options={[
               { value: '', label: t('allMakes') },
               ...carMakes.map((make) => ({ value: make, label: make })),
@@ -204,8 +203,9 @@ export function AdminPartsPage() {
             placeholder={t('selectMake')}
           />
           <SearchableSelect
+            label={t('model')}
             value={modelFilter}
-            onChange={setModelFilter}
+            onChange={(value) => setModelFilter(typeof value === 'string' ? value : value[0] || '')}
             options={[
               { value: '', label: t('allModels') },
               ...availableModels.map((model) => ({ value: model, label: model })),
@@ -384,10 +384,10 @@ export function AdminPartsPage() {
         const lightboxPart = parts?.find(p => p.id === lightboxPartId);
         return lightboxPart?.images && lightboxPart.images.length > 0 ? (
           <ImageLightbox
-            images={lightboxPart.images.map(img => img.url)}
-            currentIndex={lightboxImageIndex}
+            images={lightboxPart.images}
+            initialIndex={lightboxImageIndex}
+            isOpen={true}
             onClose={() => setLightboxPartId(null)}
-            onNavigate={setLightboxImageIndex}
           />
         ) : null;
       })()}
@@ -538,7 +538,6 @@ function PartFormModal({ isOpen, onClose, part, categories }: {
               value={formData.name} 
               onChange={(value) => setFormData({ ...formData, name: Array.isArray(value) ? value[0] : value })} 
               options={commonPartNames}
-              allowCustom
               required 
             />
           </div>

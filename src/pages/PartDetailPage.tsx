@@ -273,10 +273,10 @@ export function PartDetailPage() {
       {/* Lightbox */}
       {isLightboxOpen && partImages.length > 0 && (
         <ImageLightbox
-          images={partImages.map(img => img.url)}
-          currentIndex={currentImageIndex}
+          images={partImages}
+          initialIndex={currentImageIndex}
+          isOpen={isLightboxOpen}
           onClose={() => setIsLightboxOpen(false)}
-          onNavigate={setCurrentImageIndex}
         />
       )}
     </Layout>

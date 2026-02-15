@@ -9,11 +9,9 @@ import { SearchableSelect } from '../components/ui/SearchableSelect';
 import { LoadingSpinner } from '../components/ui/Loading';
 import { Button } from '../components/ui/Button';
 import { useLanguage } from '../contexts/useLanguage';
-import { useAuth } from '../contexts/AuthContext';
 import { partsApi } from '../api/parts';
 import { carMakes, carModels } from '../data/carData';
 import { partYears } from '../data/partData';
-import type { Part } from '../types/api';
 import { 
   WrenchScrewdriverIcon, 
   FunnelIcon,
@@ -24,7 +22,6 @@ import {
 
 export function PartsPage() {
   const { t } = useLanguage();
-  const { role } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [makeFilter, setMakeFilter] = useState<string>('');
   const [modelFilter, setModelFilter] = useState<string>('');
@@ -202,8 +199,9 @@ export function PartsPage() {
           {showAdvancedFilters && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4 pt-4 border-t">
               <SearchableSelect
+                label={t('manufacturer')}
                 value={makeFilter}
-                onChange={setMakeFilter}
+                onChange={(value) => setMakeFilter(typeof value === 'string' ? value : value[0] || '')}
                 options={[
                   { value: '', label: t('allMakes') },
                   ...carMakes.map((make) => ({ value: make, label: make })),
@@ -211,8 +209,9 @@ export function PartsPage() {
                 placeholder={t('selectMake')}
               />
               <SearchableSelect
+                label={t('model')}
                 value={modelFilter}
-                onChange={setModelFilter}
+                onChange={(value) => setModelFilter(typeof value === 'string' ? value : value[0] || '')}
                 options={[
                   { value: '', label: t('allModels') },
                   ...availableModels.map((model) => ({ value: model, label: model })),
