@@ -223,6 +223,7 @@ export function AdminContractDetailModal({
       return;
     }
     
+    // Notes are optional - no validation needed
     console.log('Completing contract with data:', completeFormData);
     completeMutation.mutate({ id: contract.id, data: completeFormData });
   };

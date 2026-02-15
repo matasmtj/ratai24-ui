@@ -94,7 +94,11 @@ export function DateTimePicker({
                 className="fixed inset-0 z-[999]"
                 onClick={() => setShowCalendar(false)}
               />
-              <div className="absolute left-0 z-[1000] mt-1 bg-white rounded-lg shadow-2xl border border-gray-200 p-3">
+              <div 
+                className="absolute left-0 z-[1000] mt-1 bg-white rounded-lg shadow-2xl border border-gray-200 p-3"
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.preventDefault()}
+              >
                 <Calendar
                   onChange={handleDateSelect}
                   value={currentValue}

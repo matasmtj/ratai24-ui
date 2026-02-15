@@ -64,8 +64,9 @@ export function CarSalePage() {
       (engineCapacityFilter === '2.0-3.0' && car.engineCapacityL > 2.0 && car.engineCapacityL <= 3.0) ||
       (engineCapacityFilter === '>3.0' && car.engineCapacityL > 3.0);
     const matchesSeats = !seatCountFilter || car.seatCount.toString() === seatCountFilter;
+    const matchesAvailableForSale = car.availableForSale === true; // Must be explicitly true
 
-    return matchesSearch && matchesFuel && matchesBody && matchesGearbox && matchesEngine && matchesSeats;
+    return matchesSearch && matchesFuel && matchesBody && matchesGearbox && matchesEngine && matchesSeats && matchesAvailableForSale;
   }).sort((a, b) => {
     if (!sortBy) return 0;
     if (sortBy === 'priceAsc') return (a.salePrice || 0) - (b.salePrice || 0);

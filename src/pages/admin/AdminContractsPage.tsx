@@ -55,10 +55,30 @@ export function AdminContractsPage() {
     });
   }, [contracts, searchTerm, stateFilter, sortBy]);
 
+  // Split contracts into attention needed and regular
+  const { attentionNeeded, regularContracts } = useMemo(() => {
+    const now = new Date();
+    const attention: typeof filteredAndSortedContracts = [];
+    const regular: typeof filteredAndSortedContracts = [];
+
+    filteredAndSortedContracts.forEach((contract) => {
+      const endDate = new Date(contract.endDate);
+      // Active contracts past their end date need attention
+      if (contract.state === 'ACTIVE' && endDate < now) {
+        attention.push(contract);
+      } else {
+        regular.push(contract);
+      }
+    });
+
+    return { attentionNeeded: attention, regularContracts: regular };
+  }, [filteredAndSortedContracts]);
+
   const paginatedContracts = useMemo(() => {
-    if (itemsPerPage === -1) return filteredAndSortedContracts;
-    return filteredAndSortedContracts.slice(0, itemsPerPage);
-  }, [filteredAndSortedContracts, itemsPerPage]);
+    const allToDisplay = [...attentionNeeded, ...regularContracts];
+    if (itemsPerPage === -1) return allToDisplay;
+    return allToDisplay.slice(0, itemsPerPage);
+  }, [attentionNeeded, regularContracts, itemsPerPage]);
 
   const getStatusBadge = (state: string) => {
     const styles = {
@@ -174,19 +194,59 @@ export function AdminContractsPage() {
               .replace('{current}', paginatedContracts.length.toString())
               .replace('{total}', filteredAndSortedContracts.length.toString())}
           </div>
-          <div className="space-y-4">
-            {paginatedContracts.map((contract) => (
-              <ContractCard
-                key={contract.id}
-                contract={contract}
-                getStatusBadge={getStatusBadge}
-                getStatusIcon={getStatusIcon}
-                getStateLabel={getStateLabel}
-                onClickContract={setSelectedContract}
-                t={t}
-              />
-            ))}
-          </div>
+
+          {/* Attention Needed Section */}
+          {attentionNeeded.length > 0 && (
+            <div className="mb-6">
+              <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                <div className="flex items-center">
+                  <XCircleIcon className="h-5 w-5 text-red-500 mr-2" />
+                  <h3 className="text-lg font-semibold text-red-800">
+                    {t('attentionNeeded')} ({attentionNeeded.length})
+                  </h3>
+                </div>
+                <p className="text-sm text-red-700 mt-1">
+                  {t('activeContractsPastEndDate')}
+                </p>
+              </div>
+              <div className="space-y-4">
+                {attentionNeeded.slice(0, itemsPerPage === -1 ? undefined : itemsPerPage).map((contract) => (
+                  <ContractCard
+                    key={contract.id}
+                    contract={contract}
+                    getStatusBadge={getStatusBadge}
+                    getStatusIcon={getStatusIcon}
+                    getStateLabel={getStateLabel}
+                    onClickContract={setSelectedContract}
+                    t={t}
+                    highlight={true}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Regular Contracts Section */}
+          {regularContracts.length > 0 && (
+            <div className="space-y-4">
+              {attentionNeeded.length > 0 && (
+                <h3 className="text-lg font-semibold text-gray-800 mt-6 mb-2">
+                  {t('otherContracts')}
+                </h3>
+              )}
+              {regularContracts.slice(0, itemsPerPage === -1 ? undefined : Math.max(0, itemsPerPage - attentionNeeded.length)).map((contract) => (
+                <ContractCard
+                  key={contract.id}
+                  contract={contract}
+                  getStatusBadge={getStatusBadge}
+                  getStatusIcon={getStatusIcon}
+                  getStateLabel={getStateLabel}
+                  onClickContract={setSelectedContract}
+                  t={t}
+                />
+              ))}
+            </div>
+          )}
         </>
       ) : (
         <Card className="p-12 text-center">
@@ -214,6 +274,7 @@ function ContractCard({
   getStateLabel,
   onClickContract,
   t,
+  highlight = false,
 }: {
   contract: any;
   getStatusBadge: (state: string) => string;
@@ -221,6 +282,7 @@ function ContractCard({
   getStateLabel: (state: string) => string;
   onClickContract: (contract: any) => void;
   t: (key: any) => string;
+  highlight?: boolean;
 }) {
   const { data: car, isError: carError } = useQuery({
     queryKey: ['car', contract.carId],
@@ -237,7 +299,9 @@ function ContractCard({
 
   return (
     <Card 
-      className="p-6 cursor-pointer hover:shadow-lg transition-shadow"
+      className={`p-6 cursor-pointer hover:shadow-lg transition-shadow ${
+        highlight ? 'border-2 border-red-400 bg-red-50' : ''
+      }`}
       onClick={() => onClickContract({ ...contract, car, user })}
     >
       <div className="flex justify-between items-start">

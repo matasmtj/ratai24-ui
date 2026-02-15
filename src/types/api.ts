@@ -6,6 +6,7 @@ export type BodyType = 'SEDAN' | 'HATCHBACK' | 'SUV' | 'WAGON' | 'COUPE' | 'CONV
 export type CarState = 'AVAILABLE' | 'LEASED' | 'MAINTENANCE';
 export type ContractState = 'DRAFT' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 export type UserRole = 'USER' | 'ADMIN';
+export type PartCondition = 'NEW' | 'USED_GOOD' | 'USED_FAIR' | 'REFURBISHED';
 
 export interface ApiError {
   error: string;
@@ -59,6 +60,11 @@ export interface Car {
   odometerKm: number;
   isActive?: boolean;
   images?: CarImage[];
+  // Pricing config
+  useDynamicPricing?: boolean;
+  basePricePerDay?: number;
+  minPricePerDay?: number;
+  maxPricePerDay?: number;
 }
 
 export interface CarCreate {
@@ -82,6 +88,11 @@ export interface CarCreate {
   colour?: string | null;
   state?: CarState;
   odometerKm?: number;
+  // Pricing config
+  useDynamicPricing?: boolean;
+  basePricePerDay?: number;
+  minPricePerDay?: number;
+  maxPricePerDay?: number;
 }
 
 // User
@@ -225,4 +236,96 @@ export interface RefreshRequest {
 
 export interface LogoutRequest {
   refreshToken: string;
+}
+
+// Part
+export interface PartImage {
+  id: number;
+  partId: number;
+  filename: string;
+  url: string;
+  isMain: boolean;
+  createdAt: string;
+}
+
+export interface Part {
+  id: number;
+  name: string;
+  description?: string | null;
+  partNumber?: string | null;
+  make: string;
+  model: string;
+  year: number;
+  price: number;
+  condition: PartCondition;
+  quantity: number;
+  categoryId?: number | null;
+  categoryName?: string | null;
+  location?: string | null;
+  images?: PartImage[];
+  isActive?: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PartCreate {
+  name: string;
+  description?: string | null;
+  partNumber?: string | null;
+  make: string;
+  model: string;
+  year: number;
+  price: number;
+  condition: PartCondition;
+  quantity: number;
+  categoryId?: number | null;
+  location?: string | null;
+}
+
+export interface PartUpdate {
+  name?: string;
+  description?: string | null;
+  partNumber?: string | null;
+  make?: string;
+  model?: string;
+  year?: number;
+  price?: number;
+  condition?: PartCondition;
+  quantity?: number;
+  categoryId?: number | null;
+  location?: string | null;
+  isActive?: boolean;
+}
+
+// Part Category
+export interface PartCategory {
+  id: number;
+  name: string;
+  nameEn: string;
+  nameLt: string;
+  icon?: string | null;
+  parentId?: number | null;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PartCategoryCreate {
+  name: string;
+  nameEn: string;
+  nameLt: string;
+  icon?: string | null;
+  parentId?: number | null;
+  sortOrder?: number;
+}
+
+export interface PartCategoryUpdate {
+  name?: string;
+  nameEn?: string;
+  nameLt?: string;
+  icon?: string | null;
+  parentId?: number | null;
+  sortOrder?: number;
+  isActive?: boolean;
 }

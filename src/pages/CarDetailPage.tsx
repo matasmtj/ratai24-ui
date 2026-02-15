@@ -8,8 +8,12 @@ import { LoadingPage } from '../components/ui/Loading';
 import { DateTimePicker } from '../components/ui/DateTimePicker';
 import { ImageLightbox } from '../components/ui/ImageLightbox';
 import { Alert } from '../components/ui/Alert';
+import { PricePreviewWidget } from '../components/pricing/PricePreviewWidget';
+import { DemandIndicator } from '../components/pricing/DemandIndicator';
+import { LoyaltyBadge } from '../components/pricing/LoyaltyBadge';
 import { carsApi } from '../api/cars';
 import { citiesApi } from '../api/cities';
+import { usersApi } from '../api/users';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/useLanguage';
 import { Modal } from '../components/ui/Modal';
@@ -62,6 +66,12 @@ export function CarDetailPage() {
     queryKey: ['city', car?.cityId],
     queryFn: () => citiesApi.getById(car!.cityId),
     enabled: !!car?.cityId,
+  });
+
+  const { data: currentUser } = useQuery({
+    queryKey: ['current-user'],
+    queryFn: () => usersApi.getCurrentUser(),
+    enabled: isAuthenticated && role === 'USER',
   });
 
   const handleBooking = async (e: React.FormEvent) => {
@@ -316,10 +326,33 @@ export function CarDetailPage() {
             </Card>
 
             <Card className="p-6 bg-primary-50 border-primary-200">
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="text-sm text-gray-600 mb-1">{t('pricePerDay')}</div>
-                  <div className="text-4xl font-bold text-primary-600">€{car.pricePerDay}</div>
+              <div className="flex justify-between items-start mb-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <div className="text-sm text-gray-600">{t('pricePerDay')}</div>
+                    {car.useDynamicPricing && (
+                      <span className="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
+                        {t('dynamicLabel')}
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-4xl font-bold text-primary-600">
+                    €{car.useDynamicPricing && car.basePricePerDay ? car.basePricePerDay : car.pricePerDay}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {car.useDynamicPricing ? (
+                      <>
+                        {t('pricing.basePrice')} • {t('dynamicPricingNote') || 'Final price varies by demand'}
+                        {car.minPricePerDay && car.maxPricePerDay && (
+                          <div className="mt-1 text-gray-600">
+                            {t('priceRange') || 'Range'}: €{car.minPricePerDay} - €{car.maxPricePerDay}
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      t('pricing.fixedPrice') || 'Fixed price'
+                    )}
+                  </div>
                 </div>
                 {car.state === 'AVAILABLE' && (
                   <div>
@@ -342,6 +375,11 @@ export function CarDetailPage() {
                   </div>
                 )}
               </div>
+              {city && (
+                <div className="mt-3 pt-3 border-t border-primary-200">
+                  <DemandIndicator cityId={city.id} />
+                </div>
+              )}
             </Card>
           </div>
         </div>
@@ -395,6 +433,37 @@ export function CarDetailPage() {
             value={bookingData.notes}
             onChange={(e) => setBookingData({ ...bookingData, notes: e.target.value })}
           />
+
+          {/* Loyalty Badge for authenticated users */}
+          {isAuthenticated && role === 'USER' && (
+            <div className="pt-2">
+              <LoyaltyBadge />
+            </div>
+          )}
+
+          {/* Dynamic pricing preview */}
+          {car.useDynamicPricing && bookingData.startDate && bookingData.endDate && bookingData.startTime && bookingData.endTime && (() => {
+            // Construct full ISO datetime strings for price calculation
+            const startDateTime = new Date(`${bookingData.startDate}T${bookingData.startTime.padStart(2, '0')}:00:00`);
+            const endDateTime = new Date(`${bookingData.endDate}T${bookingData.endTime.padStart(2, '0')}:00:00`);
+            
+            // Only show preview if end is after start
+            if (endDateTime <= startDateTime) {
+              return null;
+            }
+            
+            return (
+              <div className="pt-2">
+                <PricePreviewWidget
+                  carId={car.id}
+                  startDate={startDateTime.toISOString()}
+                  endDate={endDateTime.toISOString()}
+                  userId={currentUser?.id}
+                  showBreakdown={true}
+                />
+              </div>
+            );
+          })()}
 
           <div className="flex justify-end space-x-3 pt-4">
             <Button

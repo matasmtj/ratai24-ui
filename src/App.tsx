@@ -7,7 +7,6 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { HomePage } from './pages/HomePage';
 import { CarsPage } from './pages/CarsPage';
 import { CarSalePage } from './pages/CarSalePage';
-import { PartsPage } from './pages/PartsPage';
 import { CarDetailPage } from './pages/CarDetailPage';
 import { CarSaleDetailPage } from './pages/CarSaleDetailPage';
 import { LoginPage } from './pages/LoginPage';
@@ -21,6 +20,9 @@ import { AdminCarsPage } from './pages/admin/AdminCarsPage';
 import { AdminContractsPage } from './pages/admin/AdminContractsPage';
 import { AdminContactsPage } from './pages/AdminContactsPage';
 import { AdminUsersPage } from './pages/admin/AdminUsersPage';
+import { AdminPricingDashboard } from './pages/admin/AdminPricingDashboard';
+import { AdminPricingRulesPage } from './pages/admin/AdminPricingRulesPage';
+import { AdminSeasonalFactorsPage } from './pages/admin/AdminSeasonalFactorsPage';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,7 +45,6 @@ function App() {
             <Route path="/cars" element={<CarsPage />} />
             <Route path="/car-sale" element={<CarSalePage />} />
             <Route path="/car-sale/:id" element={<CarSaleDetailPage />} />
-            <Route path="/parts" element={<PartsPage />} />
             <Route path="/cars/:id" element={<CarDetailPage />} />
             <Route path="/contacts" element={<ContactsPage />} />
             <Route path="/login" element={<LoginPage />} />
@@ -82,6 +83,9 @@ function App() {
               <Route path="contracts" element={<AdminContractsPage />} />
               <Route path="contacts" element={<AdminContactsPage />} />
               <Route path="users" element={<AdminUsersPage />} />
+              <Route path="pricing" element={<AdminPricingDashboard />} />
+              <Route path="pricing/rules" element={<AdminPricingRulesPage />} />
+              <Route path="pricing/seasonal" element={<AdminSeasonalFactorsPage />} />
             </Route>
 
             {/* Catch all */}

@@ -67,8 +67,9 @@ export function CarsPage() {
       (engineCapacityFilter === '>3.0' && car.engineCapacityL > 3.0);
     const matchesSeats = !seatCountFilter || car.seatCount.toString() === seatCountFilter;
     const matchesAvailable = car.state === 'AVAILABLE';
+    const matchesAvailableForLease = car.availableForLease !== false; // undefined or true means available
 
-    return matchesSearch && matchesFuel && matchesBody && matchesGearbox && matchesEngine && matchesSeats && matchesAvailable;
+    return matchesSearch && matchesFuel && matchesBody && matchesGearbox && matchesEngine && matchesSeats && matchesAvailable && matchesAvailableForLease;
   }).sort((a, b) => {
     if (!sortBy) return 0;
     if (sortBy === 'priceAsc') return a.pricePerDay - b.pricePerDay;
@@ -298,11 +299,28 @@ export function CarsPage() {
                       </div>
 
                       <div className="flex justify-between items-center pt-4 border-t">
-                        <div>
-                          <div className="text-sm text-gray-500">{t('pricePerDay')}</div>
-                          <div className="text-2xl font-bold text-primary-600">
-                            €{car.pricePerDay}
-                          </div>
+                        <div className="flex-1">
+                          {car.useDynamicPricing ? (
+                            <>
+                              <div className="flex items-center gap-2 mb-1">
+                                <div className="text-sm text-gray-500">{t('startsFrom')}</div>
+                                <span className="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
+                                  {t('dynamicLabel')}
+                                </span>
+                              </div>
+                              <div className="text-2xl font-bold text-primary-600">
+                                €{car.minPricePerDay || car.basePricePerDay || car.pricePerDay}
+                                <span className="text-sm font-normal text-gray-500">/day</span>
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="text-sm text-gray-500">{t('pricePerDay')}</div>
+                              <div className="text-2xl font-bold text-primary-600">
+                                €{car.pricePerDay}
+                              </div>
+                            </>
+                          )}
                         </div>
                         <Button size="sm">{t('view')}</Button>
                       </div>

@@ -146,9 +146,18 @@ export function HomePage() {
                   </h3>
                   <p className="text-gray-600 mb-4">{car.year} {t('year')}</p>
                   <div className="flex justify-between items-center">
-                    <span className="text-2xl font-bold text-primary-600">
-                      €{car.pricePerDay}{t('perDay')}
-                    </span>
+                    <div>
+                      <span className="text-2xl font-bold text-primary-600">
+                        €{car.useDynamicPricing && car.basePricePerDay ? car.basePricePerDay : car.pricePerDay}{t('perDay')}
+                      </span>
+                      {car.useDynamicPricing && (
+                        <div>
+                          <span className="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-700 font-medium ml-2">
+                            {t('dynamicLabel')}
+                          </span>
+                        </div>
+                      )}
+                    </div>
                     <Link to="/cars">
                       <Button size="sm">{t('view')}</Button>
                     </Link>

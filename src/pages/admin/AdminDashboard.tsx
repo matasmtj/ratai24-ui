@@ -8,6 +8,7 @@ import {
   Cog6ToothIcon,
   PhoneIcon,
   UsersIcon,
+  CurrencyDollarIcon,
 } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
 
@@ -21,6 +22,7 @@ export function AdminDashboard() {
     { name: t('cities'), href: '/admin/cities', icon: MapPinIcon },
     { name: t('contacts'), href: '/admin/contacts', icon: PhoneIcon },
     { name: t('users'), href: '/admin/users', icon: UsersIcon },
+    { name: t('pricing.admin.pricing'), href: '/admin/pricing', icon: CurrencyDollarIcon },
   ];
 
   return (
@@ -38,7 +40,8 @@ export function AdminDashboard() {
           <nav className="-mb-px flex space-x-8">
             {tabs.map((tab) => {
               const isActive = location.pathname === tab.href || 
-                              (tab.href === '/admin/cars' && location.pathname === '/admin');
+                              (tab.href === '/admin/cars' && location.pathname === '/admin') ||
+                              (tab.href === '/admin/pricing' && location.pathname.startsWith('/admin/pricing'));
               return (
                 <Link
                   key={tab.name}
@@ -62,6 +65,35 @@ export function AdminDashboard() {
             })}
           </nav>
         </div>
+
+        {/* Pricing Sub-navigation */}
+        {location.pathname.startsWith('/admin/pricing') && (
+          <div className="border-b border-gray-200 mb-6">
+            <nav className="-mb-px flex space-x-4">
+              {[
+                { name: t('pricing.admin.analytics'), href: '/admin/pricing' },
+                { name: t('pricing.admin.pricingRules'), href: '/admin/pricing/rules' },
+                { name: t('pricing.admin.seasonalFactors'), href: '/admin/pricing/seasonal' },
+              ].map((subtab) => {
+                const isActive = location.pathname === subtab.href;
+                return (
+                  <Link
+                    key={subtab.name}
+                    to={subtab.href}
+                    className={clsx(
+                      'py-2 px-3 border-b-2 font-medium text-sm',
+                      isActive
+                        ? 'border-primary-500 text-primary-600'
+                        : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                    )}
+                  >
+                    {subtab.name}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        )}
 
         <Outlet />
       </div>

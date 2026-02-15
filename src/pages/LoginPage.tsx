@@ -21,26 +21,50 @@ export function LoginPage() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
+  const handleInputChange = (field: 'email' | 'password', value: string) => {
+    setFormData({ ...formData, [field]: value });
+    // Clear error when user starts typing
+    if (error) setError('');
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
+  const handleSubmit = async () => {
+    console.log('Submit clicked - starting login flow');
+    
+    // Prevent multiple submissions
+    if (isLoading) {
+      console.log('Already loading, preventing duplicate submission');
+      return;
+    }
 
     // Verify reCAPTCHA
     const recaptchaToken = recaptchaRef.current?.getValue();
+    console.log('ReCAPTCHA token:', recaptchaToken ? 'present' : 'missing');
+    
     if (!recaptchaToken) {
       setError(t('completeRecaptcha'));
       return;
     }
 
     setIsLoading(true);
+    console.log('Starting login request...');
 
     try {
       await login(formData);
+      console.log('Login successful, navigating...');
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || t('loginFailed'));
+      console.error('Login error:', err);
+      const errorMessage = err.response?.data?.error || t('loginFailed');
+      setError(errorMessage);
+      console.log('Error set:', errorMessage);
       recaptchaRef.current?.reset();
-    } finally {
       setIsLoading(false);
     }
   };
@@ -63,31 +87,39 @@ export function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-4">
             <Input
               label={t('email')}
               type="email"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              required
+              onChange={(e) => handleInputChange('email', e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder={t('emailPlaceholder')}
+              autoComplete="email"
             />
             <Input
               label={t('password')}
               type="password"
               value={formData.password}
-              onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-              required
+              onChange={(e) => handleInputChange('password', e.target.value)}
+              onKeyDown={handleKeyDown}
+              autoComplete="current-password"
             />
 
             <div className="pt-2">
               <ReCaptcha ref={recaptchaRef} />
             </div>
 
-            <Button type="submit" className="w-full" isLoading={isLoading}>
+            <Button 
+              type="button"
+              onClick={handleSubmit}
+              className="w-full" 
+              isLoading={isLoading}
+              disabled={isLoading}
+            >
               {t('login')}
             </Button>
-          </form>
+          </div>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">

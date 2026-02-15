@@ -42,7 +42,20 @@ export function AdminCarsPage() {
 
   const { data: cars, isLoading } = useQuery({
     queryKey: ['cars'],
-    queryFn: () => carsApi.getAll(),
+    queryFn: async () => {
+      const cars = await carsApi.getAll();
+      console.log('Fetched cars:', cars);
+      if (cars.length > 0) {
+        console.log('First car pricing config:', {
+          id: cars[0].id,
+          useDynamicPricing: cars[0].useDynamicPricing,
+          basePricePerDay: cars[0].basePricePerDay,
+          minPricePerDay: cars[0].minPricePerDay,
+          maxPricePerDay: cars[0].maxPricePerDay,
+        });
+      }
+      return cars;
+    },
   });
 
   const filteredAndSortedCars = useMemo(() => {
@@ -103,6 +116,11 @@ export function AdminCarsPage() {
     }
   };
 
+  // Calculate stats
+  const totalCars = cars?.length || 0;
+  const dynamicPricingEnabled = cars?.filter(car => car.useDynamicPricing).length || 0;
+  const dynamicPricingPercentage = totalCars > 0 ? (dynamicPricingEnabled / totalCars * 100) : 0;
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -111,6 +129,31 @@ export function AdminCarsPage() {
           <PlusIcon className="h-5 w-5 mr-2" />
           {t('addCar')}
         </Button>
+      </div>
+
+      {/* Stats Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <Card className="p-4">
+          <div className="text-sm text-gray-600">{t('totalCars') || 'Total Cars'}</div>
+          <div className="text-2xl font-bold text-gray-900">{totalCars}</div>
+        </Card>
+        <Card className="p-4">
+          <div className="text-sm text-gray-600">{t('withDynamicPricing') || 'Dynamic Pricing'}</div>
+          <div className="text-2xl font-bold text-purple-600">{dynamicPricingEnabled}</div>
+          <div className="text-xs text-gray-500 mt-1">{dynamicPricingPercentage.toFixed(0)}% of cars</div>
+        </Card>
+        <Card className="p-4">
+          <div className="text-sm text-gray-600">{t('availableCars') || 'Available'}</div>
+          <div className="text-2xl font-bold text-green-600">
+            {cars?.filter(car => car.state === 'AVAILABLE').length || 0}
+          </div>
+        </Card>
+        <Card className="p-4">
+          <div className="text-sm text-gray-600">{t('leasedCars') || 'Leased'}</div>
+          <div className="text-2xl font-bold text-yellow-600">
+            {cars?.filter(car => car.state === 'LEASED').length || 0}
+          </div>
+        </Card>
       </div>
 
       {/* Filters */}
@@ -236,13 +279,22 @@ export function AdminCarsPage() {
                 </h3>
                 <p className="text-gray-600 text-sm mb-2">{car.year} {t('year')} • {car.numberPlate}</p>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="text-primary-600 font-bold">€{car.pricePerDay}/d</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-primary-600 font-bold">
+                      €{car.useDynamicPricing && car.basePricePerDay ? car.basePricePerDay : car.pricePerDay}/d
+                    </span>
+                    {car.useDynamicPricing && (
+                      <span className="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
+                        {t('dynamicLabel')}
+                      </span>
+                    )}
+                  </div>
                   <span className={`text-xs px-2 py-1 rounded ${
                     car.state === 'AVAILABLE' ? 'bg-green-100 text-green-800' : 
                     car.state === 'LEASED' ? 'bg-yellow-100 text-yellow-800' : 
                     'bg-red-100 text-red-800'
                   }`}>
-                    {car.state}
+                    {car.state === 'AVAILABLE' ? t('availableLabel') : car.state === 'LEASED' ? t('leasedLabel') : t('maintenanceLabel')}
                   </span>
                 </div>
                 <div className="flex space-x-2">
@@ -371,7 +423,7 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
   };
   
   // Form state with string values for number inputs to prevent 0 prefix bug
-  type FormState = Omit<CarCreate, 'year' | 'pricePerDay' | 'cityId' | 'seatCount' | 'powerKW' | 'engineCapacityL' | 'odometerKm' | 'salePrice'> & {
+  type FormState = Omit<CarCreate, 'year' | 'pricePerDay' | 'cityId' | 'seatCount' | 'powerKW' | 'engineCapacityL' | 'odometerKm' | 'salePrice' | 'basePricePerDay' | 'minPricePerDay' | 'maxPricePerDay'> & {
     year: number;
     pricePerDay: string | number;
     cityId: number;
@@ -380,6 +432,10 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
     engineCapacityL: string | number | null;
     odometerKm: string | number;
     salePrice: string | number | null;
+    useDynamicPricing?: boolean;
+    basePricePerDay?: string | number;
+    minPricePerDay?: string | number;
+    maxPricePerDay?: string | number;
   };
   
   const [formData, setFormData] = useState<FormState>({
@@ -402,6 +458,10 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
     gearbox: 'MANUAL',
     state: 'AVAILABLE',
     odometerKm: '0',
+    useDynamicPricing: false,
+    basePricePerDay: '',
+    minPricePerDay: '',
+    maxPricePerDay: '',
   });
 
   // Update form data when car changes (for edit mode)
@@ -427,6 +487,10 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
         gearbox: car.gearbox,
         state: car.state,
         odometerKm: car.odometerKm.toString(),
+        useDynamicPricing: car.useDynamicPricing ?? false,
+        basePricePerDay: car.basePricePerDay?.toString() || '',
+        minPricePerDay: car.minPricePerDay?.toString() || '',
+        maxPricePerDay: car.maxPricePerDay?.toString() || '',
       });
     } else {
       // Reset form for create mode
@@ -450,13 +514,18 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
         gearbox: 'MANUAL',
         state: 'AVAILABLE',
         odometerKm: '0',
+        useDynamicPricing: false,
+        basePricePerDay: '',
+        minPricePerDay: '',
+        maxPricePerDay: '',
       });
     }
   }, [car, cities]);
 
   const createMutation = useMutation({
     mutationFn: carsApi.create,
-    onSuccess: () => {
+    onSuccess: (createdCar: Car) => {
+      console.log('Car created:', createdCar);
       queryClient.invalidateQueries({ queryKey: ['cars'] });
       setError(null);
       onClose();
@@ -469,7 +538,8 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Partial<CarCreate> }) => carsApi.update(id, data),
-    onSuccess: () => {
+    onSuccess: (updatedCar: Car) => {
+      console.log('Car updated:', updatedCar);
       queryClient.invalidateQueries({ queryKey: ['cars'] });
       setError(null);
       onClose();
@@ -491,6 +561,39 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
       return;
     }
     
+    // Validate dynamic pricing fields
+    if (formData.useDynamicPricing) {
+      const basePrice = typeof formData.basePricePerDay === 'string' 
+        ? Number(formData.basePricePerDay) 
+        : formData.basePricePerDay;
+      const minPrice = typeof formData.minPricePerDay === 'string' 
+        ? Number(formData.minPricePerDay) 
+        : formData.minPricePerDay;
+      const maxPrice = typeof formData.maxPricePerDay === 'string' 
+        ? Number(formData.maxPricePerDay) 
+        : formData.maxPricePerDay;
+      
+      if (!basePrice || !minPrice || !maxPrice) {
+        setError('All dynamic pricing fields (base, min, max) are required when dynamic pricing is enabled');
+        return;
+      }
+      
+      if (minPrice > basePrice) {
+        setError('Minimum price cannot be higher than base price');
+        return;
+      }
+      
+      if (maxPrice < basePrice) {
+        setError('Maximum price cannot be lower than base price');
+        return;
+      }
+      
+      if (minPrice > maxPrice) {
+        setError('Minimum price cannot be higher than maximum price');
+        return;
+      }
+    }
+    
     // Convert string values to numbers for API
     const submitData: CarCreate = {
       ...formData,
@@ -508,6 +611,22 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
           ? Number(formData.engineCapacityL) 
           : formData.engineCapacityL,
       odometerKm: typeof formData.odometerKm === 'string' ? Number(formData.odometerKm) : formData.odometerKm,
+      useDynamicPricing: formData.useDynamicPricing,
+      basePricePerDay: formData.basePricePerDay === '' || formData.basePricePerDay === undefined
+        ? undefined
+        : typeof formData.basePricePerDay === 'string' 
+          ? Number(formData.basePricePerDay) 
+          : formData.basePricePerDay,
+      minPricePerDay: formData.minPricePerDay === '' || formData.minPricePerDay === undefined
+        ? undefined
+        : typeof formData.minPricePerDay === 'string' 
+          ? Number(formData.minPricePerDay) 
+          : formData.minPricePerDay,
+      maxPricePerDay: formData.maxPricePerDay === '' || formData.maxPricePerDay === undefined
+        ? undefined
+        : typeof formData.maxPricePerDay === 'string' 
+          ? Number(formData.maxPricePerDay) 
+          : formData.maxPricePerDay,
     };
     
     if (car) {
@@ -583,6 +702,63 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
           </div>
         )}
 
+        {/* Dynamic Pricing Section */}
+        <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
+          <div className="flex items-start justify-between mb-3">
+            <div>
+              <h4 className="font-semibold text-purple-900">{t('dynamicPricing') || 'Dynamic Pricing'}</h4>
+              <p className="text-xs text-purple-700 mt-1">{t('dynamicPricingDescription') || 'Enable real-time pricing based on demand, seasonality, and other factors'}</p>
+            </div>
+            <label className="flex items-center space-x-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={formData.useDynamicPricing || false}
+                onChange={(e) => setFormData({ ...formData, useDynamicPricing: e.target.checked })}
+                className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+              />
+              <span className="text-sm font-medium text-gray-700">{t('enableDynamicPricing') || 'Enable'}</span>
+            </label>
+          </div>
+          
+          {formData.useDynamicPricing && (
+            <div className="grid grid-cols-3 gap-4 mt-4">
+              <Input 
+                label={t('basePricePerDay') || 'Base Price (€/day)'}
+                type="number"
+                step="0.01"
+                value={formData.basePricePerDay || ''} 
+                onChange={(e) => setFormData({ ...formData, basePricePerDay: e.target.value })} 
+                placeholder="e.g., 40"
+                required={formData.useDynamicPricing}
+              />
+              <Input 
+                label={t('minPricePerDay') || 'Min Price (€/day)'}
+                type="number"
+                step="0.01"
+                value={formData.minPricePerDay || ''} 
+                onChange={(e) => setFormData({ ...formData, minPricePerDay: e.target.value })} 
+                placeholder="e.g., 25"
+                required={formData.useDynamicPricing}
+              />
+              <Input 
+                label={t('maxPricePerDay') || 'Max Price (€/day)'}
+                type="number"
+                step="0.01"
+                value={formData.maxPricePerDay || ''} 
+                onChange={(e) => setFormData({ ...formData, maxPricePerDay: e.target.value })} 
+                placeholder="e.g., 100"
+                required={formData.useDynamicPricing}
+              />
+            </div>
+          )}
+          
+          {!formData.useDynamicPricing && (
+            <p className="text-xs text-gray-600 mt-2 italic">
+              {t('dynamicPricingDisabledNote') || 'When disabled, the car will use the fixed "Price per Day" value below'}
+            </p>
+          )}
+        </div>
+
         <div className="grid grid-cols-2 gap-4">
           <SearchableSelect 
             label={t('manufacturer')} 
@@ -627,7 +803,26 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
             options={carYears.map(y => String(y))}
             required 
           />
-          <Input label={t('pricePerDayField')} type="number" value={formData.pricePerDay || ''} onChange={(e) => setFormData({ ...formData, pricePerDay: e.target.value })} required />
+          <div className="relative">
+            <Input 
+              label={t('pricePerDayField')} 
+              type="number" 
+              value={formData.pricePerDay || ''} 
+              onChange={(e) => setFormData({ ...formData, pricePerDay: e.target.value })} 
+              required={!formData.useDynamicPricing}
+              disabled={formData.useDynamicPricing}
+            />
+            {formData.useDynamicPricing && (
+              <p className="text-xs text-purple-600 mt-1 italic">
+                {t('dynamicPricingEnabledNote') || 'Dynamic pricing is enabled. This fixed price will not be used.'}
+              </p>
+            )}
+            {!formData.useDynamicPricing && (
+              <p className="text-xs text-gray-500 mt-1">
+                {t('dynamicPricingDisabledNote') || 'Fixed daily rate. Enable dynamic pricing above for automatic adjustments.'}
+              </p>
+            )}
+          </div>
           <Select label={t('city')} value={formData.cityId} onChange={(e) => setFormData({ ...formData, cityId: Number(e.target.value) })} options={cities.map(c => ({ value: c.id, label: c.name }))} />
           <Input label={t('seatsCount')} type="number" value={formData.seatCount || ''} onChange={(e) => setFormData({ ...formData, seatCount: e.target.value })} />
           <Select label={t('fuel')} value={formData.fuelType} onChange={(e) => setFormData({ ...formData, fuelType: e.target.value as any })} options={[

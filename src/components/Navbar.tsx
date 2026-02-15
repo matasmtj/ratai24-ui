@@ -62,13 +62,6 @@ export function Navbar() {
                 {t('carSale')}
               </Link>
               <Link
-                to="/parts"
-                className="inline-flex items-center px-2 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
-              >
-                <TruckIcon className="h-4 w-4 mr-1" />
-                {t('parts')}
-              </Link>
-              <Link
                 to="/contacts"
                 className="inline-flex items-center px-2 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
               >
@@ -195,14 +188,6 @@ export function Navbar() {
               >
                 <TruckIcon className="h-5 w-5 mr-3" />
                 {t('carSale')}
-              </Link>
-              <Link
-                to="/parts"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-              >
-                <TruckIcon className="h-5 w-5 mr-3" />
-                {t('parts')}
               </Link>
               <Link
                 to="/contacts"

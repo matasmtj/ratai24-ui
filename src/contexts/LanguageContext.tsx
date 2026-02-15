@@ -4,10 +4,15 @@ import { translations, type Language } from '../i18n/translations';
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: keyof typeof translations.lt) => string;
+  t: (key: string) => string;
 }
 
 export const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+
+// Helper function to get nested value from object using dot notation
+function getNestedValue(obj: any, path: string): any {
+  return path.split('.').reduce((current, key) => current?.[key], obj);
+}
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
@@ -23,9 +28,12 @@ export function LanguageProvider({ children }: { children: ReactNode }) {
     setLanguageState(lang);
   };
 
-  const t = (key: keyof typeof translations.lt): string => {
-    const currentTranslations = translations[language] as Record<string, string>;
-    return currentTranslations[key] || translations.lt[key] || key;
+  const t = (key: string): string => {
+    const currentTranslations = translations[language];
+    const value = getNestedValue(currentTranslations, key) || 
+                  getNestedValue(translations.lt, key) || 
+                  key;
+    return typeof value === 'string' ? value : key;
   };
 
   return (

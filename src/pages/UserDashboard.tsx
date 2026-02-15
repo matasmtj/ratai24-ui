@@ -5,6 +5,7 @@ import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { LoadingSpinner } from '../components/ui/Loading';
 import { Select } from '../components/ui/Select';
+import { LoyaltyBadge } from '../components/pricing/LoyaltyBadge';
 import { contractsApi } from '../api/contracts';
 import { carsApi } from '../api/cars';
 import type { Contract } from '../types/api';
@@ -89,6 +90,11 @@ export function UserDashboard() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('myReservationsTitle')}</h1>
           <p className="text-gray-600">{t('myReservationsSubtitle')}</p>
+        </div>
+
+        {/* Loyalty Badge */}
+        <div className="mb-6">
+          <LoyaltyBadge />
         </div>
 
         {/* Items per page selector */}
