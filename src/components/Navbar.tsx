@@ -191,7 +191,6 @@ export function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
               >
-                <HomeIcon className="h-5 w-5 mr-3" />
                 {t('home')}
               </Link>
               <Link
@@ -199,7 +198,6 @@ export function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
               >
-                <TruckIcon className="h-5 w-5 mr-3" />
                 {t('carLease')}
               </Link>
               <Link
@@ -207,7 +205,6 @@ export function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
               >
-                <TruckIcon className="h-5 w-5 mr-3" />
                 {t('carSale')}
               </Link>
               <Link
