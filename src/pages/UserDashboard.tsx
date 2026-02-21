@@ -90,6 +90,9 @@ export function UserDashboard() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('myReservationsTitle')}</h1>
           <p className="text-gray-600">{t('myReservationsSubtitle')}</p>
+          <p className="text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2 mt-3 inline-block">
+            {t('cancellationPolicyNote')}
+          </p>
         </div>
 
         {/* Loyalty Badge */}
@@ -187,6 +190,10 @@ function ContractCard({
     queryFn: () => carsApi.getById(contract.carId),
   });
 
+  const start = new Date(contract.startDate).getTime();
+  const now = Date.now();
+  const canCancel = contract.state === 'DRAFT' && start - now >= 24 * 60 * 60 * 1000;
+
   return (
     <Card className="p-6">
       <div className="flex justify-between items-start mb-4">
@@ -216,7 +223,7 @@ function ContractCard({
           </div>
         </div>
         <div className="flex space-x-2">
-          {(contract.state === 'DRAFT' || contract.state === 'ACTIVE') && (
+          {canCancel && (
             <Button size="sm" variant="danger" onClick={onCancel}>
               {t('cancelButton')}
             </Button>

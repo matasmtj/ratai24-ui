@@ -1,22 +1,11 @@
 import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Menu } from '@headlessui/react';
+import { UserCircleIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/useLanguage';
 import { Button } from './ui/Button';
-import { 
-  HomeIcon, 
-  TruckIcon, 
-  DocumentTextIcon,
-  UserCircleIcon,
-  Cog6ToothIcon,
-  ArrowRightOnRectangleIcon,
-  LanguageIcon,
-  PhoneIcon,
-  Bars3Icon,
-  XMarkIcon
-} from '@heroicons/react/24/outline';
-import { Menu } from '@headlessui/react';
 import type { Language } from '../i18n/translations';
-import { useState } from 'react';
 
 export function Navbar() {
   const { isAuthenticated, role, logout } = useAuth();
@@ -26,52 +15,49 @@ export function Navbar() {
 
   const handleLogout = async () => {
     await logout();
-    navigate('/');
+    setMobileMenuOpen(false);
+    navigate('/', { replace: true });
+    window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
   };
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex items-center">
-            <Link to="/" className="flex items-center flex-shrink-0">
-              <TruckIcon className="h-8 w-8 text-primary-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">Ratai24</span>
+          <div className="flex items-center gap-6">
+            <Link to="/" className="flex items-center flex-shrink-0 text-xl font-bold text-gray-900">
+              Ratai24
             </Link>
-            
-            <div className="hidden lg:ml-8 lg:flex lg:space-x-1">
+
+            <div className="hidden lg:flex lg:space-x-3">
               <Link
                 to="/"
-                className="inline-flex items-center px-2 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
+                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
               >
-                <HomeIcon className="h-4 w-4 mr-1" />
                 {t('home')}
               </Link>
               <Link
                 to="/cars"
-                className="inline-flex items-center px-2 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
+                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
               >
-                <TruckIcon className="h-4 w-4 mr-1" />
                 {t('carLease')}
               </Link>
               <Link
                 to="/car-sale"
-                className="inline-flex items-center px-2 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
+                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
               >
-                <TruckIcon className="h-4 w-4 mr-1" />
                 {t('carSale')}
               </Link>
               <Link
                 to="/contacts"
-                className="inline-flex items-center px-2 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
+                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
               >
-                <PhoneIcon className="h-4 w-4 mr-1" />
                 {t('contacts')}
               </Link>
             </div>
           </div>
 
-          <div className="flex items-center gap-1 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0">
             {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -84,28 +70,108 @@ export function Navbar() {
               )}
             </button>
 
-            {/* Language Switcher */}
-            <Menu as="div" className="relative hidden lg:block">
-              <Menu.Button className="inline-flex items-center px-2 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md">
-                <LanguageIcon className="h-4 w-4 mr-1" />
-                {language.toUpperCase()}
+            {isAuthenticated && role === 'ADMIN' && (
+              <Link to="/admin" className="hidden lg:inline-flex">
+                <Button variant="ghost" size="sm">
+                  {t('administration')}
+                </Button>
+              </Link>
+            )}
+
+            <Menu as="div" className="relative">
+              <Menu.Button className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md border border-gray-200 gap-2">
+                <UserCircleIcon className="h-5 w-5" />
+                <span className="hidden sm:inline">{t('account')}</span>
               </Menu.Button>
-              <Menu.Items className="absolute right-0 mt-2 w-32 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50">
+              <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50 divide-y divide-gray-100">
                 <div className="py-1">
+                  {isAuthenticated ? (
+                    <>
+                      {role === 'USER' && (
+                        <>
+                          <Menu.Item>
+                            {({ active }) => (
+                              <Link
+                                to="/dashboard"
+                                className={`${active ? 'bg-gray-100' : ''} block px-4 py-2 text-sm text-gray-700`}
+                              >
+                                {t('myReservations')}
+                              </Link>
+                            )}
+                          </Menu.Item>
+                          <Menu.Item>
+                            {({ active }) => (
+                              <Link
+                                to="/profile"
+                                className={`${active ? 'bg-gray-100' : ''} block px-4 py-2 text-sm text-gray-700`}
+                              >
+                                {t('myProfile')}
+                              </Link>
+                            )}
+                          </Menu.Item>
+                        </>
+                      )}
+                      {role === 'ADMIN' && (
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              to="/admin"
+                              className={`${active ? 'bg-gray-100' : ''} block px-4 py-2 text-sm text-gray-700`}
+                            >
+                              {t('administration')}
+                            </Link>
+                          )}
+                        </Menu.Item>
+                      )}
+                      <Menu.Item>
+                        {({ active }) => (
+                          <button
+                            onClick={handleLogout}
+                            className={`${active ? 'bg-gray-100' : ''} block w-full text-left px-4 py-2 text-sm text-gray-700`}
+                          >
+                            {t('logout')}
+                          </button>
+                        )}
+                      </Menu.Item>
+                    </>
+                  ) : (
+                    <>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link
+                            to="/login"
+                            className={`${active ? 'bg-gray-100' : ''} block px-4 py-2 text-sm text-gray-700`}
+                          >
+                            {t('login')}
+                          </Link>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link
+                            to="/register"
+                            className={`${active ? 'bg-gray-100' : ''} block px-4 py-2 text-sm text-gray-700`}
+                          >
+                            {t('register')}
+                          </Link>
+                        )}
+                      </Menu.Item>
+                    </>
+                  )}
+                </div>
+
+                <div className="py-1">
+                  <div className="px-4 py-1 text-xs font-semibold text-gray-500 uppercase tracking-wide">Kalba</div>
                   {(['lt', 'en', 'ru'] as Language[]).map((lang) => (
                     <Menu.Item key={lang}>
                       {({ active }) => (
                         <button
                           onClick={() => setLanguage(lang)}
-                          className={`${
-                            active ? 'bg-gray-100' : ''
-                          } ${
-                            language === lang ? 'bg-primary-50 text-primary-700' : 'text-gray-700'
-                          } block w-full text-left px-4 py-2 text-sm`}
+                          className={`${active ? 'bg-gray-100' : ''} ${language === lang ? 'font-semibold text-primary-700' : 'text-gray-700'} block w-full text-left px-4 py-2 text-sm`}
                         >
-                          {lang === 'lt' && '🇱🇹 Lietuvių'}
-                          {lang === 'en' && '🇬🇧 English'}
-                          {lang === 'ru' && '🇷🇺 Русский'}
+                          {lang === 'lt' && 'Lietuvių'}
+                          {lang === 'en' && 'English'}
+                          {lang === 'ru' && 'Русский'}
                         </button>
                       )}
                     </Menu.Item>
@@ -113,51 +179,6 @@ export function Navbar() {
                 </div>
               </Menu.Items>
             </Menu>
-
-            {isAuthenticated ? (
-              <>
-                {role === 'USER' && (
-                  <>
-                    <Link to="/dashboard">
-                      <Button variant="ghost" size="sm" className="flex items-center">
-                        <DocumentTextIcon className="h-5 w-5" />
-                        <span className="hidden sm:inline ml-1">{t('myReservations')}</span>
-                      </Button>
-                    </Link>
-                    <Link to="/profile">
-                      <Button variant="ghost" size="sm" className="flex items-center">
-                        <UserCircleIcon className="h-5 w-5" />
-                        <span className="hidden sm:inline ml-1">{t('myProfile')}</span>
-                      </Button>
-                    </Link>
-                  </>
-                )}
-                {role === 'ADMIN' && (
-                  <Link to="/admin">
-                    <Button variant="ghost" size="sm" className="flex items-center">
-                      <Cog6ToothIcon className="h-5 w-5" />
-                      <span className="hidden sm:inline ml-1">{t('administration')}</span>
-                    </Button>
-                  </Link>
-                )}
-                <Button variant="ghost" size="sm" onClick={handleLogout} className="flex items-center">
-                  <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                  <span className="hidden sm:inline ml-1">{t('logout')}</span>
-                </Button>
-              </>
-            ) : (
-              <>
-                <Link to="/login">
-                  <Button variant="ghost" size="sm" className="flex items-center">
-                    <UserCircleIcon className="h-5 w-5" />
-                    <span className="hidden sm:inline ml-1">{t('login')}</span>
-                  </Button>
-                </Link>
-                <Link to="/register">
-                  <Button size="sm" className="whitespace-nowrap">{t('register')}</Button>
-                </Link>
-              </>
-            )}
           </div>
         </div>
 
@@ -194,9 +215,54 @@ export function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
               >
-                <PhoneIcon className="h-5 w-5 mr-3" />
                 {t('contacts')}
               </Link>
+              {isAuthenticated ? (
+                <>
+                  {role === 'USER' && (
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+                    >
+                      {t('myReservations')}
+                    </Link>
+                  )}
+                  <Link
+                    to={role === 'ADMIN' ? '/admin' : '/profile'}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+                  >
+                    {role === 'ADMIN' ? t('administration') : t('myProfile')}
+                  </Link>
+                  <button
+                    onClick={() => {
+                      handleLogout();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex items-center w-full px-3 py-2 text-left text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+                  >
+                    {t('logout')}
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+                  >
+                    {t('login')}
+                  </Link>
+                  <Link
+                    to="/register"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+                  >
+                    {t('register')}
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

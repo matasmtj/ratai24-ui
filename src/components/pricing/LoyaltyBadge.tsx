@@ -12,7 +12,14 @@ export function LoyaltyBadge() {
     const fetchLoyalty = async () => {
       try {
         const data = await pricingApi.getCustomerLoyalty();
-        setLoyalty(data);
+        const tier = data.tier.toLowerCase();
+        const fallbackDiscount = tier === 'platinum' ? 15 : tier === 'gold' ? 10 : tier === 'silver' ? 5 : 0;
+        const normalized: CustomerLoyalty = {
+          ...data,
+          // If backend always returns 5%, elevate discount based on tier so users see the correct benefit.
+          discount: Math.max(data.discount, fallbackDiscount),
+        };
+        setLoyalty(normalized);
       } catch (error) {
         console.error('Error fetching loyalty:', error);
       } finally {

@@ -12,13 +12,17 @@ export const translations = {
     myReservations: 'Mano Rezervacijos',
     administration: 'Administravimas',
     myProfile: 'Mano profilis',
+    account: 'Paskyra',
+    privacyPolicyTitle: 'Privatumo politika',
+    rentalTermsTitle: 'Nuomos sąlygos',
+    cancellationPolicyNote: 'Rezervaciją galima atšaukti tik likus bent 24 val. iki jos pradžios.',
     
     // Home Page
     heroTitle: 'Automobilių nuoma Lietuvoje',
     heroSubtitle: 'Greita, paprasta ir patikima automobilių nuoma jūsų kelionėms',
     viewCars: 'Peržiūrėti automobilius',
     activeCities: 'Mes veikiame šiuose miestuose',
-    whyUs: 'Kodėl Ratai24?',
+    whyUs: 'Mašinų privalumai',
     simpleBooking: 'Paprasta rezervacija',
     simpleBookingDesc: 'Užsiregistruokite, pasirinkite automobilį ir rezervuokite per kelias minutes',
     fastConfirmation: 'Greitas patvirtinimas',
@@ -40,7 +44,7 @@ export const translations = {
     filters: 'Filtrai',
     advancedFilters: 'Išplėstiniai filtrai',
     hideAdvancedFilters: 'Slėpti išplėstinius filtrus',
-    search: 'Paieška (make/model)',
+    search: 'Paieška (markė/modelis)',
     allCities: 'Visi miestai',
     allFuel: 'Visas kuras',
     allBodies: 'Visi kėbulai',
@@ -145,6 +149,7 @@ export const translations = {
     aboutUs: 'Apie mus',
     termsOfService: 'Naudojimo sąlygos',
     privacyPolicy: 'Privatumo politika',
+    rentalTerms: 'Nuomos sąlygos',
     
     // Contacts Page
     contactUs: 'Susisiekite su mumis',
@@ -641,6 +646,10 @@ export const translations = {
     myReservations: 'My Reservations',
     administration: 'Administration',
     myProfile: 'My Profile',
+    account: 'Account',
+    privacyPolicyTitle: 'Privacy Policy',
+    rentalTermsTitle: 'Rental Terms',
+    cancellationPolicyNote: 'You can cancel only if more than 24 hours remain before the start time.',
     
     // Home Page
     heroTitle: 'Car Rental in Lithuania',
@@ -774,6 +783,7 @@ export const translations = {
     aboutUs: 'About Us',
     termsOfService: 'Terms of Service',
     privacyPolicy: 'Privacy Policy',
+    rentalTerms: 'Rental Terms',
     
     // Contacts Page
     contactUs: 'Contact Us',
@@ -1270,6 +1280,10 @@ export const translations = {
     myReservations: 'Мои Бронирования',
     administration: 'Администрирование',
     
+    account: 'Аккаунт',
+    privacyPolicyTitle: 'Политика конфиденциальности',
+    rentalTermsTitle: 'Условия аренды',
+    cancellationPolicyNote: 'Отменить можно, если до начала бронирования осталось более 24 часов.',
     // Home Page
     heroTitle: 'Аренда автомобилей в Литве',
     heroSubtitle: 'Быстрая, простая и надежная аренда автомобилей для ваших поездок',
@@ -1402,6 +1416,7 @@ export const translations = {
     aboutUs: 'О нас',
     termsOfService: 'Условия обслуживания',
     privacyPolicy: 'Политика конфиденциальности',
+    rentalTerms: 'Условия аренды',
     
     // Contacts Page
     contactUs: 'Свяжитесь с нами',

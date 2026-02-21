@@ -38,20 +38,48 @@ export function Layout({ children }: LayoutProps) {
               <p className="text-sm text-gray-400">
                 {t('footerTagline')}
               </p>
+              <p className="text-sm text-gray-400 mt-4">
+                {t('aboutUs')}
+              </p>
             </div>
 
-            {/* Quick Links */}
+            {/* Information */}
             <div>
-              <h3 className="text-white font-semibold mb-4">{t('quickLinks')}</h3>
-              <ul className="space-y-2">
+              <h3 className="text-white font-semibold mb-4">{t('information')}</h3>
+              <ul className="space-y-2 text-sm">
                 <li>
-                  <Link to="/cars" className="text-sm hover:text-white transition-colors">
-                    {t('cars')}
+                  <Link to="/contacts" className="hover:text-white transition-colors">
+                    {t('aboutUs')}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contacts" className="text-sm hover:text-white transition-colors">
+                  <Link to="/contacts" className="hover:text-white transition-colors">
+                    {t('workingHours')}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/contacts" className="hover:text-white transition-colors">
                     {t('contacts')}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/cars" className="hover:text-white transition-colors">
+                    {t('carLease')}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/car-sale" className="hover:text-white transition-colors">
+                    {t('carSale')}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/privacy-policy" className="hover:text-white transition-colors">
+                    {t('privacyPolicy')}
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/rental-terms" className="hover:text-white transition-colors">
+                    {t('rentalTerms')}
                   </Link>
                 </li>
               </ul>
@@ -61,25 +89,37 @@ export function Layout({ children }: LayoutProps) {
             <div>
               <h3 className="text-white font-semibold mb-4">{t('contactInfo')}</h3>
               {contactInfo ? (
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   <li className="flex items-start text-sm">
                     <EnvelopeIcon className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
-                    <a>
-                      {contactInfo.email}
-                    </a>
+                    <span>{contactInfo.email}</span>
                   </li>
                   <li className="flex items-start text-sm">
                     <PhoneIcon className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
-                    <a>
-                      {contactInfo.phone}
-                    </a>
+                    <span>{contactInfo.phone}</span>
                   </li>
-                  {contactInfo.operationAreas && (
+                  {contactInfo.operationAreasDetails && contactInfo.operationAreasDetails.length > 0 ? (
+                    contactInfo.operationAreasDetails.map((detail) => (
+                      <li key={detail.id} className="flex items-start text-sm">
+                        <MapPinIcon className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <div className="text-white font-semibold">{t('address')}</div>
+                          <div className="text-gray-300">{detail.address || `${detail.cityName}, ${detail.country}`}</div>
+                          {detail.address && (
+                            <div className="text-gray-400 text-xs">{detail.cityName}, {detail.country}</div>
+                          )}
+                        </div>
+                      </li>
+                    ))
+                  ) : contactInfo.operationAreas ? (
                     <li className="flex items-start text-sm">
                       <MapPinIcon className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
-                      <span>{contactInfo.operationAreas}</span>
+                      <div>
+                        <div className="text-white font-semibold">{t('address')}</div>
+                        <div className="text-gray-300">{contactInfo.operationAreas}</div>
+                      </div>
                     </li>
-                  )}
+                  ) : null}
                 </ul>
               ) : (
                 <ul className="space-y-2">

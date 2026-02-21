@@ -72,7 +72,7 @@ export function ContactsPage() {
               <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-primary-100">
                 <MapPinIcon className="h-6 w-6 text-primary-600" />
               </div>
-              <h3 className="text-xl font-semibold">{t('operationAreas')}</h3>
+              <h3 className="text-xl font-semibold">{t('address')}</h3>
             </div>
             <div className="space-y-3">
               {!contact.operationAreasDetails || contact.operationAreasDetails.length === 0 ? (
