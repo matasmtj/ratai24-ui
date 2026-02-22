@@ -78,8 +78,17 @@ export function Navbar() {
               </Link>
             )}
 
+            {!isAuthenticated && (
+              <Link to="/login" className="hidden lg:inline-flex">
+                <Button variant="ghost" size="sm">
+                  {t('login')}
+                </Button>
+              </Link>
+            )}
+
             <Menu as="div" className="relative">
               <Menu.Button className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md border border-gray-200 gap-2">
+                <Bars3Icon className="h-5 w-5" />
                 <UserCircleIcon className="h-5 w-5" />
                 <span className="hidden sm:inline">{t('account')}</span>
               </Menu.Button>
@@ -110,18 +119,6 @@ export function Navbar() {
                             )}
                           </Menu.Item>
                         </>
-                      )}
-                      {role === 'ADMIN' && (
-                        <Menu.Item>
-                          {({ active }) => (
-                            <Link
-                              to="/admin"
-                              className={`${active ? 'bg-gray-100' : ''} block px-4 py-2 text-sm text-gray-700`}
-                            >
-                              {t('administration')}
-                            </Link>
-                          )}
-                        </Menu.Item>
                       )}
                       <Menu.Item>
                         {({ active }) => (
@@ -225,13 +222,23 @@ export function Navbar() {
                       {t('myReservations')}
                     </Link>
                   )}
-                  <Link
-                    to={role === 'ADMIN' ? '/admin' : '/profile'}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                  >
-                    {role === 'ADMIN' ? t('administration') : t('myProfile')}
-                  </Link>
+                  {role === 'USER' ? (
+                    <Link
+                      to="/profile"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+                    >
+                      {t('myProfile')}
+                    </Link>
+                  ) : (
+                    <Link
+                      to="/admin"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+                    >
+                      {t('administration')}
+                    </Link>
+                  )}
                   <button
                     onClick={() => {
                       handleLogout();
