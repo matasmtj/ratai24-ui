@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
@@ -11,6 +11,7 @@ import { UserCircleIcon } from '@heroicons/react/24/outline';
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { login } = useAuth();
   const { t } = useLanguage();
   const recaptchaRef = useRef<ReCaptchaHandle>(null);
@@ -20,6 +21,8 @@ export function LoginPage() {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const resetBanner =
+    (location.state as { passwordResetOk?: boolean } | null)?.passwordResetOk === true;
 
   const handleInputChange = (field: 'email' | 'password', value: string) => {
     setFormData({ ...formData, [field]: value });
@@ -81,6 +84,12 @@ export function LoginPage() {
             <p className="text-gray-600 mt-2">{t('loginSubtitle')}</p>
           </div>
 
+          {resetBanner && (
+            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
+              {t('passwordResetSuccess')}
+            </div>
+          )}
+
           {error && (
             <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
               {error}
@@ -105,6 +114,15 @@ export function LoginPage() {
               onKeyDown={handleKeyDown}
               autoComplete="current-password"
             />
+
+            <div className="text-right -mt-1">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+              >
+                {t('forgotPasswordLink')}
+              </Link>
+            </div>
 
             <div className="pt-2">
               <ReCaptcha ref={recaptchaRef} />

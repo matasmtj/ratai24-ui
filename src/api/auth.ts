@@ -5,6 +5,9 @@ import type {
   RegisterRequest,
   RefreshRequest,
   LogoutRequest,
+  ForgotPasswordRequest,
+  ForgotPasswordResponse,
+  ResetPasswordRequest,
 } from '../types/api';
 
 export const authApi = {
@@ -24,5 +27,14 @@ export const authApi = {
 
   logout: async (data: LogoutRequest): Promise<void> => {
     await api.post('/auth/logout', data);
+  },
+
+  forgotPassword: async (data: ForgotPasswordRequest): Promise<ForgotPasswordResponse> => {
+    const response = await api.post<ForgotPasswordResponse>('/auth/forgot-password', data);
+    return response.data;
+  },
+
+  resetPassword: async (data: ResetPasswordRequest): Promise<void> => {
+    await api.post('/auth/reset-password', data);
   },
 };

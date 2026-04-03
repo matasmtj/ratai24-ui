@@ -12,6 +12,8 @@ import { CarDetailPage } from './pages/CarDetailPage';
 import { CarSaleDetailPage } from './pages/CarSaleDetailPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { ContactsPage } from './pages/ContactsPage';
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 import { RentalTermsPage } from './pages/RentalTermsPage';
@@ -55,6 +57,8 @@ function App() {
             <Route path="/rental-terms" element={<RentalTermsPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
 
             {/* User Routes */}
             <Route
