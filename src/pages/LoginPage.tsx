@@ -115,10 +115,10 @@ export function LoginPage() {
               autoComplete="current-password"
             />
 
-            <div className="text-right -mt-1">
+            <div className="flex flex-col items-stretch gap-1 -mt-1">
               <Link
                 to="/forgot-password"
-                className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                className="text-sm font-semibold text-primary-600 hover:text-primary-800 underline underline-offset-2 text-center"
               >
                 {t('forgotPasswordLink')}
               </Link>

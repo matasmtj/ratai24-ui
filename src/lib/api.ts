@@ -2,6 +2,14 @@ import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://ratai24.onrender.com';
 
+/** Login/register/forgot/reset: no Bearer; 401 means bad input, not “refresh token”. */
+const AUTH_PUBLIC_PATH = /^\/auth\/(login|register|forgot-password|reset-password)(?:\?|$)/;
+
+function isAuthPublicEndpoint(url: string | undefined): boolean {
+  if (!url) return false;
+  return AUTH_PUBLIC_PATH.test(url);
+}
+
 export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
@@ -9,9 +17,16 @@ export const api = axios.create({
   },
 });
 
-// Request interceptor to add auth token
+// Request interceptor to add auth token (skip public auth routes — avoid sending stale JWT on login)
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    const url = config.url || '';
+    if (isAuthPublicEndpoint(url)) {
+      if (config.headers) {
+        delete config.headers.Authorization;
+      }
+      return config;
+    }
     const token = localStorage.getItem('accessToken');
     if (token && config.headers) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -29,7 +44,11 @@ api.interceptors.response.use(
   async (error: AxiosError) => {
     const originalRequest = error.config as InternalAxiosRequestConfig & { _retry?: boolean };
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthPublicEndpoint(originalRequest.url)
+    ) {
       originalRequest._retry = true;
 
       try {
@@ -52,11 +71,14 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (refreshError) {
-        // Refresh failed, clear tokens and redirect to login
+        // Refresh failed, clear tokens and return to login (same origin as the SPA)
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('role');
-        window.location.href = '/login';
+        const path = `${window.location.pathname}${window.location.search}`;
+        if (!path.startsWith('/login')) {
+          window.location.assign(`${window.location.origin}/login`);
+        }
         return Promise.reject(refreshError);
       }
     }

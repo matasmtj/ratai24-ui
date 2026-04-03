@@ -61,10 +61,10 @@ export function RegisterPage() {
         password: formData.password,
       });
       
-      setSuccess(t('profileUpdated'));
+      setSuccess(t('registerSuccess'));
       setTimeout(() => navigate('/login'), 2000);
     } catch (err: any) {
-      setError(err.response?.data?.error || t('profileUpdateFailed'));
+      setError(err.response?.data?.error || t('registerFailed'));
       recaptchaRef.current?.reset();
     } finally {
       setIsLoading(false);

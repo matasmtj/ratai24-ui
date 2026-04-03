@@ -79,8 +79,8 @@ export function Navbar() {
             )}
 
             {!isAuthenticated && (
-              <Link to="/login" className="hidden lg:inline-flex">
-                <Button variant="ghost" size="sm">
+              <Link to="/login" className="inline-flex">
+                <Button variant="secondary" size="sm" className="border border-gray-300 shadow-sm">
                   {t('login')}
                 </Button>
               </Link>
@@ -88,7 +88,7 @@ export function Navbar() {
 
             <Menu as="div" className="relative">
               <Menu.Button className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md border border-gray-200 gap-2">
-                <Bars3Icon className="h-5 w-5" />
+                <Bars3Icon className="h-5 w-5 lg:hidden" aria-hidden />
                 <UserCircleIcon className="h-5 w-5" />
                 <span className="hidden sm:inline">{t('account')}</span>
               </Menu.Button>
@@ -150,6 +150,16 @@ export function Navbar() {
                             className={`${active ? 'bg-gray-100' : ''} block px-4 py-2 text-sm text-gray-700`}
                           >
                             {t('register')}
+                          </Link>
+                        )}
+                      </Menu.Item>
+                      <Menu.Item>
+                        {({ active }) => (
+                          <Link
+                            to="/forgot-password"
+                            className={`${active ? 'bg-gray-100' : ''} block px-4 py-2 text-sm text-gray-700`}
+                          >
+                            {t('forgotPasswordLink')}
                           </Link>
                         )}
                       </Menu.Item>
@@ -264,6 +274,13 @@ export function Navbar() {
                     className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
                   >
                     {t('register')}
+                  </Link>
+                  <Link
+                    to="/forgot-password"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+                  >
+                    {t('forgotPasswordLink')}
                   </Link>
                 </>
               )}
