@@ -8,6 +8,8 @@ import { useLanguage } from '../contexts/useLanguage';
 import { usersApi } from '../api/users';
 import type { User } from '../types/api';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
+import { PasswordCriteria } from '../components/PasswordCriteria';
+import { passwordMeetsAllRequirements } from '../lib/passwordRequirements';
 
 export function UserProfilePage() {
   const { t } = useLanguage();
@@ -59,8 +61,8 @@ export function UserProfilePage() {
         setError(t('passwordsDontMatch'));
         return;
       }
-      if (formData.password.length < 8) {
-        setError(t('minPasswordLength'));
+      if (!passwordMeetsAllRequirements(formData.password)) {
+        setError(t('passwordRequirementsIncomplete'));
         return;
       }
     }
@@ -175,14 +177,17 @@ export function UserProfilePage() {
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder={t('minPasswordLength')}
                 />
-                {formData.password && (
-                  <Input
-                    label={t('confirmNewPassword')}
-                    type="password"
-                    value={formData.confirmPassword}
-                    onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  />
-                )}
+                {formData.password ? (
+                  <>
+                    <PasswordCriteria password={formData.password} />
+                    <Input
+                      label={t('confirmNewPassword')}
+                      type="password"
+                      value={formData.confirmPassword}
+                      onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                    />
+                  </>
+                ) : null}
               </div>
             </div>
 

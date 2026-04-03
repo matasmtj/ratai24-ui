@@ -11,7 +11,8 @@ export function AdminPricingDashboard() {
   const { t } = useLanguage();
   const [analytics, setAnalytics] = useState<PricingAnalytics | null>(null);
   const [performance, setPerformance] = useState<CarPerformance | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [initialLoad, setInitialLoad] = useState(true);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -27,29 +28,28 @@ export function AdminPricingDashboard() {
   });
 
   const fetchData = async () => {
-    setLoading(true);
+    if (!initialLoad) setAnalyticsLoading(true);
     setError(null);
     try {
-      console.log('Fetching analytics with date range:', { startDate, endDate });
       const [analyticsData, performanceData] = await Promise.all([
         pricingApi.getAnalytics({ startDate, endDate }),
         pricingApi.getCarPerformance(),
       ]);
-      console.log('Analytics data:', analyticsData);
-      console.log('Performance data:', performanceData);
       setAnalytics(analyticsData);
       setPerformance(performanceData);
     } catch (err) {
       console.error('Error fetching pricing data:', err);
       setError(t('pricing.errors.fetchFailed'));
     } finally {
-      setLoading(false);
+      setAnalyticsLoading(false);
+      setInitialLoad(false);
     }
   };
 
   useEffect(() => {
     fetchData();
-  }, [startDate, endDate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- load once; date changes use "Apply"
+  }, []);
 
   const handleRefreshPricing = async () => {
     setRefreshing(true);
@@ -67,7 +67,7 @@ export function AdminPricingDashboard() {
     }
   };
 
-  if (loading) {
+  if (initialLoad && !analytics && !performance) {
     return (
       <div className="flex justify-center py-8">
         <LoadingSpinner />
@@ -97,8 +97,8 @@ export function AdminPricingDashboard() {
 
       {/* Date filters */}
       <Card className="p-4">
-        <div className="flex gap-4 items-end">
-          <div className="flex-1">
+        <div className="flex flex-wrap gap-4 items-end">
+          <div className="flex-1 min-w-[10rem]">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {t('common.startDate')}
             </label>
@@ -109,7 +109,7 @@ export function AdminPricingDashboard() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
           </div>
-          <div className="flex-1">
+          <div className="flex-1 min-w-[10rem]">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {t('common.endDate')}
             </label>
@@ -120,7 +120,7 @@ export function AdminPricingDashboard() {
               className="w-full px-3 py-2 border border-gray-300 rounded-md"
             />
           </div>
-          <Button onClick={fetchData} size="sm">
+          <Button onClick={() => fetchData()} size="sm" isLoading={analyticsLoading}>
             {t('common.apply')}
           </Button>
         </div>
@@ -129,7 +129,12 @@ export function AdminPricingDashboard() {
       {/* Statistics */}
       {analytics && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="relative grid grid-cols-1 md:grid-cols-3 gap-4">
+            {analyticsLoading && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/60">
+                <LoadingSpinner />
+              </div>
+            )}
             <Card className="p-6">
               <div className="text-sm text-gray-600 mb-1">{t('pricing.admin.totalSnapshots')}</div>
               <div className="text-3xl font-bold text-primary-600">{analytics.revenue.totalContracts || 0}</div>
@@ -152,7 +157,12 @@ export function AdminPricingDashboard() {
           </div>
 
           {/* Pricing Performance Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="relative grid grid-cols-1 md:grid-cols-4 gap-4">
+            {analyticsLoading && (
+              <div className="absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white/60">
+                <LoadingSpinner />
+              </div>
+            )}
             <Card className="p-6">
               <div className="text-sm text-gray-600 mb-1">{t('pricing.admin.dynamicPricingUsage') || 'Dynamic Pricing Usage'}</div>
               <div className="text-2xl font-bold text-blue-600">

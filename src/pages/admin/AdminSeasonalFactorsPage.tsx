@@ -34,6 +34,8 @@ export function AdminSeasonalFactorsPage() {
     multiplier: 1.0,
     cityId: undefined,
   });
+  /** String so clearing the field does not snap to 0 */
+  const [multiplierInput, setMultiplierInput] = useState('1');
 
   useEffect(() => {
     fetchData();
@@ -67,6 +69,7 @@ export function AdminSeasonalFactorsPage() {
         multiplier: factor.multiplier,
         cityId: factor.cityId,
       });
+      setMultiplierInput(String(factor.multiplier));
     } else {
       setEditingFactor(null);
       setFormData({
@@ -76,6 +79,7 @@ export function AdminSeasonalFactorsPage() {
         multiplier: 1.0,
         cityId: undefined,
       });
+      setMultiplierInput('1');
     }
     setIsModalOpen(true);
   };
@@ -90,12 +94,19 @@ export function AdminSeasonalFactorsPage() {
     setError(null);
     setSuccessMessage(null);
 
+    const mult = parseFloat(multiplierInput.replace(',', '.'));
+    if (!Number.isFinite(mult) || mult < 0.1 || mult > 3) {
+      setError(t('pricing.errors.invalidMultiplier'));
+      return;
+    }
+
     try {
+      const payload = { ...formData, multiplier: mult };
       if (editingFactor) {
-        await pricingApi.updateSeasonalFactor(editingFactor.id, formData);
+        await pricingApi.updateSeasonalFactor(editingFactor.id, payload);
         setSuccessMessage(t('pricing.admin.seasonalFactorUpdated'));
       } else {
-        await pricingApi.createSeasonalFactor(formData);
+        await pricingApi.createSeasonalFactor(payload);
         setSuccessMessage(t('pricing.admin.seasonalFactorCreated'));
       }
       handleCloseModal();
@@ -285,21 +296,21 @@ export function AdminSeasonalFactorsPage() {
           <div>
             <Input
               label={t('pricing.admin.multiplier')}
-              type="number"
-              step="0.01"
-              min="0.1"
-              max="3"
-              value={formData.multiplier}
-              onChange={(e) => setFormData({ ...formData, multiplier: Number(e.target.value) })}
+              type="text"
+              inputMode="decimal"
+              value={multiplierInput}
+              onChange={(e) => setMultiplierInput(e.target.value)}
               required
             />
             <p className="mt-1 text-xs text-gray-600">
               <strong>
-                {formData.multiplier < 1
-                  ? `${((1 - formData.multiplier) * 100).toFixed(0)}% ${t('pricing.admin.discount')}`
-                  : formData.multiplier > 1
-                  ? `${((formData.multiplier - 1) * 100).toFixed(0)}% ${t('pricing.admin.increase')}`
-                  : t('pricing.admin.noChange')}
+                {(() => {
+                  const m = parseFloat(multiplierInput.replace(',', '.'));
+                  if (!Number.isFinite(m)) return '—';
+                  if (m < 1) return `${((1 - m) * 100).toFixed(0)}% ${t('pricing.admin.discount')}`;
+                  if (m > 1) return `${((m - 1) * 100).toFixed(0)}% ${t('pricing.admin.increase')}`;
+                  return t('pricing.admin.noChange');
+                })()}
               </strong>
             </p>
             <p className="mt-1 text-xs text-gray-500">{t('pricing.admin.multiplierExplanation')}</p>

@@ -257,7 +257,7 @@ export function AdminContractDetailModal({
 
   const getStateLabel = (state: string) => {
     const labels = {
-      DRAFT: t('draft'),
+      DRAFT: t('pendingApproval'),
       ACTIVE: t('active'),
       COMPLETED: t('completed'),
       CANCELLED: t('cancelled'),
@@ -462,7 +462,7 @@ export function AdminContractDetailModal({
             value={editFormData.state || ''}
             onChange={(e) => setEditFormData({ ...editFormData, state: e.target.value as any })}
             options={[
-              { value: 'DRAFT', label: t('draft') },
+              { value: 'DRAFT', label: t('pendingApproval') },
               { value: 'ACTIVE', label: t('active') },
               { value: 'COMPLETED', label: t('completed') },
               { value: 'CANCELLED', label: t('cancelled') },

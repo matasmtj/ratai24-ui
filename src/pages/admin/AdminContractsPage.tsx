@@ -45,7 +45,17 @@ export function AdminContractsPage() {
     });
 
     return filtered.sort((a, b) => {
-      if (!sortBy) return 0;
+      if (!sortBy) {
+        const rank = (c: Contract) => {
+          if (c.state === 'DRAFT') return 0;
+          const end = new Date(c.endDate);
+          if (c.state === 'ACTIVE' && end < new Date()) return 1;
+          return 2;
+        };
+        const d = rank(a) - rank(b);
+        if (d !== 0) return d;
+        return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
+      }
       if (sortBy === 'startDateAsc') return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
       if (sortBy === 'startDateDesc') return new Date(b.startDate).getTime() - new Date(a.startDate).getTime();
       if (sortBy === 'endDateAsc') return new Date(a.endDate).getTime() - new Date(b.endDate).getTime();
@@ -55,30 +65,40 @@ export function AdminContractsPage() {
     });
   }, [contracts, searchTerm, stateFilter, sortBy]);
 
-  // Split contracts into attention needed and regular
-  const { attentionNeeded, regularContracts } = useMemo(() => {
+  // Pending approval (DRAFT), overdue ACTIVE, then the rest — DRAFT always listed first on the page
+  const { pendingDrafts, attentionNeeded, regularContracts } = useMemo(() => {
     const now = new Date();
-    const attention: typeof filteredAndSortedContracts = [];
-    const regular: typeof filteredAndSortedContracts = [];
+    const drafts: Contract[] = [];
+    const attention: Contract[] = [];
+    const regular: Contract[] = [];
 
-    filteredAndSortedContracts.forEach((contract) => {
+    for (const contract of filteredAndSortedContracts) {
+      if (contract.state === 'DRAFT') {
+        drafts.push(contract);
+        continue;
+      }
       const endDate = new Date(contract.endDate);
-      // Active contracts past their end date need attention
       if (contract.state === 'ACTIVE' && endDate < now) {
         attention.push(contract);
       } else {
         regular.push(contract);
       }
-    });
-
-    return { attentionNeeded: attention, regularContracts: regular };
+    }
+    drafts.sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
+    return { pendingDrafts: drafts, attentionNeeded: attention, regularContracts: regular };
   }, [filteredAndSortedContracts]);
 
-  const paginatedContracts = useMemo(() => {
-    const allToDisplay = [...attentionNeeded, ...regularContracts];
-    if (itemsPerPage === -1) return allToDisplay;
-    return allToDisplay.slice(0, itemsPerPage);
-  }, [attentionNeeded, regularContracts, itemsPerPage]);
+  const flatOrdered = useMemo(
+    () => [...pendingDrafts, ...attentionNeeded, ...regularContracts],
+    [pendingDrafts, attentionNeeded, regularContracts]
+  );
+
+  const pageSlice = useMemo(() => {
+    if (itemsPerPage === -1) return flatOrdered;
+    return flatOrdered.slice(0, itemsPerPage);
+  }, [flatOrdered, itemsPerPage]);
+
+  const idsOnPage = useMemo(() => new Set(pageSlice.map((c) => c.id)), [pageSlice]);
 
   const getStatusBadge = (state: string) => {
     const styles = {
@@ -103,7 +123,7 @@ export function AdminContractsPage() {
 
   const getStateLabel = (state: string) => {
     const labels = {
-      DRAFT: t('draft'),
+      DRAFT: t('pendingApproval'),
       ACTIVE: t('active'),
       COMPLETED: t('completed'),
       CANCELLED: t('cancelled'),
@@ -145,7 +165,7 @@ export function AdminContractsPage() {
             onChange={(e) => setStateFilter(e.target.value)}
             options={[
               { value: '', label: t('allStates') },
-              { value: 'DRAFT', label: t('draft') },
+              { value: 'DRAFT', label: t('pendingApproval') },
               { value: 'ACTIVE', label: t('active') },
               { value: 'COMPLETED', label: t('completed') },
               { value: 'CANCELLED', label: t('cancelled') },
@@ -191,12 +211,36 @@ export function AdminContractsPage() {
         <>
           <div className="mb-4 text-gray-600">
             {t('showingXofY')
-              .replace('{current}', paginatedContracts.length.toString())
-              .replace('{total}', filteredAndSortedContracts.length.toString())}
+              .replace('{current}', pageSlice.length.toString())
+              .replace('{total}', flatOrdered.length.toString())}
           </div>
 
+          {/* Pending approval (DRAFT) */}
+          {pendingDrafts.filter((c) => idsOnPage.has(c.id)).length > 0 && (
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                {t('contractsPendingSection')} ({pendingDrafts.length})
+              </h3>
+              <div className="space-y-4">
+                {pendingDrafts
+                  .filter((c) => idsOnPage.has(c.id))
+                  .map((contract) => (
+                    <ContractCard
+                      key={contract.id}
+                      contract={contract}
+                      getStatusBadge={getStatusBadge}
+                      getStatusIcon={getStatusIcon}
+                      getStateLabel={getStateLabel}
+                      onClickContract={setSelectedContract}
+                      t={t}
+                    />
+                  ))}
+              </div>
+            </div>
+          )}
+
           {/* Attention Needed Section */}
-          {attentionNeeded.length > 0 && (
+          {attentionNeeded.filter((c) => idsOnPage.has(c.id)).length > 0 && (
             <div className="mb-6">
               <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
                 <div className="flex items-center">
@@ -210,7 +254,35 @@ export function AdminContractsPage() {
                 </p>
               </div>
               <div className="space-y-4">
-                {attentionNeeded.slice(0, itemsPerPage === -1 ? undefined : itemsPerPage).map((contract) => (
+                {attentionNeeded
+                  .filter((c) => idsOnPage.has(c.id))
+                  .map((contract) => (
+                    <ContractCard
+                      key={contract.id}
+                      contract={contract}
+                      getStatusBadge={getStatusBadge}
+                      getStatusIcon={getStatusIcon}
+                      getStateLabel={getStateLabel}
+                      onClickContract={setSelectedContract}
+                      t={t}
+                      highlight={true}
+                    />
+                  ))}
+              </div>
+            </div>
+          )}
+
+          {/* Regular Contracts Section */}
+          {regularContracts.filter((c) => idsOnPage.has(c.id)).length > 0 && (
+            <div className="space-y-4">
+              {(pendingDrafts.length > 0 || attentionNeeded.length > 0) && (
+                <h3 className="text-lg font-semibold text-gray-800 mt-6 mb-2">
+                  {t('otherContracts')}
+                </h3>
+              )}
+              {regularContracts
+                .filter((c) => idsOnPage.has(c.id))
+                .map((contract) => (
                   <ContractCard
                     key={contract.id}
                     contract={contract}
@@ -219,32 +291,8 @@ export function AdminContractsPage() {
                     getStateLabel={getStateLabel}
                     onClickContract={setSelectedContract}
                     t={t}
-                    highlight={true}
                   />
                 ))}
-              </div>
-            </div>
-          )}
-
-          {/* Regular Contracts Section */}
-          {regularContracts.length > 0 && (
-            <div className="space-y-4">
-              {attentionNeeded.length > 0 && (
-                <h3 className="text-lg font-semibold text-gray-800 mt-6 mb-2">
-                  {t('otherContracts')}
-                </h3>
-              )}
-              {regularContracts.slice(0, itemsPerPage === -1 ? undefined : Math.max(0, itemsPerPage - attentionNeeded.length)).map((contract) => (
-                <ContractCard
-                  key={contract.id}
-                  contract={contract}
-                  getStatusBadge={getStatusBadge}
-                  getStatusIcon={getStatusIcon}
-                  getStateLabel={getStateLabel}
-                  onClickContract={setSelectedContract}
-                  t={t}
-                />
-              ))}
             </div>
           )}
         </>

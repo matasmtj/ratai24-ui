@@ -17,8 +17,8 @@ export function AdminDashboard() {
   const { t } = useLanguage();
   
   const tabs = [
-    { name: t('cars'), href: '/admin/cars', icon: TruckIcon },
     { name: t('contracts'), href: '/admin/contracts', icon: DocumentTextIcon },
+    { name: t('cars'), href: '/admin/cars', icon: TruckIcon },
     { name: t('cities'), href: '/admin/cities', icon: MapPinIcon },
     { name: t('contacts'), href: '/admin/contacts', icon: PhoneIcon },
     { name: t('users'), href: '/admin/users', icon: UsersIcon },
@@ -40,7 +40,7 @@ export function AdminDashboard() {
           <nav className="-mb-px flex space-x-8">
             {tabs.map((tab) => {
               const isActive = location.pathname === tab.href || 
-                              (tab.href === '/admin/cars' && location.pathname === '/admin') ||
+                              (tab.href === '/admin/contracts' && location.pathname === '/admin') ||
                               (tab.href === '/admin/pricing' && location.pathname.startsWith('/admin/pricing'));
               return (
                 <Link

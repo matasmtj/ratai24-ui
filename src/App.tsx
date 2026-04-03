@@ -87,7 +87,7 @@ function App() {
                 </ProtectedRoute>
               }
             >
-              <Route index element={<Navigate to="/admin/cars" replace />} />
+              <Route index element={<Navigate to="/admin/contracts" replace />} />
               <Route path="cities" element={<AdminCitiesPage />} />
               <Route path="cars" element={<AdminCarsPage />} />
               <Route path="contracts" element={<AdminContractsPage />} />

@@ -6,6 +6,8 @@ import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
 import { useLanguage } from '../contexts/useLanguage';
 import { authApi } from '../api/auth';
+import { PasswordCriteria } from '../components/PasswordCriteria';
+import { passwordMeetsAllRequirements } from '../lib/passwordRequirements';
 import { KeyIcon } from '@heroicons/react/24/outline';
 
 export function ResetPasswordPage() {
@@ -33,8 +35,8 @@ export function ResetPasswordPage() {
       setError(t('passwordsDontMatch'));
       return;
     }
-    if (password.length < 8) {
-      setError(t('minPasswordLength'));
+    if (!passwordMeetsAllRequirements(password)) {
+      setError(t('passwordRequirementsIncomplete'));
       return;
     }
 
@@ -80,6 +82,7 @@ export function ResetPasswordPage() {
               onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleSubmit())}
               autoComplete="new-password"
             />
+            <PasswordCriteria password={password} />
             <Input
               label={t('confirmPassword')}
               type="password"

@@ -101,6 +101,11 @@ export const translations = {
     resetPasswordFailed: 'Nepavyko pakeisti slaptažodžio. Nuoroda gali būti pasibaigusi.',
     saveNewPassword: 'Išsaugoti slaptažodį',
     passwordResetSuccess: 'Slaptažodis pakeistas. Galite prisijungti.',
+    passwordRequirementsTitle: 'Slaptažodis turi turėti:',
+    passwordReqMinLength: 'Bent 8 simbolius',
+    passwordReqLetter: 'Bent vieną raidę (a–z)',
+    passwordReqDigit: 'Bent vieną skaitmenį (0–9)',
+    passwordRequirementsIncomplete: 'Įvykdykite visus slaptažodžio reikalavimus.',
     
     // Booking
     bookCar: 'Rezervuoti',
@@ -212,6 +217,9 @@ export const translations = {
       optional: 'neprivaloma',
       all: 'Visi',
       apply: 'Taikyti',
+      day: 'd.',
+      days: 'dienų',
+      total: 'Iš viso',
     },
     
     // Admin Panel
@@ -323,6 +331,8 @@ export const translations = {
     extraFees: 'Papildomi mokesčiai',
     notesContract: 'Pastabos',
     draft: 'Juodraštis',
+    pendingApproval: 'Nepatvirtinta',
+    contractsPendingSection: 'Laukiančios administratoriaus patvirtinimo',
     active: 'Aktyvus',
     completed: 'Užbaigtas',
     cancelled: 'Atšauktas',
@@ -560,6 +570,7 @@ export const translations = {
         refreshFailed: 'Nepavyko atnaujinti duomenų',
         saveFailed: 'Nepavyko išsaugoti',
         deleteFailed: 'Nepavyko ištrinti',
+        invalidMultiplier: 'Koeficientas turi būti skaičius nuo 0,1 iki 3',
       },
       admin: {
         dashboard: 'Kainų analizė',
@@ -750,6 +761,11 @@ export const translations = {
     resetPasswordFailed: 'Could not reset your password. The link may have expired.',
     saveNewPassword: 'Save password',
     passwordResetSuccess: 'Your password was updated. You can sign in now.',
+    passwordRequirementsTitle: 'Password must include:',
+    passwordReqMinLength: 'At least 8 characters',
+    passwordReqLetter: 'At least one letter (a–z)',
+    passwordReqDigit: 'At least one number (0–9)',
+    passwordRequirementsIncomplete: 'Please meet all password requirements.',
     
     // Booking
     bookCar: 'Book',
@@ -861,6 +877,9 @@ export const translations = {
       optional: 'optional',
       all: 'All',
       apply: 'Apply',
+      day: 'day',
+      days: 'days',
+      total: 'Total',
     },
     
     // Admin Panel
@@ -972,6 +991,8 @@ export const translations = {
     extraFees: 'Extra Fees',
     notesContract: 'Notes',
     draft: 'Draft',
+    pendingApproval: 'Pending approval',
+    contractsPendingSection: 'Awaiting administrator approval',
     active: 'Active',
     completed: 'Completed',
     cancelled: 'Cancelled',
@@ -1209,6 +1230,7 @@ export const translations = {
         refreshFailed: 'Failed to refresh data',
         saveFailed: 'Failed to save',
         deleteFailed: 'Failed to delete',
+        invalidMultiplier: 'Multiplier must be a number between 0.1 and 3',
       },
       admin: {
         dashboard: 'Pricing Analytics',
@@ -1398,6 +1420,11 @@ export const translations = {
     resetPasswordFailed: 'Не удалось сменить пароль. Ссылка могла истечь.',
     saveNewPassword: 'Сохранить пароль',
     passwordResetSuccess: 'Пароль обновлён. Можно войти.',
+    passwordRequirementsTitle: 'Пароль должен содержать:',
+    passwordReqMinLength: 'Не менее 8 символов',
+    passwordReqLetter: 'Хотя бы одну букву (a–z)',
+    passwordReqDigit: 'Хотя бы одну цифру (0–9)',
+    passwordRequirementsIncomplete: 'Выполните все требования к паролю.',
     
     // Booking
     bookCar: 'Забронировать',
@@ -1509,6 +1536,9 @@ export const translations = {
       optional: 'необязательно',
       all: 'Все',
       apply: 'Применить',
+      day: 'д.',
+      days: 'дн.',
+      total: 'Итого',
     },
     
     // Admin Panel
@@ -1620,6 +1650,8 @@ export const translations = {
     extraFees: 'Дополнительные сборы',
     notesContract: 'Примечания',
     draft: 'Черновик',
+    pendingApproval: 'Не подтверждено',
+    contractsPendingSection: 'Ожидают подтверждения администратора',
     active: 'Активный',
     completed: 'Завершен',
     cancelled: 'Отменен',
@@ -1857,6 +1889,7 @@ export const translations = {
         refreshFailed: 'Не удалось обновить данные',
         saveFailed: 'Не удалось сохранить',
         deleteFailed: 'Не удалось удалить',
+        invalidMultiplier: 'Множитель должен быть числом от 0,1 до 3',
       },
       admin: {
         dashboard: 'Аналитика цен',

@@ -9,6 +9,8 @@ import { ReCaptcha, type ReCaptchaHandle } from '../components/ui/ReCaptcha';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/useLanguage';
 import { UserPlusIcon } from '@heroicons/react/24/outline';
+import { PasswordCriteria } from '../components/PasswordCriteria';
+import { passwordMeetsAllRequirements } from '../lib/passwordRequirements';
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -36,8 +38,8 @@ export function RegisterPage() {
       return;
     }
 
-    if (formData.password.length < 8) {
-      setError(t('minPasswordLength'));
+    if (!passwordMeetsAllRequirements(formData.password)) {
+      setError(t('passwordRequirementsIncomplete'));
       return;
     }
 
@@ -132,6 +134,7 @@ export function RegisterPage() {
               required
               placeholder={t('minPasswordLength')}
             />
+            <PasswordCriteria password={formData.password} />
             <Input
               label={t('confirmPassword')}
               type="password"

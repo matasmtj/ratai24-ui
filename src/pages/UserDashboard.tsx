@@ -76,7 +76,7 @@ export function UserDashboard() {
 
   const getStatusText = (state: string) => {
     const translations = {
-      DRAFT: t('draft'),
+      DRAFT: t('pendingApproval'),
       ACTIVE: t('active'),
       COMPLETED: t('completed'),
       CANCELLED: t('cancelled'),
