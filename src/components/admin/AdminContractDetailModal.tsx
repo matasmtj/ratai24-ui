@@ -161,6 +161,7 @@ export function AdminContractDetailModal({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-contracts'] });
       setMode('view');
+      onClose();
     },
   });
 

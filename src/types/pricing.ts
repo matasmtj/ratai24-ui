@@ -37,7 +37,10 @@ export interface CityDemand {
 
 export interface CustomerLoyalty {
   tier: string;
+  /** Total effective loyalty discount % applied in pricing (tier + recent bonus, capped) */
   discount: number;
+  tierDiscount?: number;
+  recentActivityBonus?: number;
   rentalsCount: number;
   lifetimeValue: number;
 }
@@ -160,4 +163,6 @@ export interface CarPricingConfig {
   dailyOperatingCost?: number;
   monthlyFinancingCost?: number;
   purchasePrice?: number;
+  applyUtilizationPricing?: boolean;
+  utilizationMultiplierOverride?: number | null;
 }

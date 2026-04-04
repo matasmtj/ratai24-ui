@@ -423,7 +423,22 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
   };
   
   // Form state with string values for number inputs to prevent 0 prefix bug
-  type FormState = Omit<CarCreate, 'year' | 'pricePerDay' | 'cityId' | 'seatCount' | 'powerKW' | 'engineCapacityL' | 'odometerKm' | 'salePrice' | 'basePricePerDay' | 'minPricePerDay' | 'maxPricePerDay'> & {
+  type FormState = Omit<
+    CarCreate,
+    | 'year'
+    | 'pricePerDay'
+    | 'cityId'
+    | 'seatCount'
+    | 'powerKW'
+    | 'engineCapacityL'
+    | 'odometerKm'
+    | 'salePrice'
+    | 'basePricePerDay'
+    | 'minPricePerDay'
+    | 'maxPricePerDay'
+    | 'applyUtilizationPricing'
+    | 'utilizationMultiplierOverride'
+  > & {
     year: number;
     pricePerDay: string | number;
     cityId: number;
@@ -436,6 +451,8 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
     basePricePerDay?: string | number;
     minPricePerDay?: string | number;
     maxPricePerDay?: string | number;
+    applyUtilizationPricing?: boolean;
+    utilizationMultiplierOverride?: string;
   };
   
   const [formData, setFormData] = useState<FormState>({
@@ -462,6 +479,8 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
     basePricePerDay: '',
     minPricePerDay: '',
     maxPricePerDay: '',
+    applyUtilizationPricing: true,
+    utilizationMultiplierOverride: '',
   });
 
   // Update form data when car changes (for edit mode)
@@ -491,6 +510,11 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
         basePricePerDay: car.basePricePerDay?.toString() || '',
         minPricePerDay: car.minPricePerDay?.toString() || '',
         maxPricePerDay: car.maxPricePerDay?.toString() || '',
+        applyUtilizationPricing: car.applyUtilizationPricing !== false,
+        utilizationMultiplierOverride:
+          car.utilizationMultiplierOverride != null
+            ? String(car.utilizationMultiplierOverride)
+            : '',
       });
     } else {
       // Reset form for create mode
@@ -518,6 +542,8 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
         basePricePerDay: '',
         minPricePerDay: '',
         maxPricePerDay: '',
+        applyUtilizationPricing: true,
+        utilizationMultiplierOverride: '',
       });
     }
   }, [car, cities]);
@@ -627,7 +653,23 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
         : typeof formData.maxPricePerDay === 'string' 
           ? Number(formData.maxPricePerDay) 
           : formData.maxPricePerDay,
+      applyUtilizationPricing: formData.applyUtilizationPricing !== false,
+      utilizationMultiplierOverride:
+        formData.utilizationMultiplierOverride === '' ||
+        formData.utilizationMultiplierOverride === undefined
+          ? null
+          : Number(formData.utilizationMultiplierOverride),
     };
+
+    if (
+      submitData.utilizationMultiplierOverride != null &&
+      (Number.isNaN(submitData.utilizationMultiplierOverride) ||
+        submitData.utilizationMultiplierOverride < 0.1 ||
+        submitData.utilizationMultiplierOverride > 3)
+    ) {
+      setError('Utilization multiplier must be between 0.1 and 3, or leave empty');
+      return;
+    }
     
     if (car) {
       updateMutation.mutate({ id: car.id, data: submitData });
@@ -749,6 +791,36 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
                 placeholder="e.g., 100"
                 required={formData.useDynamicPricing}
               />
+            </div>
+          )}
+          {formData.useDynamicPricing && (
+            <div className="mt-4 space-y-3 border-t border-purple-200 pt-4">
+              <label className="flex items-center space-x-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.applyUtilizationPricing !== false}
+                  onChange={(e) =>
+                    setFormData({ ...formData, applyUtilizationPricing: e.target.checked })
+                  }
+                  className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                />
+                <span className="text-sm font-medium text-gray-800">
+                  {t('applyUtilizationPricing')}
+                </span>
+              </label>
+              <Input
+                label={t('utilizationMultiplierOverride')}
+                type="text"
+                inputMode="decimal"
+                value={formData.utilizationMultiplierOverride || ''}
+                onChange={(e) =>
+                  setFormData({ ...formData, utilizationMultiplierOverride: e.target.value })
+                }
+                placeholder="1"
+                disabled={formData.applyUtilizationPricing === false}
+              />
+              <p className="text-xs text-purple-900">{t('utilizationMultiplierHelp')}</p>
+              <p className="text-xs text-gray-600 italic">{t('flatDailyPriceHint')}</p>
             </div>
           )}
           

@@ -65,6 +65,8 @@ export interface Car {
   basePricePerDay?: number;
   minPricePerDay?: number;
   maxPricePerDay?: number;
+  applyUtilizationPricing?: boolean;
+  utilizationMultiplierOverride?: number | null;
 }
 
 export interface CarCreate {
@@ -93,6 +95,8 @@ export interface CarCreate {
   basePricePerDay?: number;
   minPricePerDay?: number;
   maxPricePerDay?: number;
+  applyUtilizationPricing?: boolean;
+  utilizationMultiplierOverride?: number | null;
 }
 
 // User

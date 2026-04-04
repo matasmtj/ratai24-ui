@@ -563,6 +563,7 @@ export const translations = {
         noDiscount: 'Nėra nuolaidos',
         rentals: 'nuomos',
         spent: 'išleista',
+        includesRecentBonus: 'įskaitant {pct}% už pastarąją nuomą',
       },
       errors: {
         calculationFailed: 'Nepavyko apskaičiuoti kainos',
@@ -653,6 +654,12 @@ export const translations = {
     dynamicPricingDisabledNote: 'Kai išjungta, automobilis naudos fiksuotą "Kaina per parą" vertę žemiau',
     dynamicPricingEnabledNote: 'Kai įjungta, bus naudojama dinaminė kaina. Fiksuota kaina nebus rodoma.',
     dynamicPricingNote: 'Galutinė kaina keičiasi priklausomai nuo paklausos',
+    applyUtilizationPricing: 'Taikyti užimtumo koregavimą kainai',
+    utilizationMultiplierOverride: 'Fiksuotas užimtumo daugiklis (tuščia = automatinis)',
+    utilizationMultiplierHelp:
+      'Pvz. 1 = neutralu, 0.75 ≈ −25 %. Jei išjungta – užimtumas nekeičia kainos. Fiksuotai kainai (pvz. 30 €/d.) nustatykite min. ir maks. į tą pačią sumą.',
+    flatDailyPriceHint:
+      'Norėdami fiksuoti vieną paros kainą (pvz. 30 €), nustatykite min. ir maks. kainą į tą pačią reikšmę.',
     priceRange: 'Kainų intervalas',
     totalCars: 'Iš viso automobilių',
     withDynamicPricing: 'Su dinamiška kainodara',
@@ -1223,6 +1230,7 @@ export const translations = {
         noDiscount: 'No discount',
         rentals: 'rentals',
         spent: 'spent',
+        includesRecentBonus: 'includes {pct}% recent-rental bonus',
       },
       errors: {
         calculationFailed: 'Failed to calculate price',
@@ -1313,6 +1321,12 @@ export const translations = {
     dynamicPricingDisabledNote: 'When disabled, the car will use the fixed "Price per Day" value below',
     dynamicPricingEnabledNote: 'When enabled, dynamic pricing will be used. The fixed price will not be shown.',
     dynamicPricingNote: 'Final price varies by demand',
+    applyUtilizationPricing: 'Apply utilization-based price adjustment',
+    utilizationMultiplierOverride: 'Fixed utilization multiplier (empty = automatic)',
+    utilizationMultiplierHelp:
+      'e.g. 1 = neutral, 0.75 ≈ −25%. If disabled, utilization does not change price. For a flat daily rate (e.g. €30), set min and max price to the same value.',
+    flatDailyPriceHint:
+      'To pin one daily price (e.g. €30), set minimum and maximum price per day to that same amount.',
     priceRange: 'Range',
     totalCars: 'Total Cars',
     withDynamicPricing: 'Dynamic Pricing',
@@ -1882,6 +1896,7 @@ export const translations = {
         noDiscount: 'Нет скидки',
         rentals: 'аренды',
         spent: 'потрачено',
+        includesRecentBonus: 'включая {pct}% за недавнюю аренду',
       },
       errors: {
         calculationFailed: 'Не удалось рассчитать цену',
@@ -1972,6 +1987,12 @@ export const translations = {
     dynamicPricingDisabledNote: 'При отключении автомобиль будет использовать фиксированное значение "Цена за день" ниже',
     dynamicPricingEnabledNote: 'При включении будет использоваться динамическое ценообразование. Фиксированная цена не будет показана.',
     dynamicPricingNote: 'Окончательная цена варьируется в зависимости от спроса',
+    applyUtilizationPricing: 'Учитывать загрузку автомобиля в цене',
+    utilizationMultiplierOverride: 'Фиксированный множитель загрузки (пусто = авто)',
+    utilizationMultiplierHelp:
+      'Напр. 1 = без изменения, 0,75 ≈ −25 %. Если выключено — загрузка не влияет. Для фикс. цены (напр. 30 €/день) задайте мин. и макс. одинаково.',
+    flatDailyPriceHint:
+      'Чтобы зафиксировать одну цену за день (напр. 30 €), установите минимальную и максимальную одинаково.',
     priceRange: 'Диапазон',
     totalCars: 'Всего автомобилей',
     withDynamicPricing: 'Динамическое ценообразование',
