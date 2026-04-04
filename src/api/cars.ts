@@ -1,6 +1,21 @@
 import api from '../lib/api';
 import type { Car, CarContractsCalendar, CarCreate, CarImage, Contract } from '../types/api';
 
+/** Handles legacy array responses, persisted cache, and malformed `{ contracts }` payloads. */
+export function normalizeCarContractsCalendar(raw: unknown): CarContractsCalendar {
+  if (Array.isArray(raw)) {
+    return { contracts: raw as Contract[], prepBlocks: [] };
+  }
+  if (raw && typeof raw === 'object') {
+    const o = raw as Partial<CarContractsCalendar>;
+    return {
+      contracts: Array.isArray(o.contracts) ? o.contracts : [],
+      prepBlocks: Array.isArray(o.prepBlocks) ? o.prepBlocks : [],
+    };
+  }
+  return { contracts: [], prepBlocks: [] };
+}
+
 export const carsApi = {
   getAll: async (cityId?: number): Promise<Car[]> => {
     const params = cityId ? { cityId } : {};
@@ -44,15 +59,8 @@ export const carsApi = {
   },
 
   getContracts: async (id: number): Promise<CarContractsCalendar> => {
-    const response = await api.get<CarContractsCalendar | Contract[]>(`/cars/${id}/contracts`);
-    const data = response.data;
-    if (Array.isArray(data)) {
-      return { contracts: data, prepBlocks: [] };
-    }
-    return {
-      contracts: data.contracts ?? [],
-      prepBlocks: data.prepBlocks ?? [],
-    };
+    const response = await api.get<unknown>(`/cars/${id}/contracts`);
+    return normalizeCarContractsCalendar(response.data);
   },
 
   // Image management

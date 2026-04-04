@@ -8,7 +8,7 @@ import { DateTimePicker } from '../ui/DateTimePicker';
 import { Alert } from '../ui/Alert';
 import { useLanguage } from '../../contexts/useLanguage';
 import { contractsApi } from '../../api/contracts';
-import { carsApi } from '../../api/cars';
+import { carsApi, normalizeCarContractsCalendar } from '../../api/cars';
 import type { Contract, ContractUpdate, ContractComplete, Car } from '../../types/api';
 import { format } from 'date-fns';
 
@@ -67,6 +67,7 @@ export function AdminContractDetailModal({
   const { data: carCalendar } = useQuery({
     queryKey: ['car-contracts', contract.carId],
     queryFn: () => carsApi.getContracts(contract.carId),
+    select: normalizeCarContractsCalendar,
     enabled: mode === 'edit' && isOpen,
   });
 

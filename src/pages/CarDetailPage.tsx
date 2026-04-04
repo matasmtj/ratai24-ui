@@ -11,7 +11,7 @@ import { Alert } from '../components/ui/Alert';
 import { PricePreviewWidget } from '../components/pricing/PricePreviewWidget';
 import { DemandIndicator } from '../components/pricing/DemandIndicator';
 import { LoyaltyBadge } from '../components/pricing/LoyaltyBadge';
-import { carsApi } from '../api/cars';
+import { carsApi, normalizeCarContractsCalendar } from '../api/cars';
 import { citiesApi } from '../api/cities';
 import { usersApi } from '../api/users';
 import { useAuth } from '../contexts/AuthContext';
@@ -59,6 +59,7 @@ export function CarDetailPage() {
   const { data: carContracts } = useQuery({
     queryKey: ['car-contracts', id],
     queryFn: () => carsApi.getContracts(Number(id)),
+    select: normalizeCarContractsCalendar,
     enabled: !!id,
   });
 
