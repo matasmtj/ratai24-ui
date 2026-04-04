@@ -1,5 +1,5 @@
 import api from '../lib/api';
-import type { Car, CarCreate, CarImage } from '../types/api';
+import type { Car, CarContractsCalendar, CarCreate, CarImage, Contract } from '../types/api';
 
 export const carsApi = {
   getAll: async (cityId?: number): Promise<Car[]> => {
@@ -43,9 +43,16 @@ export const carsApi = {
     return response.data;
   },
 
-  getContracts: async (id: number) => {
-    const response = await api.get(`/cars/${id}/contracts`);
-    return response.data;
+  getContracts: async (id: number): Promise<CarContractsCalendar> => {
+    const response = await api.get<CarContractsCalendar | Contract[]>(`/cars/${id}/contracts`);
+    const data = response.data;
+    if (Array.isArray(data)) {
+      return { contracts: data, prepBlocks: [] };
+    }
+    return {
+      contracts: data.contracts ?? [],
+      prepBlocks: data.prepBlocks ?? [],
+    };
   },
 
   // Image management

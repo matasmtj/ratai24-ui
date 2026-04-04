@@ -122,21 +122,27 @@ export function CarDetailPage() {
   // Get blocked dates for calendar
   const blockedDates = useMemo(() => {
     if (!carContracts) return [];
-    
+
     const dates: Date[] = [];
-    carContracts.forEach((contract: any) => {
-      // Only block active or draft contracts
-      if (contract.state === 'COMPLETED' || contract.state === 'CANCELLED') return;
-      
-      const start = new Date(contract.startDate);
-      const end = new Date(contract.endDate);
-      
-      // Add all dates in the range
+    const addInclusiveEndDay = (start: Date, end: Date) => {
       for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
         dates.push(new Date(d));
       }
+    };
+    const addHalfOpenDays = (start: Date, endExclusive: Date) => {
+      for (let d = new Date(start); d < endExclusive; d.setDate(d.getDate() + 1)) {
+        dates.push(new Date(d));
+      }
+    };
+
+    carContracts.contracts.forEach((contract) => {
+      if (contract.state === 'COMPLETED' || contract.state === 'CANCELLED') return;
+      addInclusiveEndDay(new Date(contract.startDate), new Date(contract.endDate));
     });
-    
+    carContracts.prepBlocks.forEach((block) => {
+      addHalfOpenDays(new Date(block.startDate), new Date(block.endDate));
+    });
+
     return dates;
   }, [carContracts]);
 

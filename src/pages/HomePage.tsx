@@ -27,7 +27,9 @@ export function HomePage() {
     queryFn: () => carsApi.getAll(),
   });
 
-  const featuredCars = cars?.slice(0, 3);
+  const featuredCars = cars
+    ?.filter((car) => car.state !== 'MAINTENANCE' && car.availableForLease !== false)
+    .slice(0, 3);
 
   return (
     <Layout>

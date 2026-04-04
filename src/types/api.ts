@@ -158,6 +158,20 @@ export interface Contract {
   car?: Car; // Populated car data (admin endpoint)
 }
 
+/** Internal calendar holds returned with GET /cars/:id/contracts (not shown as contracts to users). */
+export interface CarPrepBlock {
+  id: number;
+  carId: number;
+  startDate: string;
+  endDate: string;
+  createdAt?: string;
+}
+
+export interface CarContractsCalendar {
+  contracts: Contract[];
+  prepBlocks: CarPrepBlock[];
+}
+
 export interface ContractCreate {
   carId: number;
   startDate: string;

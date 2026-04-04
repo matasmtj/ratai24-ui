@@ -8,6 +8,7 @@ import { DateTimePicker } from '../ui/DateTimePicker';
 import { Alert } from '../ui/Alert';
 import { useLanguage } from '../../contexts/useLanguage';
 import { contractsApi } from '../../api/contracts';
+import { carsApi } from '../../api/cars';
 import type { Contract, ContractUpdate, ContractComplete, Car } from '../../types/api';
 import { format } from 'date-fns';
 
@@ -63,33 +64,38 @@ export function AdminContractDetailModal({
     notes: '',
   });
 
-  // Fetch all contracts for the car to show blocked dates
-  const { data: carContracts } = useQuery({
+  const { data: carCalendar } = useQuery({
     queryKey: ['car-contracts', contract.carId],
-    queryFn: () => contractsApi.getAll().then(contracts => 
-      contracts.filter(c => c.carId === contract.carId && c.id !== contract.id && c.state !== 'CANCELLED')
-    ),
-    enabled: mode === 'edit',
+    queryFn: () => carsApi.getContracts(contract.carId),
+    enabled: mode === 'edit' && isOpen,
   });
 
-  // Calculate blocked dates from other contracts
   const blockedDates = useMemo(() => {
-    if (!carContracts) return [];
-    
+    if (!carCalendar) return [];
+
     const dates: Date[] = [];
-    carContracts.forEach(c => {
-      const start = new Date(c.startDate);
-      const end = new Date(c.endDate);
-      const current = new Date(start);
-      
-      while (current <= end) {
-        dates.push(new Date(current));
-        current.setDate(current.getDate() + 1);
+    const addInclusiveEndDay = (start: Date, end: Date) => {
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        dates.push(new Date(d));
       }
+    };
+    const addHalfOpenDays = (start: Date, endExclusive: Date) => {
+      for (let d = new Date(start); d < endExclusive; d.setDate(d.getDate() + 1)) {
+        dates.push(new Date(d));
+      }
+    };
+
+    carCalendar.contracts.forEach((c) => {
+      if (c.id === contract.id) return;
+      if (c.state === 'CANCELLED' || c.state === 'COMPLETED') return;
+      addInclusiveEndDay(new Date(c.startDate), new Date(c.endDate));
     });
-    
+    carCalendar.prepBlocks.forEach((b) => {
+      addHalfOpenDays(new Date(b.startDate), new Date(b.endDate));
+    });
+
     return dates;
-  }, [carContracts]);
+  }, [carCalendar, contract.id]);
 
   // Calculate price details
   const calculatePriceDetails = () => {
@@ -122,6 +128,7 @@ export function AdminContractDetailModal({
       contractsApi.update(id, data),
     onSuccess: (updatedContract) => {
       queryClient.invalidateQueries({ queryKey: ['admin-contracts'] });
+      queryClient.invalidateQueries({ queryKey: ['car-contracts'] });
       // Update the local state with the new data
       Object.assign(contract, updatedContract);
       setError(null);
@@ -139,6 +146,7 @@ export function AdminContractDetailModal({
       contractsApi.complete(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-contracts'] });
+      queryClient.invalidateQueries({ queryKey: ['car-contracts'] });
       onClose();
     },
     onError: (error: any) => {

@@ -66,10 +66,10 @@ export function CarsPage() {
       (engineCapacityFilter === '2.0-3.0' && car.engineCapacityL > 2.0 && car.engineCapacityL <= 3.0) ||
       (engineCapacityFilter === '>3.0' && car.engineCapacityL > 3.0);
     const matchesSeats = !seatCountFilter || car.seatCount.toString() === seatCountFilter;
-    const matchesAvailable = car.state === 'AVAILABLE';
+    const matchesLeaseCatalog = car.state !== 'MAINTENANCE';
     const matchesAvailableForLease = car.availableForLease !== false; // undefined or true means available
 
-    return matchesSearch && matchesFuel && matchesBody && matchesGearbox && matchesEngine && matchesSeats && matchesAvailable && matchesAvailableForLease;
+    return matchesSearch && matchesFuel && matchesBody && matchesGearbox && matchesEngine && matchesSeats && matchesLeaseCatalog && matchesAvailableForLease;
   }).sort((a, b) => {
     if (!sortBy) return 0;
     if (sortBy === 'priceAsc') return a.pricePerDay - b.pricePerDay;

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -64,7 +64,12 @@ export function AdminUsersPage() {
           <h2 className="text-2xl font-bold text-gray-900">{t('users')}</h2>
           <p className="text-gray-600">{t('manageSystemUsers')}</p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)}>
+        <Button
+          onClick={() => {
+            setEditingUser(null);
+            setIsModalOpen(true);
+          }}
+        >
           <PlusIcon className="h-5 w-5 mr-2" />
           {t('addUser')}
         </Button>
@@ -183,6 +188,29 @@ export function AdminUsersPage() {
   );
 }
 
+function emptyUserForm(): UserCreate | UserAdminUpdate {
+  return {
+    email: '',
+    password: '',
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    role: 'USER',
+  };
+}
+
+function userFormFromUser(user: User | null): UserCreate | UserAdminUpdate {
+  if (!user) return emptyUserForm();
+  return {
+    email: user.email || '',
+    password: '',
+    firstName: user.firstName || '',
+    lastName: user.lastName || '',
+    phoneNumber: user.phone || user.phoneNumber || '',
+    role: user.role || 'USER',
+  };
+}
+
 function UserFormModal({ 
   isOpen, 
   onClose, 
@@ -196,14 +224,19 @@ function UserFormModal({
   const { t } = useLanguage();
   const [error, setError] = useState<string | null>(null);
   
-  const [formData, setFormData] = useState<UserCreate | UserAdminUpdate>({
-    email: user?.email || '',
-    password: '',
-    firstName: user?.firstName || '',
-    lastName: user?.lastName || '',
-    phoneNumber: user?.phone || user?.phoneNumber || '',
-    role: user?.role || 'USER',
-  });
+  const [formData, setFormData] = useState<UserCreate | UserAdminUpdate>(() =>
+    userFormFromUser(user)
+  );
+
+  const editingKey = user?.id ?? 'new';
+
+  useEffect(() => {
+    if (!isOpen) return;
+    setFormData(userFormFromUser(user));
+    setError(null);
+    // Re-seed when the modal opens or a different user is selected — not when the same row is replaced by a refetch.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `user` is intentional when `editingKey` / `isOpen` change
+  }, [isOpen, editingKey]);
 
   const createMutation = useMutation({
     mutationFn: usersApi.createUser,
