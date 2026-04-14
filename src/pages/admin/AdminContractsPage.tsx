@@ -39,7 +39,7 @@ export function AdminContractsPage() {
   const filteredAndSortedContracts = useMemo(() => {
     if (!contracts) return [];
     
-    let filtered = contracts.filter((contract) => {
+    const filtered = contracts.filter((contract) => {
       const matchesSearch = 
         contract.id.toString().includes(searchTerm) ||
         contract.carId.toString().includes(searchTerm);
@@ -221,9 +221,17 @@ export function AdminContractsPage() {
           {/* Pending approval (DRAFT) */}
           {pendingDrafts.filter((c) => idsOnPage.has(c.id)).length > 0 && (
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">
-                {t('contractsPendingSection')} ({pendingDrafts.length})
-              </h3>
+              <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+                <div className="flex items-center">
+                  <CheckCircleIcon className="h-5 w-5 text-blue-500 mr-2" />
+                  <h3 className="text-lg font-semibold text-blue-800">
+                    {t('contractsPendingSection')} ({pendingDrafts.length})
+                  </h3>
+                </div>
+                <p className="text-sm text-blue-700 mt-1">
+                  {t('pendingActivationHint')}
+                </p>
+              </div>
               <div className="space-y-4">
                 {pendingDrafts
                   .filter((c) => idsOnPage.has(c.id))
@@ -236,6 +244,7 @@ export function AdminContractsPage() {
                       getStateLabel={getStateLabel}
                       onClickContract={setSelectedContract}
                       t={t}
+                      highlightType="pending"
                     />
                   ))}
               </div>
@@ -268,7 +277,7 @@ export function AdminContractsPage() {
                       getStateLabel={getStateLabel}
                       onClickContract={setSelectedContract}
                       t={t}
-                      highlight={true}
+                      highlightType="attention"
                     />
                   ))}
               </div>
@@ -325,7 +334,7 @@ function ContractCard({
   getStateLabel,
   onClickContract,
   t,
-  highlight = false,
+  highlightType = null,
 }: {
   contract: any;
   getStatusBadge: (state: string) => string;
@@ -333,7 +342,7 @@ function ContractCard({
   getStateLabel: (state: string) => string;
   onClickContract: (contract: any) => void;
   t: (key: any) => string;
-  highlight?: boolean;
+  highlightType?: 'attention' | 'pending' | null;
 }) {
   const { data: car, isError: carError } = useQuery({
     queryKey: ['car', contract.carId],
@@ -348,11 +357,16 @@ function ContractCard({
     retry: false,
   });
 
+  const highlightClass =
+    highlightType === 'attention'
+      ? 'border-2 border-red-400 bg-red-50'
+      : highlightType === 'pending'
+      ? 'border-2 border-blue-300 bg-blue-50'
+      : '';
+
   return (
     <Card 
-      className={`p-6 cursor-pointer hover:shadow-lg transition-shadow ${
-        highlight ? 'border-2 border-red-400 bg-red-50' : ''
-      }`}
+      className={`p-6 cursor-pointer hover:shadow-lg transition-shadow ${highlightClass}`}
       onClick={() => onClickContract({ ...contract, car, user })}
     >
       <div className="flex justify-between items-start">

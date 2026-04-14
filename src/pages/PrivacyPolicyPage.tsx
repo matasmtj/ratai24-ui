@@ -2,7 +2,64 @@ import { Layout } from '../components/Layout';
 import { useLanguage } from '../contexts/useLanguage';
 
 export function PrivacyPolicyPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  if (language !== 'lt') {
+    const isEn = language === 'en';
+    return (
+      <Layout>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('privacyPolicyTitle')}</h1>
+          <p className="text-gray-700">
+            {isEn
+              ? 'This privacy policy explains how Ratai24 collects, uses and protects your personal data when you use our website and services.'
+              : 'Эта политика конфиденциальности объясняет, как Ratai24 собирает, использует и защищает ваши персональные данные при использовании сайта и услуг.'}
+          </p>
+          <section className="space-y-2">
+            <h2 className="text-2xl font-semibold text-gray-900">{isEn ? '1. Data we collect' : '1. Какие данные мы собираем'}</h2>
+            <ul className="list-disc pl-5 text-gray-700 space-y-1">
+              <li>{isEn ? 'Account data: email, encrypted password, name, surname, phone.' : 'Данные аккаунта: email, зашифрованный пароль, имя, фамилия, телефон.'}</li>
+              <li>{isEn ? 'Rental data: selected car, rental period, price, contract and return information.' : 'Данные аренды: выбранный авто, период аренды, цена, договор и информация о возврате.'}</li>
+              <li>{isEn ? 'Technical data: IP, browser details, logs, cookies required for functionality and analytics.' : 'Технические данные: IP, данные браузера, журналы, cookie для работы и аналитики.'}</li>
+            </ul>
+          </section>
+          <section className="space-y-2">
+            <h2 className="text-2xl font-semibold text-gray-900">{isEn ? '2. Why we process data' : '2. Зачем мы обрабатываем данные'}</h2>
+            <ul className="list-disc pl-5 text-gray-700 space-y-1">
+              <li>{isEn ? 'To provide account access, reservations, contracts and customer support.' : 'Для доступа к аккаунту, бронирований, договоров и поддержки.'}</li>
+              <li>{isEn ? 'To meet legal obligations (accounting, compliance, fraud prevention).' : 'Для соблюдения юридических требований (бухгалтерия, комплаенс, предотвращение мошенничества).'}</li>
+              <li>{isEn ? 'With consent, for optional communication and offers.' : 'С вашего согласия — для дополнительных рассылок и предложений.'}</li>
+            </ul>
+          </section>
+          <section className="space-y-2">
+            <h2 className="text-2xl font-semibold text-gray-900">{isEn ? '3. Retention and sharing' : '3. Хранение и передача'}</h2>
+            <p className="text-gray-700">
+              {isEn
+                ? 'We keep data only as long as needed for service and legal purposes. Data may be shared with trusted providers (hosting, email, payments) under data protection requirements.'
+                : 'Мы храним данные только столько, сколько необходимо для оказания услуг и выполнения закона. Данные могут передаваться доверенным провайдерам (хостинг, email, платежи) при соблюдении требований защиты данных.'}
+            </p>
+          </section>
+          <section className="space-y-2">
+            <h2 className="text-2xl font-semibold text-gray-900">{isEn ? '4. Your rights' : '4. Ваши права'}</h2>
+            <p className="text-gray-700">
+              {isEn
+                ? 'You can request access, correction, deletion, restriction, objection, portability, and withdrawal of consent. Contact us at info@ratai24.lt.'
+                : 'Вы можете запросить доступ, исправление, удаление, ограничение, возражение, переносимость данных и отзыв согласия. Свяжитесь с нами: info@ratai24.lt.'}
+            </p>
+          </section>
+          <section className="space-y-2">
+            <h2 className="text-2xl font-semibold text-gray-900">{isEn ? '5. Cookies and security' : '5. Cookie и безопасность'}</h2>
+            <p className="text-gray-700">
+              {isEn
+                ? 'We use essential cookies and apply technical/organizational security measures to protect your data.'
+                : 'Мы используем обязательные cookie и применяем технические/организационные меры безопасности для защиты ваших данных.'}
+            </p>
+          </section>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

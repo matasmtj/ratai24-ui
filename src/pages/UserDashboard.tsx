@@ -18,15 +18,20 @@ import {
 } from '@heroicons/react/24/outline';
 import { format } from 'date-fns';
 import { useLanguage } from '../contexts/useLanguage';
+import { useAuth } from '../contexts/AuthContext';
 
 export function UserDashboard() {
   const queryClient = useQueryClient();
   const { t } = useLanguage();
+  const { isAuthenticated, role } = useAuth();
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const accessToken = localStorage.getItem('accessToken');
 
   const { data: contracts, isLoading, error, isError } = useQuery({
-    queryKey: ['my-contracts'],
+    queryKey: ['my-contracts', accessToken],
     queryFn: contractsApi.getMy, // Use getMy() for user's own contracts
+    enabled: isAuthenticated && role === 'USER',
+    refetchOnMount: 'always',
   });
 
   // Debug logging

@@ -131,7 +131,7 @@ export function HomePage() {
               
               return (
               <Card key={car.id} hover className="overflow-hidden">
-                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
                   {mainImage ? (
                     <img 
                       src={mainImage.url} 
@@ -140,6 +140,11 @@ export function HomePage() {
                     />
                   ) : (
                     <TruckIcon className="h-24 w-24 text-gray-400" />
+                  )}
+                  {car.state === 'LEASED' && (
+                    <div className="absolute top-2 right-2 bg-amber-500 text-white px-2 py-1 rounded text-xs font-medium">
+                      {t('occupiedToday')}
+                    </div>
                   )}
                 </div>
                 <div className="p-6">

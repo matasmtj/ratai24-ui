@@ -2,7 +2,64 @@ import { Layout } from '../components/Layout';
 import { useLanguage } from '../contexts/useLanguage';
 
 export function RentalTermsPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  if (language !== 'lt') {
+    const isEn = language === 'en';
+    return (
+      <Layout>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">{t('rentalTermsTitle')}</h1>
+          <p className="text-gray-700">
+            {isEn
+              ? 'These terms apply when reserving and renting vehicles through Ratai24.'
+              : 'Эти условия применяются при бронировании и аренде автомобилей через Ratai24.'}
+          </p>
+          <section className="space-y-2">
+            <h2 className="text-2xl font-semibold text-gray-900">{isEn ? '1. Reservation and confirmation' : '1. Бронирование и подтверждение'}</h2>
+            <p className="text-gray-700">
+              {isEn
+                ? 'Reservations can be made online. A reservation may require a deposit, and confirmation finalizes the rental contract.'
+                : 'Бронирование можно сделать онлайн. Может потребоваться депозит, а подтверждение завершает оформление договора аренды.'}
+            </p>
+          </section>
+          <section className="space-y-2">
+            <h2 className="text-2xl font-semibold text-gray-900">{isEn ? '2. Driver requirements' : '2. Требования к водителю'}</h2>
+            <p className="text-gray-700">
+              {isEn
+                ? 'A valid driving license and identity document are required. Minimum driving experience requirements may apply.'
+                : 'Требуются действующее водительское удостоверение и документ, удостоверяющий личность. Может применяться требование к минимальному стажу вождения.'}
+            </p>
+          </section>
+          <section className="space-y-2">
+            <h2 className="text-2xl font-semibold text-gray-900">{isEn ? '3. Payment, deposit and insurance' : '3. Оплата, депозит и страхование'}</h2>
+            <p className="text-gray-700">
+              {isEn
+                ? 'Rental payment and deposit amount depend on selected package. Vehicles are insured under stated contract conditions.'
+                : 'Оплата аренды и размер депозита зависят от выбранного пакета. Автомобили застрахованы на условиях, указанных в договоре.'}
+            </p>
+          </section>
+          <section className="space-y-2">
+            <h2 className="text-2xl font-semibold text-gray-900">{isEn ? '4. Mileage, fuel and return' : '4. Пробег, топливо и возврат'}</h2>
+            <p className="text-gray-700">
+              {isEn
+                ? 'Mileage conditions depend on destination and contract. The car must be returned according to agreed fuel and return time terms.'
+                : 'Условия пробега зависят от направления и договора. Автомобиль должен быть возвращен согласно условиям по топливу и времени возврата.'}
+            </p>
+          </section>
+          <section className="space-y-2">
+            <h2 className="text-2xl font-semibold text-gray-900">{isEn ? '5. Delays, cancellation and liability' : '5. Задержка, отмена и ответственность'}</h2>
+            <p className="text-gray-700">
+              {isEn
+                ? 'Late return fees and cancellation rules apply as defined in the booking/contract. Driver liability follows selected insurance package and contract obligations.'
+                : 'Штрафы за поздний возврат и правила отмены применяются согласно бронированию/договору. Ответственность водителя определяется выбранным страховым пакетом и условиями договора.'}
+            </p>
+          </section>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">

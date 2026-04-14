@@ -21,6 +21,7 @@ export function AdminPricingRulesPage() {
   const [cities, setCities] = useState<City[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [modalError, setModalError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   
   // Modal state
@@ -40,6 +41,7 @@ export function AdminPricingRulesPage() {
     multiplier: undefined,
     priority: 10,
   });
+  const [priorityInput, setPriorityInput] = useState<string>('10');
 
   useEffect(() => {
     fetchData();
@@ -66,6 +68,7 @@ export function AdminPricingRulesPage() {
   };
 
   const handleOpenModal = (rule?: PricingRule) => {
+    setModalError(null);
     if (rule) {
       setEditingRule(rule);
       setFormData({
@@ -79,6 +82,7 @@ export function AdminPricingRulesPage() {
         multiplier: rule.multiplier,
         priority: rule.priority,
       });
+      setPriorityInput(String(rule.priority ?? 10));
     } else {
       setEditingRule(null);
       setFormData({
@@ -92,6 +96,7 @@ export function AdminPricingRulesPage() {
         multiplier: undefined,
         priority: 10,
       });
+      setPriorityInput('10');
     }
     setIsModalOpen(true);
   };
@@ -99,12 +104,44 @@ export function AdminPricingRulesPage() {
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setEditingRule(null);
+    setModalError(null);
+  };
+
+  const getApiErrorMessage = (err: unknown): string => {
+    const candidate = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
+    if (typeof candidate === 'string' && candidate.trim() !== '') return candidate;
+    return t('pricing.errors.saveFailed');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setModalError(null);
     setSuccessMessage(null);
+
+    if (!formData.name.trim()) {
+      setModalError(t('pricing.admin.validation.nameRequired'));
+      return;
+    }
+    if (formData.fixedPrice === undefined && formData.multiplier === undefined) {
+      setModalError(t('pricing.admin.validation.fixedOrMultiplierRequired'));
+      return;
+    }
+    if (formData.fixedPrice !== undefined && formData.fixedPrice <= 0) {
+      setModalError(t('pricing.admin.validation.fixedPricePositive'));
+      return;
+    }
+    if (
+      formData.multiplier !== undefined &&
+      (formData.multiplier < 0.1 || formData.multiplier > 3)
+    ) {
+      setModalError(t('pricing.admin.validation.multiplierRange'));
+      return;
+    }
+    if (formData.startDate && formData.endDate && formData.endDate < formData.startDate) {
+      setModalError(t('pricing.admin.validation.endDateAfterStart'));
+      return;
+    }
 
     try {
       if (editingRule) {
@@ -118,7 +155,7 @@ export function AdminPricingRulesPage() {
       await fetchData();
     } catch (err) {
       console.error('Error saving rule:', err);
-      setError(t('pricing.errors.saveFailed'));
+      setModalError(getApiErrorMessage(err));
     }
   };
 
@@ -190,7 +227,7 @@ export function AdminPricingRulesPage() {
                   <div className="grid grid-cols-2 gap-4 text-sm">
                     {rule.carId && (
                       <div>
-                        <span className="text-gray-500">{t('car')}: </span>
+                        <span className="text-gray-500">{t('carLabel')}: </span>
                         <span className="font-medium">
                           {cars.find((c) => c.id === rule.carId)?.make}{' '}
                           {cars.find((c) => c.id === rule.carId)?.model}
@@ -272,6 +309,8 @@ export function AdminPricingRulesPage() {
         size="lg"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
+          {modalError && <Alert type="error" message={modalError} onClose={() => setModalError(null)} />}
+
           {/* Info Box */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-sm">
             <h4 className="font-semibold text-blue-900 mb-2">{t('pricing.admin.howPricingRulesWork')}</h4>
@@ -304,7 +343,7 @@ export function AdminPricingRulesPage() {
           </div>
 
           <Select
-            label={t('car') + ' (' + t('common.optional') + ')'}
+            label={t('carLabel') + ' (' + t('common.optional') + ')'}
             value={formData.carId?.toString() || ''}
             onChange={(e) =>
               setFormData({ ...formData, carId: e.target.value ? Number(e.target.value) : undefined })
@@ -385,8 +424,19 @@ export function AdminPricingRulesPage() {
             <Input
               label={t('pricing.admin.priority')}
               type="number"
-              value={formData.priority || 10}
-              onChange={(e) => setFormData({ ...formData, priority: Number(e.target.value) })}
+              value={priorityInput}
+              onChange={(e) => {
+                const value = e.target.value;
+                setPriorityInput(value);
+                if (value === '') {
+                  setFormData({ ...formData, priority: undefined });
+                  return;
+                }
+                const parsed = Number(value);
+                if (Number.isFinite(parsed)) {
+                  setFormData({ ...formData, priority: parsed });
+                }
+              }}
             />
             <p className="mt-1 text-xs text-gray-500">{t('pricing.admin.priorityHelp')}</p>
           </div>

@@ -277,6 +277,11 @@ export function CarsPage() {
                           {t('alsoForSale')}
                         </div>
                       )}
+                      {car.state === 'LEASED' && (
+                        <div className="absolute top-2 right-2 bg-amber-500 text-white px-2 py-1 rounded text-xs font-medium">
+                          {t('occupiedToday')}
+                        </div>
+                      )}
                     </div>
                     <div className="p-6">
                       <div className="flex justify-between items-start mb-2">

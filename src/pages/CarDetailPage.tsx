@@ -47,6 +47,15 @@ export function CarDetailPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
 
+  const mapBookingApiError = (apiError: unknown): string => {
+    if (typeof apiError !== 'string') return t('bookingError');
+    const normalized = apiError.toLowerCase();
+    if (normalized.includes('active or pending reservations at a time')) {
+      return t('bookingLimitExceeded');
+    }
+    return apiError;
+  };
+
   const { data: car, isLoading } = useQuery({
     queryKey: ['car', id],
     queryFn: () => carsApi.getById(Number(id)),
@@ -113,7 +122,11 @@ export function CarDetailPage() {
     } catch (error) {
       console.error('Booking error:', error);
       const apiError = (error as any)?.response?.data?.error;
-      setBookingError(typeof apiError === 'string' && apiError.trim() !== '' ? apiError : t('bookingError'));
+      setBookingError(
+        typeof apiError === 'string' && apiError.trim() !== ''
+          ? mapBookingApiError(apiError)
+          : t('bookingError')
+      );
     } finally {
       setIsSubmitting(false);
     }
