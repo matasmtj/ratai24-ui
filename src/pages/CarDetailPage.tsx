@@ -166,6 +166,7 @@ export function CarDetailPage() {
 
   if (isLoading) return <LoadingPage />;
   if (!car) return <div>{t('carNotFound')}</div>;
+  const canBookThisCar = car.availableForLease !== false && car.state !== 'MAINTENANCE';
 
   const carImages = car.images || [];
   const currentImage = carImages[currentImageIndex];
@@ -287,6 +288,11 @@ export function CarDetailPage() {
                 )}
               </div>
               <p className="text-xl text-gray-600">{car.year} m.</p>
+              {car.occupiedToday && (
+                <div className="mt-3 inline-flex items-center bg-amber-500 text-white px-2 py-1 rounded text-xs font-medium">
+                  {t('occupiedToday')}
+                </div>
+              )}
             </div>
 
             <Card className="p-6 mb-6">
@@ -368,7 +374,7 @@ export function CarDetailPage() {
                     )}
                   </div>
                 </div>
-                {car.state === 'AVAILABLE' ? (
+                {canBookThisCar ? (
                   <div>
                     {isAuthenticated && role === 'USER' ? (
                       <Button

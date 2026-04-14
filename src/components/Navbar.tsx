@@ -1,7 +1,7 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { Menu } from '@headlessui/react';
-import { UserCircleIcon, Bars3Icon, XMarkIcon } from '@heroicons/react/24/outline';
+import { UserCircleIcon, Bars3Icon, XMarkIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/useLanguage';
 import { Button } from './ui/Button';
@@ -77,6 +77,21 @@ export function Navbar() {
                 </Button>
               </Link>
             )}
+            {isAuthenticated && role === 'USER' && (
+              <Link to="/dashboard" className="hidden lg:inline-flex">
+                <Button variant="ghost" size="sm">
+                  {t('myReservations')}
+                </Button>
+              </Link>
+            )}
+            {isAuthenticated && role === 'USER' && (
+              <Link to="/dashboard" className="inline-flex lg:hidden">
+                <Button variant="ghost" size="sm" className="px-2">
+                  <CalendarDaysIcon className="h-5 w-5 sm:mr-1" />
+                  <span className="hidden sm:inline">{t('myReservations')}</span>
+                </Button>
+              </Link>
+            )}
 
             {!isAuthenticated && (
               <Link to="/login" className="inline-flex">
@@ -97,28 +112,16 @@ export function Navbar() {
                   {isAuthenticated ? (
                     <>
                       {role === 'USER' && (
-                        <>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <Link
-                                to="/dashboard"
-                                className={`${active ? 'bg-gray-100' : ''} block px-4 py-2 text-sm text-gray-700`}
-                              >
-                                {t('myReservations')}
-                              </Link>
-                            )}
-                          </Menu.Item>
-                          <Menu.Item>
-                            {({ active }) => (
-                              <Link
-                                to="/profile"
-                                className={`${active ? 'bg-gray-100' : ''} block px-4 py-2 text-sm text-gray-700`}
-                              >
-                                {t('myProfile')}
-                              </Link>
-                            )}
-                          </Menu.Item>
-                        </>
+                        <Menu.Item>
+                          {({ active }) => (
+                            <Link
+                              to="/profile"
+                              className={`${active ? 'bg-gray-100' : ''} block px-4 py-2 text-sm text-gray-700`}
+                            >
+                              {t('myProfile')}
+                            </Link>
+                          )}
+                        </Menu.Item>
                       )}
                       <Menu.Item>
                         {({ active }) => (
@@ -223,15 +226,6 @@ export function Navbar() {
               </Link>
               {isAuthenticated ? (
                 <>
-                  {role === 'USER' && (
-                    <Link
-                      to="/dashboard"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-                    >
-                      {t('myReservations')}
-                    </Link>
-                  )}
                   {role === 'USER' ? (
                     <Link
                       to="/profile"

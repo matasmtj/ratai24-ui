@@ -4,26 +4,14 @@ import type { Contract, ContractCreate, ContractUpdate, ContractComplete } from 
 export const contractsApi = {
   // Get all contracts (ADMIN only)
   getAll: async (): Promise<Contract[]> => {
-    console.log('contractsApi.getAll - Making request to /contracts');
-    try {
-      const response = await api.get<Contract[]>('/contracts');
-      return response.data;
-    } catch (error) {
-      console.error('contractsApi.getAll - Error:', error);
-      throw error;
-    }
+    const response = await api.get<Contract[]>('/contracts');
+    return response.data;
   },
 
   // Get current user's contracts (USER endpoint)
   getMy: async (): Promise<Contract[]> => {
-    console.log('contractsApi.getMy - Making request to /contracts/my');
-    try {
-      const response = await api.get<Contract[]>('/contracts/my');
-      return response.data;
-    } catch (error) {
-      console.error('contractsApi.getMy - Error:', error);
-      throw error;
-    }
+    const response = await api.get<Contract[]>('/contracts/my');
+    return response.data;
   },
 
   getById: async (id: number): Promise<Contract> => {

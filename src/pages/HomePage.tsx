@@ -5,6 +5,7 @@ import { Button } from '../components/ui/Button';
 import { Card } from '../components/ui/Card';
 import { LoadingSpinner } from '../components/ui/Loading';
 import { useLanguage } from '../contexts/useLanguage';
+import { useAuth } from '../contexts/AuthContext';
 import { citiesApi } from '../api/cities';
 import { carsApi } from '../api/cars';
 import { 
@@ -17,6 +18,7 @@ import {
 
 export function HomePage() {
   const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const { data: cities, isLoading: citiesLoading } = useQuery({
     queryKey: ['cities'],
     queryFn: citiesApi.getAll,
@@ -141,7 +143,7 @@ export function HomePage() {
                   ) : (
                     <TruckIcon className="h-24 w-24 text-gray-400" />
                   )}
-                  {car.state === 'LEASED' && (
+                  {car.occupiedToday && (
                     <div className="absolute top-2 right-2 bg-amber-500 text-white px-2 py-1 rounded text-xs font-medium">
                       {t('occupiedToday')}
                     </div>
@@ -184,19 +186,21 @@ export function HomePage() {
       )}
 
       {/* CTA Section */}
-      <div className="bg-primary-600 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">{t('readyToStart')}</h2>
-          <p className="text-xl mb-8 text-primary-100">
-            {t('readyToStartDesc')}
-          </p>
-          <Link to="/register">
-            <Button size="lg" variant="secondary">
-              {t('registerNow')}
-            </Button>
-          </Link>
+      {!isAuthenticated && (
+        <div className="bg-primary-600 text-white py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h2 className="text-3xl font-bold mb-4">{t('readyToStart')}</h2>
+            <p className="text-xl mb-8 text-primary-100">
+              {t('readyToStartDesc')}
+            </p>
+            <Link to="/register">
+              <Button size="lg" variant="secondary">
+                {t('registerNow')}
+              </Button>
+            </Link>
+          </div>
         </div>
-      </div>
+      )}
     </Layout>
   );
 }

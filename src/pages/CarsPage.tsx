@@ -277,7 +277,7 @@ export function CarsPage() {
                           {t('alsoForSale')}
                         </div>
                       )}
-                      {car.state === 'LEASED' && (
+                      {car.occupiedToday && (
                         <div className="absolute top-2 right-2 bg-amber-500 text-white px-2 py-1 rounded text-xs font-medium">
                           {t('occupiedToday')}
                         </div>

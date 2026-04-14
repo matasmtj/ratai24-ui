@@ -6,6 +6,7 @@ import { Input } from '../../components/ui/Input';
 import { Select } from '../../components/ui/Select';
 import { LoadingSpinner } from '../../components/ui/Loading';
 import { useLanguage } from '../../contexts/useLanguage';
+import { useAuth } from '../../contexts/AuthContext';
 import { contractsApi } from '../../api/contracts';
 import { carsApi } from '../../api/cars';
 import { usersApi } from '../../api/users';
@@ -16,6 +17,7 @@ import type { Contract } from '../../types/api';
 
 export function AdminContractsPage() {
   const { t } = useLanguage();
+  const { isAuthenticated, role } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [stateFilter, setStateFilter] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('');
@@ -25,9 +27,15 @@ export function AdminContractsPage() {
   const { data: contracts, isLoading } = useQuery({
     queryKey: ['admin-contracts'],
     queryFn: contractsApi.getAll,
+    enabled: isAuthenticated && role === 'ADMIN',
     refetchOnWindowFocus: true,
     refetchOnReconnect: true,
-    refetchInterval: 15000,
+    refetchInterval: isAuthenticated && role === 'ADMIN' ? 15000 : false,
+    retry: (failureCount, error: unknown) => {
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      if (status === 401 || status === 403) return false;
+      return failureCount < 2;
+    },
   });
 
   const handleResetFilters = () => {

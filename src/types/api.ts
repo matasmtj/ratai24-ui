@@ -57,6 +57,7 @@ export interface Car {
   gearbox: Gearbox;
   colour?: string | null;
   state: CarState;
+  occupiedToday?: boolean;
   odometerKm: number;
   isActive?: boolean;
   images?: CarImage[];

@@ -272,7 +272,7 @@ export function AdminCarsPage() {
                 <div className="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded text-xs font-medium">
                   {car.images?.length || 0} {t('photos')}
                 </div>
-                {car.state === 'LEASED' && (
+                {car.occupiedToday && (
                   <div className="absolute top-2 left-2 bg-amber-500 text-white px-2 py-1 rounded text-xs font-medium">
                     {t('occupiedToday')}
                   </div>
