@@ -98,15 +98,11 @@ export function ContactsPage() {
           <div className="space-y-2 text-gray-600">
             <div className="flex justify-between">
               <span>{t('mondayFriday')}</span>
-              <span className="font-semibold">8:00 - 18:00</span>
+              <span className="font-semibold">{contact.businessHoursWeekdays}</span>
             </div>
             <div className="flex justify-between">
-              <span>{t('saturday')}</span>
-              <span className="font-semibold">9:00 - 15:00</span>
-            </div>
-            <div className="flex justify-between">
-              <span>{t('sunday')}</span>
-              <span className="font-semibold">{t('closed')}</span>
+              <span>{t('weekend')}</span>
+              <span className="font-semibold">{contact.businessHoursWeekend}</span>
             </div>
           </div>
         </Card>

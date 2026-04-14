@@ -200,6 +200,8 @@ export interface Contact {
   id: number;
   email: string;
   phone: string;
+  businessHoursWeekdays: string;
+  businessHoursWeekend: string;
   operationAreas: string; // Comma-separated city names
   operationAreasDetails: OperationAreaDetail[];
   createdAt: string;
@@ -209,6 +211,8 @@ export interface Contact {
 export interface ContactUpdate {
   email: string;
   phone: string;
+  businessHoursWeekdays: string;
+  businessHoursWeekend: string;
   operationAreas: OperationArea[];
 }
 

@@ -23,9 +23,6 @@ import { getFuelTypeKey, getBodyTypeKey } from '../lib/translationHelpers';
 import type { ContractCreate } from '../types/api';
 import { 
   TruckIcon,
-  MapPinIcon,
-  Cog6ToothIcon,
-  BoltIcon,
   CalendarIcon,
   ChevronLeftIcon,
   ChevronRightIcon
@@ -109,12 +106,14 @@ export function CarDetailPage() {
       // Invalidate queries to refresh data
       await queryClient.invalidateQueries({ queryKey: ['my-contracts'] });
       await queryClient.invalidateQueries({ queryKey: ['car-contracts', id] });
+      await queryClient.invalidateQueries({ queryKey: ['admin-contracts'] });
       
       setIsBookingModalOpen(false);
       navigate('/dashboard');
     } catch (error) {
       console.error('Booking error:', error);
-      alert(t('bookingError'));
+      const apiError = (error as any)?.response?.data?.error;
+      setBookingError(typeof apiError === 'string' && apiError.trim() !== '' ? apiError : t('bookingError'));
     } finally {
       setIsSubmitting(false);
     }
@@ -173,7 +172,7 @@ export function CarDetailPage() {
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link to="/cars" className="text-primary-600 hover:text-primary-700 mb-4 inline-block">
+        <Link to="/rent-cars" className="text-primary-600 hover:text-primary-700 mb-4 inline-block">
           ← {t('backToList')}
         </Link>
 
@@ -292,15 +291,13 @@ export function CarDetailPage() {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">{t('gearboxType')}</div>
-                  <div className="font-medium flex items-center">
-                    <Cog6ToothIcon className="h-4 w-4 mr-2" />
+                  <div className="font-medium">
                     {car.gearbox === 'AUTOMATIC' ? t('automatic') : t('manual')}
                   </div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">{t('powerOutput')}</div>
-                  <div className="font-medium flex items-center">
-                    <BoltIcon className="h-4 w-4 mr-2" />
+                  <div className="font-medium">
                     {car.powerKW} kW
                   </div>
                 </div>
@@ -324,10 +321,7 @@ export function CarDetailPage() {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">{t('location')}</div>
-                  <div className="font-medium flex items-center">
-                    <MapPinIcon className="h-4 w-4 mr-2" />
-                    {city?.name}
-                  </div>
+                  <div className="font-medium">{city?.name}</div>
                 </div>
               </div>
             </Card>
@@ -338,7 +332,7 @@ export function CarDetailPage() {
                   <div className="flex items-center gap-2 mb-1">
                     <div className="text-sm text-gray-600">{t('pricePerDay')}</div>
                     {car.useDynamicPricing && (
-                      <span className="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
+                      <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full border border-purple-200 bg-purple-50 text-purple-700 font-semibold">
                         {t('dynamicLabel')}
                       </span>
                     )}
@@ -357,11 +351,11 @@ export function CarDetailPage() {
                         )}
                       </>
                     ) : (
-                      t('pricing.fixedPrice') || 'Fixed price'
+                      t('pricing.admin.fixedPrice')
                     )}
                   </div>
                 </div>
-                {car.state === 'AVAILABLE' && (
+                {car.state === 'AVAILABLE' ? (
                   <div>
                     {isAuthenticated && role === 'USER' ? (
                       <Button
@@ -380,7 +374,13 @@ export function CarDetailPage() {
                       </Link>
                     ) : null}
                   </div>
-                )}
+                ) : isAuthenticated && role === 'USER' ? (
+                  <div>
+                    <Button size="lg" variant="secondary" disabled>
+                      {t('carUnavailableForBooking')}
+                    </Button>
+                  </div>
+                ) : null}
               </div>
               {city && (
                 <div className="mt-3 pt-3 border-t border-primary-200">

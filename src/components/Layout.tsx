@@ -63,12 +63,12 @@ export function Layout({ children }: LayoutProps) {
                   </Link>
                 </li>
                 <li>
-                  <Link to="/cars" className="hover:text-white transition-colors">
+                  <Link to="/rent-cars" className="hover:text-white transition-colors">
                     {t('carLease')}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/car-sale" className="hover:text-white transition-colors">
+                  <Link to="/sale-cars" className="hover:text-white transition-colors">
                     {t('carSale')}
                   </Link>
                 </li>
@@ -97,6 +97,15 @@ export function Layout({ children }: LayoutProps) {
                   <li className="flex items-start text-sm">
                     <PhoneIcon className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
                     <span>{contactInfo.phone}</span>
+                  </li>
+                  <li className="text-sm">
+                    <div className="text-white font-semibold">{t('workingHours')}</div>
+                    <div className="text-gray-300">
+                      {t('mondayFriday')}: {contactInfo.businessHoursWeekdays}
+                    </div>
+                    <div className="text-gray-300">
+                      {t('weekend')}: {contactInfo.businessHoursWeekend}
+                    </div>
                   </li>
                   {contactInfo.operationAreasDetails && contactInfo.operationAreasDetails.length > 0 ? (
                     contactInfo.operationAreasDetails.map((detail) => (

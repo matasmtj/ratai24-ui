@@ -43,7 +43,7 @@ export function HomePage() {
             <p className="text-xl md:text-2xl mb-8 text-primary-100">
               {t('heroSubtitle')}
             </p>
-            <Link to="/cars">
+            <Link to="/rent-cars">
               <Button size="lg" variant="secondary">
                 <TruckIcon className="h-6 w-6 mr-2" />
                 {t('viewCars')}
@@ -66,7 +66,7 @@ export function HomePage() {
               {cities.map((city) => (
                 <Link
                   key={city.id}
-                  to={`/cars?cityId=${city.id}`}
+                  to={`/rent-cars?cityId=${city.id}`}
                   className="inline-flex items-center px-6 py-3 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-primary-300 transition-all cursor-pointer"
                 >
                   <MapPinIcon className="h-6 w-6 text-primary-600 mr-2" />
@@ -160,7 +160,7 @@ export function HomePage() {
                         </div>
                       )}
                     </div>
-                    <Link to="/cars">
+                    <Link to="/rent-cars">
                       <Button size="sm">{t('view')}</Button>
                     </Link>
                   </div>
@@ -169,7 +169,7 @@ export function HomePage() {
             )})}
           </div>
           <div className="text-center mt-8">
-            <Link to="/cars">
+            <Link to="/rent-cars">
               <Button variant="secondary" size="lg">
                 {t('viewAllCars')}
               </Button>

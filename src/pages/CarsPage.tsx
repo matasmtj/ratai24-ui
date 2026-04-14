@@ -260,7 +260,7 @@ export function CarsPage() {
                 const mainImage = car.images?.find(img => img.isMain);
                 
                 return (
-                <Link key={car.id} to={`/cars/${car.id}`} className="block">
+                <Link key={car.id} to={`/rent-cars/${car.id}`} className="block">
                   <Card hover className="overflow-hidden h-full">
                     <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
                       {mainImage ? (
@@ -304,13 +304,13 @@ export function CarsPage() {
                             <>
                               <div className="flex items-center gap-2 mb-1">
                                 <div className="text-sm text-gray-500">{t('startsFrom')}</div>
-                                <span className="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
+                                <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full border border-purple-200 bg-purple-50 text-purple-700 font-semibold">
                                   {t('dynamicLabel')}
                                 </span>
                               </div>
                               <div className="text-2xl font-bold text-primary-600">
                                 €{car.minPricePerDay || car.basePricePerDay || car.pricePerDay}
-                                <span className="text-sm font-normal text-gray-500">/day</span>
+                                <span className="text-sm font-normal text-gray-500">{t('perDay')}</span>
                               </div>
                             </>
                           ) : (

@@ -20,6 +20,8 @@ export function AdminContactsPage() {
   const [formData, setFormData] = useState<ContactUpdate>({
     email: '',
     phone: '',
+    businessHoursWeekdays: '8:00 - 18:00',
+    businessHoursWeekend: '9:00 - 15:00',
     operationAreas: [],
   });
 
@@ -46,7 +48,7 @@ export function AdminContactsPage() {
     onError: (error: any) => {
       console.error('Contact update error:', error);
       const errorMsg = error?.response?.data?.error || error?.response?.data?.message || error.message;
-      setError(`Failed to update contact: ${errorMsg}`);
+      setError(`${t('contactUpdateFailed')}: ${errorMsg}`);
     },
   });
 
@@ -59,7 +61,7 @@ export function AdminContactsPage() {
     onError: (error: any) => {
       console.error('Contact create error:', error);
       const errorMsg = error?.response?.data?.error || error?.response?.data?.message || error.message;
-      setError(`Failed to create contact: ${errorMsg}`);
+      setError(`${t('contactCreateFailed')}: ${errorMsg}`);
     },
   });
 
@@ -76,6 +78,8 @@ export function AdminContactsPage() {
       setFormData({
         email: contact.email,
         phone: contact.phone,
+        businessHoursWeekdays: contact.businessHoursWeekdays,
+        businessHoursWeekend: contact.businessHoursWeekend,
         operationAreas,
       });
       setIsEditing(true);
@@ -94,6 +98,8 @@ export function AdminContactsPage() {
       setFormData({
         email: contact.email,
         phone: contact.phone,
+        businessHoursWeekdays: contact.businessHoursWeekdays,
+        businessHoursWeekend: contact.businessHoursWeekend,
         operationAreas,
       });
     }
@@ -163,6 +169,25 @@ export function AdminContactsPage() {
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 required
               />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label={t('mondayFriday')}
+                  type="text"
+                  value={formData.businessHoursWeekdays}
+                  onChange={(e) => setFormData({ ...formData, businessHoursWeekdays: e.target.value })}
+                  placeholder="8:00 - 18:00"
+                  required
+                />
+                <Input
+                  label={t('weekend')}
+                  type="text"
+                  value={formData.businessHoursWeekend}
+                  onChange={(e) => setFormData({ ...formData, businessHoursWeekend: e.target.value })}
+                  placeholder="9:00 - 15:00"
+                  required
+                />
+              </div>
 
               <div>
                 <div className="flex items-center justify-between mb-2">
@@ -275,6 +300,27 @@ export function AdminContactsPage() {
                 disabled={!isEditing}
                 required
               />
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label={t('mondayFriday')}
+                  type="text"
+                  value={isEditing ? formData.businessHoursWeekdays : contact?.businessHoursWeekdays || ''}
+                  onChange={(e) => setFormData({ ...formData, businessHoursWeekdays: e.target.value })}
+                  placeholder="8:00 - 18:00"
+                  disabled={!isEditing}
+                  required
+                />
+                <Input
+                  label={t('weekend')}
+                  type="text"
+                  value={isEditing ? formData.businessHoursWeekend : contact?.businessHoursWeekend || ''}
+                  onChange={(e) => setFormData({ ...formData, businessHoursWeekend: e.target.value })}
+                  placeholder="9:00 - 15:00"
+                  disabled={!isEditing}
+                  required
+                />
+              </div>
 
               <div>
                 <div className="flex items-center justify-between mb-3">

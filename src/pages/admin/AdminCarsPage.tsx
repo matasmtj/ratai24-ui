@@ -304,7 +304,7 @@ export function AdminCarsPage() {
                     className="flex-1"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/cars/${car.id}`);
+                      navigate(`/rent-cars/${car.id}`);
                     }}
                     title={t('view')}
                   >
@@ -400,6 +400,31 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
   const queryClient = useQueryClient();
   const { t } = useLanguage();
   const [error, setError] = useState<string | null>(null);
+
+  const mapCarApiError = (rawError: unknown): string => {
+    const message = typeof rawError === 'string' ? rawError : '';
+    const normalized = message.toLowerCase();
+
+    if (!message) return t('carCrudGenericError');
+    if (normalized.includes('odometerkm')) return t('carErrorMileageRange');
+    if (normalized.includes('priceperday')) return t('carErrorPricePerDayPositive');
+    if (normalized.includes('dynamic pricing requires')) return t('carErrorDynamicPricingFieldsRequired');
+    if (normalized.includes('minpriceperday cannot be greater than basepriceperday')) return t('carErrorMinPriceHigherThanBase');
+    if (normalized.includes('maxpriceperday cannot be lower than basepriceperday')) return t('carErrorMaxPriceLowerThanBase');
+    if (normalized.includes('minpriceperday cannot be greater than maxpriceperday')) return t('carErrorMinPriceHigherThanMax');
+    if (normalized.includes('seatcount')) return t('carErrorSeatCountRange');
+    if (normalized.includes('powerkw')) return t('carErrorPowerRange');
+    if (normalized.includes('cityid')) return t('carErrorCityInvalid');
+    if (normalized.includes('numberplate')) return t('carErrorNumberPlateInvalid');
+    if (normalized.includes('vin')) return t('vinInvalidChars');
+    if (normalized.includes('enginecapacityl must be null for electric')) return t('carErrorEngineCapacityElectric');
+    if (normalized.includes('utilizationmultiplieroverride')) return t('carErrorUtilizationMultiplier');
+    if (normalized.includes('fueltype must be one of')) return t('carErrorFuelTypeInvalid');
+    if (normalized.includes('gearbox must be one of')) return t('carErrorGearboxInvalid');
+    if (normalized.includes('bodytype must be one of')) return t('carErrorBodyTypeInvalid');
+    if (normalized.includes('state must be one of')) return t('carErrorStateInvalid');
+    return t('carCrudGenericError');
+  };
   
   // VIN validation function
   const validateVIN = (vin: string): { valid: boolean; error?: string } => {
@@ -557,8 +582,8 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
       onClose();
     },
     onError: (error: any) => {
-      const errorMsg = error?.response?.data?.error || error?.message || 'Failed to create car';
-      setError(errorMsg);
+      const errorMsg = error?.response?.data?.error || error?.message;
+      setError(mapCarApiError(errorMsg));
     },
   });
 
@@ -571,8 +596,8 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
       onClose();
     },
     onError: (error: any) => {
-      const errorMsg = error?.response?.data?.error || error?.message || 'Failed to update car';
-      setError(errorMsg);
+      const errorMsg = error?.response?.data?.error || error?.message;
+      setError(mapCarApiError(errorMsg));
     },
   });
 
@@ -600,22 +625,22 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
         : formData.maxPricePerDay;
       
       if (!basePrice || !minPrice || !maxPrice) {
-        setError('All dynamic pricing fields (base, min, max) are required when dynamic pricing is enabled');
+        setError(t('carErrorDynamicPricingFieldsRequired'));
         return;
       }
       
       if (minPrice > basePrice) {
-        setError('Minimum price cannot be higher than base price');
+        setError(t('carErrorMinPriceHigherThanBase'));
         return;
       }
       
       if (maxPrice < basePrice) {
-        setError('Maximum price cannot be lower than base price');
+        setError(t('carErrorMaxPriceLowerThanBase'));
         return;
       }
       
       if (minPrice > maxPrice) {
-        setError('Minimum price cannot be higher than maximum price');
+        setError(t('carErrorMinPriceHigherThanMax'));
         return;
       }
     }
@@ -667,7 +692,7 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
         submitData.utilizationMultiplierOverride < 0.1 ||
         submitData.utilizationMultiplierOverride > 3)
     ) {
-      setError('Utilization multiplier must be between 0.1 and 3, or leave empty');
+      setError(t('carErrorUtilizationMultiplier'));
       return;
     }
     

@@ -12,9 +12,6 @@ import { useLanguage } from '../contexts/useLanguage';
 import { getFuelTypeKey, getBodyTypeKey } from '../lib/translationHelpers';
 import { 
   TruckIcon,
-  MapPinIcon,
-  Cog6ToothIcon,
-  BoltIcon,
   PhoneIcon,
   ChevronLeftIcon,
   ChevronRightIcon
@@ -49,7 +46,7 @@ export function CarSaleDetailPage() {
           <Card className="p-12 text-center">
             <TruckIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('carNotFound')}</h2>
-            <Link to="/car-sale">
+            <Link to="/sale-cars">
               <Button>{t('backToCars')}</Button>
             </Link>
           </Card>
@@ -72,7 +69,7 @@ export function CarSaleDetailPage() {
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link to="/car-sale" className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-6">
+        <Link to="/sale-cars" className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-6">
           <ChevronLeftIcon className="h-5 w-5 mr-1" />
           {t('backToCars')}
         </Link>
@@ -164,15 +161,13 @@ export function CarSaleDetailPage() {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">{t('gearboxType')}</div>
-                  <div className="font-medium flex items-center">
-                    <Cog6ToothIcon className="h-4 w-4 mr-2" />
+                  <div className="font-medium">
                     {car.gearbox === 'AUTOMATIC' ? t('automatic') : t('manual')}
                   </div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">{t('powerOutput')}</div>
-                  <div className="font-medium flex items-center">
-                    <BoltIcon className="h-4 w-4 mr-2" />
+                  <div className="font-medium">
                     {car.powerKW} {t('kw')}
                   </div>
                 </div>
@@ -202,10 +197,7 @@ export function CarSaleDetailPage() {
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">{t('location')}</div>
-                  <div className="font-medium flex items-center">
-                    <MapPinIcon className="h-4 w-4 mr-2" />
-                    {city?.name}
-                  </div>
+                  <div className="font-medium">{city?.name}</div>
                 </div>
               </div>
             </Card>

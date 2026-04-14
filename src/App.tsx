@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -39,6 +39,16 @@ const queryClient = new QueryClient({
   },
 });
 
+function LegacyRentCarDetailRedirect() {
+  const { id } = useParams<{ id: string }>();
+  return <Navigate to={id ? `/rent-cars/${id}` : '/rent-cars'} replace />;
+}
+
+function LegacySaleCarDetailRedirect() {
+  const { id } = useParams<{ id: string }>();
+  return <Navigate to={id ? `/sale-cars/${id}` : '/sale-cars'} replace />;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -48,10 +58,14 @@ function App() {
           <Routes>
             {/* Public Routes */}
             <Route path="/" element={<HomePage />} />
-            <Route path="/cars" element={<CarsPage />} />
-            <Route path="/car-sale" element={<CarSalePage />} />
-            <Route path="/car-sale/:id" element={<CarSaleDetailPage />} />
-            <Route path="/cars/:id" element={<CarDetailPage />} />
+            <Route path="/rent-cars" element={<CarsPage />} />
+            <Route path="/rent-cars/:id" element={<CarDetailPage />} />
+            <Route path="/sale-cars" element={<CarSalePage />} />
+            <Route path="/sale-cars/:id" element={<CarSaleDetailPage />} />
+            <Route path="/cars" element={<Navigate to="/rent-cars" replace />} />
+            <Route path="/cars/:id" element={<LegacyRentCarDetailRedirect />} />
+            <Route path="/car-sale" element={<Navigate to="/sale-cars" replace />} />
+            <Route path="/car-sale/:id" element={<LegacySaleCarDetailRedirect />} />
             <Route path="/contacts" element={<ContactsPage />} />
             <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
             <Route path="/rental-terms" element={<RentalTermsPage />} />

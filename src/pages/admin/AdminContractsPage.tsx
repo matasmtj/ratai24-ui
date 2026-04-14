@@ -25,6 +25,9 @@ export function AdminContractsPage() {
   const { data: contracts, isLoading } = useQuery({
     queryKey: ['admin-contracts'],
     queryFn: contractsApi.getAll,
+    refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
+    refetchInterval: 15000,
   });
 
   const handleResetFilters = () => {

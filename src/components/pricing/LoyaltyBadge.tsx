@@ -57,6 +57,9 @@ export function LoyaltyBadge() {
   };
 
   const recentBonus = loyalty.recentActivityBonus ?? 0;
+  const tierKey = loyalty.tier.toLowerCase().replace(/\s+/g, '');
+  const translatedTier = t(`pricing.loyalty.tiers.${tierKey}` as any);
+  const tierLabel = translatedTier.startsWith('pricing.loyalty.tiers.') ? loyalty.tier : translatedTier;
 
   return (
     <div className={`p-4 rounded-lg shadow-md ${getTierColor(loyalty.tier)}`}>
@@ -65,7 +68,7 @@ export function LoyaltyBadge() {
           <div className="flex items-center gap-2 mb-1">
             <span className="text-2xl">{getTierIcon(loyalty.tier)}</span>
             <span className="font-bold text-lg">
-              {loyalty.tier} {t('pricing.loyalty.tier')}
+              {tierLabel} {t('pricing.loyalty.tier')}
             </span>
           </div>
           <p className="text-sm opacity-90">
