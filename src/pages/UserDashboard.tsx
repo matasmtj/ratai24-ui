@@ -34,13 +34,6 @@ export function UserDashboard() {
     refetchOnMount: 'always',
   });
 
-  // Debug logging
-  console.log('UserDashboard - isLoading:', isLoading);
-  console.log('UserDashboard - isError:', isError);
-  console.log('UserDashboard - error:', error);
-  console.log('UserDashboard - contracts:', contracts);
-  console.log('UserDashboard - contracts length:', contracts?.length);
-
   const cancelMutation = useMutation({
     mutationFn: (id: number) => contractsApi.cancel(id),
     onSuccess: () => {
@@ -195,9 +188,7 @@ function ContractCard({
     queryFn: () => carsApi.getById(contract.carId),
   });
 
-  const start = new Date(contract.startDate).getTime();
-  const now = Date.now();
-  const canCancel = contract.state === 'DRAFT' && start - now >= 24 * 60 * 60 * 1000;
+  const canCancel = contract.state === 'DRAFT';
 
   return (
     <Card className="p-6">

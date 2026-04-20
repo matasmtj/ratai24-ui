@@ -13,6 +13,7 @@ import { LoadingSpinner } from '../../components/ui/Loading';
 import { useLanguage } from '../../contexts/useLanguage';
 import { Alert } from '../../components/ui/Alert';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
+import { DateRangePicker } from '../../components/ui/DateRangePicker';
 
 export function AdminPricingRulesPage() {
   const { t } = useLanguage();
@@ -37,11 +38,16 @@ export function AdminPricingRulesPage() {
     cityId: undefined,
     startDate: '',
     endDate: '',
-    fixedPrice: undefined,
-    multiplier: undefined,
+    fixedPrice: null,
+    multiplier: null,
     priority: 10,
   });
   const [priorityInput, setPriorityInput] = useState<string>('10');
+  const [fixedPriceInput, setFixedPriceInput] = useState<string>('');
+  const [multiplierInput, setMultiplierInput] = useState<string>('');
+  const [selectedCarIds, setSelectedCarIds] = useState<number[]>([]);
+  const [carSelectorOpen, setCarSelectorOpen] = useState(false);
+  const [carSearch, setCarSearch] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -78,11 +84,14 @@ export function AdminPricingRulesPage() {
         cityId: rule.cityId,
         startDate: rule.startDate ? rule.startDate.split('T')[0] : '',
         endDate: rule.endDate ? rule.endDate.split('T')[0] : '',
-        fixedPrice: rule.fixedPrice,
-        multiplier: rule.multiplier,
+        fixedPrice: rule.fixedPrice ?? null,
+        multiplier: rule.multiplier ?? null,
         priority: rule.priority,
       });
       setPriorityInput(String(rule.priority ?? 10));
+      setFixedPriceInput(rule.fixedPrice != null ? String(rule.fixedPrice) : '');
+      setMultiplierInput(rule.multiplier != null ? String(rule.multiplier) : '');
+      setSelectedCarIds(rule.carId ? [rule.carId] : []);
     } else {
       setEditingRule(null);
       setFormData({
@@ -92,12 +101,17 @@ export function AdminPricingRulesPage() {
         cityId: undefined,
         startDate: '',
         endDate: '',
-        fixedPrice: undefined,
-        multiplier: undefined,
+        fixedPrice: null,
+        multiplier: null,
         priority: 10,
       });
       setPriorityInput('10');
+      setFixedPriceInput('');
+      setMultiplierInput('');
+      setSelectedCarIds([]);
     }
+    setCarSearch('');
+    setCarSelectorOpen(false);
     setIsModalOpen(true);
   };
 
@@ -105,6 +119,7 @@ export function AdminPricingRulesPage() {
     setIsModalOpen(false);
     setEditingRule(null);
     setModalError(null);
+    setCarSelectorOpen(false);
   };
 
   const getApiErrorMessage = (err: unknown): string => {
@@ -123,17 +138,22 @@ export function AdminPricingRulesPage() {
       setModalError(t('pricing.admin.validation.nameRequired'));
       return;
     }
-    if (formData.fixedPrice === undefined && formData.multiplier === undefined) {
+    const parsedFixedPrice =
+      fixedPriceInput.trim() === '' ? null : Number(fixedPriceInput.replace(',', '.'));
+    const parsedMultiplier =
+      multiplierInput.trim() === '' ? null : Number(multiplierInput.replace(',', '.'));
+
+    if (parsedFixedPrice === null && parsedMultiplier === null) {
       setModalError(t('pricing.admin.validation.fixedOrMultiplierRequired'));
       return;
     }
-    if (formData.fixedPrice !== undefined && formData.fixedPrice <= 0) {
+    if (parsedFixedPrice !== null && (!Number.isFinite(parsedFixedPrice) || parsedFixedPrice <= 0)) {
       setModalError(t('pricing.admin.validation.fixedPricePositive'));
       return;
     }
     if (
-      formData.multiplier !== undefined &&
-      (formData.multiplier < 0.1 || formData.multiplier > 3)
+      parsedMultiplier !== null &&
+      (!Number.isFinite(parsedMultiplier) || parsedMultiplier < 0.1 || parsedMultiplier > 3)
     ) {
       setModalError(t('pricing.admin.validation.multiplierRange'));
       return;
@@ -144,11 +164,42 @@ export function AdminPricingRulesPage() {
     }
 
     try {
+      const basePayload: PricingRuleCreate = {
+        ...formData,
+        fixedPrice: parsedFixedPrice,
+        multiplier: parsedMultiplier,
+      };
+
       if (editingRule) {
-        await pricingApi.updatePricingRule(editingRule.id, formData);
+        const ids = selectedCarIds.length > 0 ? selectedCarIds : [undefined];
+        await pricingApi.updatePricingRule(editingRule.id, {
+          ...basePayload,
+          carId: ids[0],
+        });
+        if (ids.length > 1) {
+          await Promise.all(
+            ids.slice(1).map((carId) =>
+              pricingApi.createPricingRule({
+                ...basePayload,
+                carId,
+              })
+            )
+          );
+        }
         setSuccessMessage(t('pricing.admin.ruleUpdated'));
       } else {
-        await pricingApi.createPricingRule(formData);
+        if (selectedCarIds.length === 0) {
+          await pricingApi.createPricingRule({ ...basePayload, carId: undefined });
+        } else {
+          await Promise.all(
+            selectedCarIds.map((carId) =>
+              pricingApi.createPricingRule({
+                ...basePayload,
+                carId,
+              })
+            )
+          );
+        }
         setSuccessMessage(t('pricing.admin.ruleCreated'));
       }
       handleCloseModal();
@@ -258,7 +309,7 @@ export function AdminPricingRulesPage() {
                         </span>
                       </div>
                     )}
-                    {rule.fixedPrice && (
+                    {rule.fixedPrice != null && (
                       <div>
                         <span className="text-gray-500">{t('pricing.admin.fixedPrice')}: </span>
                         <span className="font-medium text-primary-600">
@@ -266,7 +317,7 @@ export function AdminPricingRulesPage() {
                         </span>
                       </div>
                     )}
-                    {rule.multiplier && (
+                    {rule.multiplier != null && (
                       <div>
                         <span className="text-gray-500">{t('pricing.admin.multiplier')}: </span>
                         <span className="font-medium">{rule.multiplier.toFixed(2)}x</span>
@@ -342,20 +393,64 @@ export function AdminPricingRulesPage() {
             />
           </div>
 
-          <Select
-            label={t('carLabel') + ' (' + t('common.optional') + ')'}
-            value={formData.carId?.toString() || ''}
-            onChange={(e) =>
-              setFormData({ ...formData, carId: e.target.value ? Number(e.target.value) : undefined })
-            }
-            options={[
-              { value: '', label: t('common.all') },
-              ...cars.map((car) => ({
-                value: car.id.toString(),
-                label: `${car.make} ${car.model} - ${car.numberPlate}`
-              }))
-            ]}
-          />
+          <div className="space-y-2">
+            <label className="block text-sm font-medium text-gray-700">
+              {t('carLabel')} ({t('common.optional')})
+            </label>
+            <button
+              type="button"
+              onClick={() => setCarSelectorOpen((v) => !v)}
+              className="w-full border border-gray-300 rounded-md px-3 py-2 text-left text-sm bg-white hover:border-gray-400"
+            >
+              {selectedCarIds.length === 0
+                ? t('common.all')
+                : `${selectedCarIds.length} ${t('cars').toLowerCase()}`}
+            </button>
+            {carSelectorOpen && (
+              <div className="border border-gray-300 rounded-md p-2 bg-white space-y-2">
+                <Input
+                  label={t('search')}
+                  value={carSearch}
+                  onChange={(e) => setCarSearch(e.target.value)}
+                />
+                <div className="max-h-48 overflow-y-auto space-y-1">
+                  {cars
+                    .filter((car) =>
+                      `${car.make} ${car.model} ${car.numberPlate}`
+                        .toLowerCase()
+                        .includes(carSearch.toLowerCase())
+                    )
+                    .map((car) => {
+                      const checked = selectedCarIds.includes(car.id);
+                      return (
+                        <label
+                          key={car.id}
+                          className="flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-50 text-sm"
+                        >
+                          <input
+                            type="checkbox"
+                            checked={checked}
+                            onChange={(e) => {
+                              setSelectedCarIds((prev) =>
+                                e.target.checked
+                                  ? [...prev, car.id]
+                                  : prev.filter((id) => id !== car.id)
+                              );
+                            }}
+                          />
+                          <span>{`${car.make} ${car.model} - ${car.numberPlate}`}</span>
+                        </label>
+                      );
+                    })}
+                </div>
+                <div className="flex justify-end">
+                  <Button type="button" size="sm" variant="secondary" onClick={() => setCarSelectorOpen(false)}>
+                    {t('cancel')}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
 
           <Select
             label={t('city') + ' (' + t('common.optional') + ')'}
@@ -372,33 +467,22 @@ export function AdminPricingRulesPage() {
             ]}
           />
 
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label={t('common.startDate')}
-              type="date"
-              value={formData.startDate}
-              onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-            />
-            <Input
-              label={t('common.endDate')}
-              type="date"
-              value={formData.endDate}
-              onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-            />
-          </div>
+          <DateRangePicker
+            label={t('pricing.admin.validPeriod') || `${t('common.startDate')} - ${t('common.endDate')}`}
+            startDate={formData.startDate}
+            endDate={formData.endDate}
+            onChange={(startDate, endDate) => setFormData({ ...formData, startDate, endDate })}
+          />
 
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Input
                 label={t('pricing.admin.fixedPrice') + ' (€)'}
-                type="number"
-                step="0.01"
-                value={formData.fixedPrice || ''}
+                type="text"
+                inputMode="decimal"
+                value={fixedPriceInput}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    fixedPrice: e.target.value ? Number(e.target.value) : undefined,
-                  })
+                  setFixedPriceInput(e.target.value)
                 }
               />
               <p className="mt-1 text-xs text-gray-500">{t('pricing.admin.fixedPriceHelp')}</p>
@@ -406,14 +490,11 @@ export function AdminPricingRulesPage() {
             <div>
               <Input
                 label={t('pricing.admin.multiplier')}
-                type="number"
-                step="0.01"
-                value={formData.multiplier || ''}
+                type="text"
+                inputMode="decimal"
+                value={multiplierInput}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    multiplier: e.target.value ? Number(e.target.value) : undefined,
-                  })
+                  setMultiplierInput(e.target.value)
                 }
               />
               <p className="mt-1 text-xs text-gray-500">{t('pricing.admin.multiplierHelp')}</p>

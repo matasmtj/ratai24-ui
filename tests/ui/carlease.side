@@ -1,0 +1,328 @@
+{
+  "id": "7f6c2a48-5d19-4a60-9a3a-carlease-ui-tests",
+  "version": "2.0",
+  "name": "CarLease UI",
+  "url": "http://localhost:5173",
+  "tests": [
+    {
+      "id": "t01-home-loads",
+      "name": "01 Pagrindinio puslapio užkrovimas",
+      "commands": [
+        { "id": "c1", "comment": "Atidaromas pagrindinis puslapis", "command": "open", "target": "/", "value": "" },
+        { "id": "c2", "comment": "Nustatomas lango dydis", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "comment": "Laukiama kol matoma hero antraštė", "command": "waitForElementVisible", "target": "xpath=//h1[contains(normalize-space(.),'Automobilių nuoma Lietuvoje')]", "value": "10000" },
+        { "id": "c4", "comment": "Patikrinama, kad navbar'e yra nuoroda į nuomos katalogą", "command": "assertElementPresent", "target": "xpath=//nav//a[normalize-space(.)='Automobilių nuoma']", "value": "" },
+        { "id": "c5", "comment": "Patikrinama, kad navbar'e yra kontaktų nuoroda", "command": "assertElementPresent", "target": "xpath=//nav//a[normalize-space(.)='Kontaktai']", "value": "" },
+        { "id": "c6", "comment": "Patikrinama, kad footer'yje yra teisių eilutė su 'Ratai24'", "command": "assertElementPresent", "target": "xpath=//footer//*[contains(normalize-space(.),'Ratai24')]", "value": "" }
+      ]
+    },
+    {
+      "id": "t02-nav-home-to-cars",
+      "name": "02 Navigacija iš pradžios į nuomos katalogą per navbar",
+      "commands": [
+        { "id": "c1", "comment": "Atidaromas pagrindinis puslapis", "command": "open", "target": "/", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "comment": "Laukiama kol užkraunamas navbar", "command": "waitForElementVisible", "target": "xpath=//nav//a[normalize-space(.)='Automobilių nuoma']", "value": "10000" },
+        { "id": "c4", "comment": "Spaudžiamas navbar'o mygtukas 'Automobilių nuoma'", "command": "click", "target": "xpath=//nav//a[normalize-space(.)='Automobilių nuoma']", "value": "" },
+        { "id": "c5", "comment": "Rodoma antraštė 'Automobilių katalogas'", "command": "waitForElementVisible", "target": "xpath=//h1[contains(normalize-space(.),'Automobilių katalogas')]", "value": "10000" },
+        { "id": "c6", "comment": "Patikrinama, kad atverstas nuomos katalogo URL", "command": "executeScript", "target": "return window.location.pathname;", "value": "path" },
+        { "id": "c7", "command": "assert", "target": "path", "value": "/rent-cars" }
+      ]
+    },
+    {
+      "id": "t03-nav-home-to-contacts",
+      "name": "03 Navigacija į kontaktų puslapį per navbar",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "command": "waitForElementVisible", "target": "xpath=//nav//a[normalize-space(.)='Kontaktai']", "value": "10000" },
+        { "id": "c4", "comment": "Spaudžiama 'Kontaktai'", "command": "click", "target": "xpath=//nav//a[normalize-space(.)='Kontaktai']", "value": "" },
+        { "id": "c5", "comment": "Laukiama kol užsikrauna kontaktų puslapio antraštė", "command": "waitForElementVisible", "target": "xpath=//h1[contains(normalize-space(.),'Susisiekite')]", "value": "10000" },
+        { "id": "c6", "comment": "Patikrinama, kad URL yra /contacts", "command": "executeScript", "target": "return window.location.pathname;", "value": "path" },
+        { "id": "c7", "command": "assert", "target": "path", "value": "/contacts" }
+      ]
+    },
+    {
+      "id": "t04-nav-logo-back-home",
+      "name": "04 Logotipas grąžina į pradžios puslapį",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/contacts", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "command": "waitForElementVisible", "target": "xpath=//nav//a[normalize-space(.)='Ratai24']", "value": "10000" },
+        { "id": "c4", "comment": "Spaudžiamas 'Ratai24' logotipas", "command": "click", "target": "xpath=//nav//a[normalize-space(.)='Ratai24']", "value": "" },
+        { "id": "c5", "comment": "Laukiama, kol matoma pradinio puslapio antraštė", "command": "waitForElementVisible", "target": "xpath=//h1[contains(normalize-space(.),'Automobilių nuoma Lietuvoje')]", "value": "10000" },
+        { "id": "c6", "comment": "Patikrinama, kad URL yra /", "command": "executeScript", "target": "return window.location.pathname;", "value": "path" },
+        { "id": "c7", "command": "assert", "target": "path", "value": "/" }
+      ]
+    },
+    {
+      "id": "t05-footer-privacy-link",
+      "name": "05 Footer nuoroda į privatumo politiką",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "comment": "Slenkama į footer'į", "command": "executeScript", "target": "window.scrollTo(0, document.body.scrollHeight); return true;", "value": "" },
+        { "id": "c4", "command": "waitForElementVisible", "target": "xpath=//footer//a[normalize-space(.)='Privatumo politika']", "value": "10000" },
+        { "id": "c5", "command": "click", "target": "xpath=//footer//a[normalize-space(.)='Privatumo politika']", "value": "" },
+        { "id": "c6", "comment": "Laukiama, kol matoma privatumo politikos antraštė", "command": "waitForElementVisible", "target": "xpath=//h1[contains(normalize-space(.),'Privatumo politika')]", "value": "10000" }
+      ]
+    },
+    {
+      "id": "t06-footer-rental-terms-link",
+      "name": "06 Footer nuoroda į nuomos sąlygas",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "command": "executeScript", "target": "window.scrollTo(0, document.body.scrollHeight); return true;", "value": "" },
+        { "id": "c4", "command": "waitForElementVisible", "target": "xpath=//footer//a[normalize-space(.)='Nuomos sąlygos']", "value": "10000" },
+        { "id": "c5", "command": "click", "target": "xpath=//footer//a[normalize-space(.)='Nuomos sąlygos']", "value": "" },
+        { "id": "c6", "comment": "Laukiama, kol matoma nuomos sąlygų antraštė", "command": "waitForElementVisible", "target": "xpath=//h1[contains(normalize-space(.),'Nuomos sąlygos')]", "value": "10000" }
+      ]
+    },
+    {
+      "id": "t07-protected-dashboard-redirect",
+      "name": "07 Neprisijungęs neturi prieigos į /dashboard",
+      "commands": [
+        { "id": "c1", "comment": "Bandoma atidaryti vartotojo skydelį neprisijungus", "command": "open", "target": "/dashboard", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "comment": "Palaukiama, kol užkraunamas prisijungimo puslapio el. pašto laukas (įrodo, kad buvo nukreipta)", "command": "waitForElementVisible", "target": "css=input[type='email']", "value": "15000" },
+        { "id": "c4", "comment": "Patikrinama, kad URL yra /login", "command": "executeScript", "target": "return window.location.pathname;", "value": "path" },
+        { "id": "c5", "command": "assert", "target": "path", "value": "/login" }
+      ]
+    },
+    {
+      "id": "t08-protected-admin-redirect",
+      "name": "08 Neprisijungęs neturi prieigos į /admin/cars",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/admin/cars", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "comment": "Palaukiama prisijungimo puslapio el. pašto lauko", "command": "waitForElementVisible", "target": "css=input[type='email']", "value": "15000" },
+        { "id": "c4", "comment": "Patikrinama, kad URL yra /login", "command": "executeScript", "target": "return window.location.pathname;", "value": "path" },
+        { "id": "c5", "command": "assert", "target": "path", "value": "/login" }
+      ]
+    },
+    {
+      "id": "t09-cars-catalog-opens",
+      "name": "09 Nuomos katalogo užkrovimas",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/rent-cars", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "command": "waitForElementVisible", "target": "xpath=//h1[contains(normalize-space(.),'Automobilių katalogas')]", "value": "10000" },
+        { "id": "c4", "comment": "Patikrinama, kad yra paieškos laukas", "command": "assertElementPresent", "target": "xpath=//input[@placeholder='Paieška (markė/modelis)']", "value": "" },
+        { "id": "c5", "comment": "Patikrinama, kad yra rūšiavimo pasirinkimas", "command": "assertElementPresent", "target": "xpath=//select", "value": "" },
+        { "id": "c6", "comment": "Patikrinama, kad yra išplėstinių filtrų mygtukas", "command": "assertElementPresent", "target": "xpath=//button[contains(normalize-space(.),'Išplėstiniai filtrai')]", "value": "" }
+      ]
+    },
+    {
+      "id": "t10-cars-search-no-results",
+      "name": "10 Paieška pagal nesamą tekstą rodo žinutę 'Nerasta automobilių'",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/rent-cars", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "command": "waitForElementVisible", "target": "xpath=//input[@placeholder='Paieška (markė/modelis)']", "value": "10000" },
+        { "id": "c4", "comment": "Palaukiama kol užsikrauna katalogas", "command": "pause", "target": "1500", "value": "" },
+        { "id": "c5", "comment": "Įvedamas nesamas markės pavadinimas", "command": "sendKeys", "target": "xpath=//input[@placeholder='Paieška (markė/modelis)']", "value": "ZZXXNERASIMA" },
+        { "id": "c6", "comment": "Patikrinama, kad matoma 'Nerasta automobilių...' žinutė", "command": "waitForElementVisible", "target": "xpath=//*[contains(normalize-space(.),'Nerasta automobilių pagal pasirinktus filtrus')]", "value": "5000" }
+      ]
+    },
+    {
+      "id": "t11-cars-advanced-filters-toggle",
+      "name": "11 Išplėstinių filtrų išskleidimas ir suskleidimas",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/rent-cars", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "command": "waitForElementVisible", "target": "xpath=//button[contains(normalize-space(.),'Išplėstiniai filtrai')]", "value": "10000" },
+        { "id": "c4", "comment": "Patikrinama, kad išplėstinių filtrų variantas 'Visi miestai' dar nerodomas", "command": "assertElementNotPresent", "target": "xpath=//option[normalize-space(.)='Visi miestai']", "value": "" },
+        { "id": "c5", "comment": "Spaudžiamas 'Išplėstiniai filtrai' mygtukas", "command": "click", "target": "xpath=//button[contains(normalize-space(.),'Išplėstiniai filtrai')]", "value": "" },
+        { "id": "c6", "comment": "Pasirodo miesto filtro variantas", "command": "waitForElementPresent", "target": "xpath=//option[normalize-space(.)='Visi miestai']", "value": "3000" },
+        { "id": "c7", "comment": "Spaudžiamas mygtukas dar kartą – filtrai suskleidžiami", "command": "click", "target": "xpath=//button[contains(normalize-space(.),'Išplėstiniai filtrai')]", "value": "" },
+        { "id": "c8", "command": "assertElementNotPresent", "target": "xpath=//option[normalize-space(.)='Visi miestai']", "value": "" }
+      ]
+    },
+    {
+      "id": "t12-cars-filter-fuel-petrol",
+      "name": "12 Filtravimas pagal kuro tipą (Benzinas) aktyvuoja reset mygtuką",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/rent-cars", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "command": "waitForElementVisible", "target": "xpath=//button[contains(normalize-space(.),'Išplėstiniai filtrai')]", "value": "10000" },
+        { "id": "c4", "command": "click", "target": "xpath=//button[contains(normalize-space(.),'Išplėstiniai filtrai')]", "value": "" },
+        { "id": "c5", "comment": "Laukiama, kol atsiranda degalų tipo pasirinkimas", "command": "waitForElementPresent", "target": "xpath=//option[normalize-space(.)='Benzinas']", "value": "3000" },
+        { "id": "c6", "comment": "Pasirenkama reikšmė 'PETROL'", "command": "select", "target": "xpath=//option[normalize-space(.)='Benzinas']/parent::select", "value": "label=Benzinas" },
+        { "id": "c7", "comment": "Patikrinama, kad atsirado 'Atstatyti filtrus' mygtukas", "command": "waitForElementVisible", "target": "xpath=//button[contains(normalize-space(.),'Atstatyti filtrus')]", "value": "3000" }
+      ]
+    },
+    {
+      "id": "t13-cars-filter-reset",
+      "name": "13 'Atstatyti filtrus' mygtukas išvalo pritaikytą filtrą",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/rent-cars", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "command": "waitForElementVisible", "target": "xpath=//button[contains(normalize-space(.),'Išplėstiniai filtrai')]", "value": "10000" },
+        { "id": "c4", "command": "click", "target": "xpath=//button[contains(normalize-space(.),'Išplėstiniai filtrai')]", "value": "" },
+        { "id": "c5", "command": "waitForElementPresent", "target": "xpath=//option[normalize-space(.)='Benzinas']", "value": "3000" },
+        { "id": "c6", "command": "select", "target": "xpath=//option[normalize-space(.)='Benzinas']/parent::select", "value": "label=Benzinas" },
+        { "id": "c7", "command": "waitForElementVisible", "target": "xpath=//button[contains(normalize-space(.),'Atstatyti filtrus')]", "value": "3000" },
+        { "id": "c8", "comment": "Spaudžiamas 'Atstatyti filtrus'", "command": "click", "target": "xpath=//button[contains(normalize-space(.),'Atstatyti filtrus')]", "value": "" },
+        { "id": "c9", "comment": "Patikrinama, kad mygtukas dingo, nes filtras išvalytas", "command": "assertElementNotPresent", "target": "xpath=//button[contains(normalize-space(.),'Atstatyti filtrus')]", "value": "" }
+      ]
+    },
+    {
+      "id": "t14-cars-detail-login-to-book",
+      "name": "14 Automobilio detalių puslapis – 'Prisijunkite, kad rezervuotumėte' nukreipia į /login",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/rent-cars", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "comment": "Laukiama, kol užsikrauna pirma automobilio kortelė", "command": "waitForElementVisible", "target": "xpath=(//a[starts-with(@href,'/rent-cars/')])[1]", "value": "15000" },
+        { "id": "c4", "comment": "Spaudžiama pirma kortelė", "command": "click", "target": "xpath=(//a[starts-with(@href,'/rent-cars/')])[1]", "value": "" },
+        { "id": "c5", "comment": "Laukiama, kol užsikrauna mygtukas 'Prisijunkite, kad rezervuotumėte'", "command": "waitForElementVisible", "target": "xpath=//button[contains(normalize-space(.),'Prisijunkite, kad rezervuotumėte')]", "value": "15000" },
+        { "id": "c6", "comment": "Patikrinama, kad URL atitinka detalių puslapį /rent-cars/{id}", "command": "executeScript", "target": "return /\\/rent-cars\\/\\d+$/.test(window.location.pathname);", "value": "isDetail" },
+        { "id": "c7", "command": "assert", "target": "isDetail", "value": "true" },
+        { "id": "c8", "comment": "Spaudžiamas mygtukas – jo tėvas yra <a href='/login'>", "command": "click", "target": "xpath=//button[contains(normalize-space(.),'Prisijunkite, kad rezervuotumėte')]", "value": "" },
+        { "id": "c9", "command": "waitForElementVisible", "target": "css=input[type='email']", "value": "10000" },
+        { "id": "c10", "comment": "Patikrinama, kad URL yra /login", "command": "executeScript", "target": "return window.location.pathname;", "value": "path" },
+        { "id": "c11", "command": "assert", "target": "path", "value": "/login" }
+      ]
+    },
+    {
+      "id": "t15-login-empty-captcha-error",
+      "name": "15 Prisijungimas be reCAPTCHA rodo klaidos pranešimą",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/login", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "command": "waitForElementVisible", "target": "css=input[type='email']", "value": "10000" },
+        { "id": "c4", "comment": "Įvedamas el. paštas", "command": "sendKeys", "target": "css=input[type='email']", "value": "testas@ratai24.lt" },
+        { "id": "c5", "comment": "Įvedamas slaptažodis", "command": "sendKeys", "target": "css=input[type='password']", "value": "Slaptas123" },
+        { "id": "c6", "comment": "Spaudžiama formos 'Prisijungti' mygtukas (type='button') nepažymėjus reCAPTCHA", "command": "click", "target": "xpath=//button[@type='button' and normalize-space(.)='Prisijungti']", "value": "" },
+        { "id": "c7", "comment": "Pasirodo klaidos pranešimas apie reCAPTCHA", "command": "waitForElementVisible", "target": "xpath=//*[contains(normalize-space(.),'Užbaikite reCAPTCHA patikrinimą')]", "value": "5000" }
+      ]
+    },
+    {
+      "id": "t16-login-forgot-password-link",
+      "name": "16 Nuoroda 'Pamiršote slaptažodį?' veda į /forgot-password",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/login", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "command": "waitForElementVisible", "target": "xpath=//a[contains(normalize-space(.),'Pamiršote slaptažodį?')]", "value": "10000" },
+        { "id": "c4", "command": "click", "target": "xpath=//a[contains(normalize-space(.),'Pamiršote slaptažodį?')]", "value": "" },
+        { "id": "c5", "command": "waitForElementVisible", "target": "xpath=//h1[contains(normalize-space(.),'Atkurti slaptažodį')]", "value": "10000" },
+        { "id": "c6", "comment": "Patikrinama, kad URL yra /forgot-password", "command": "executeScript", "target": "return window.location.pathname;", "value": "path" },
+        { "id": "c7", "command": "assert", "target": "path", "value": "/forgot-password" }
+      ]
+    },
+    {
+      "id": "t17-register-password-mismatch",
+      "name": "17 Registracija: skirtingi slaptažodžiai rodo 'Slaptažodžiai nesutampa'",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/register", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "command": "waitForElementVisible", "target": "css=input[type='email']", "value": "10000" },
+        { "id": "c4", "command": "sendKeys", "target": "css=input[type='email']", "value": "pavyzdys@ratai24.lt" },
+        { "id": "c5", "comment": "Vardas", "command": "sendKeys", "target": "css=input[placeholder='Vardas']", "value": "Jonas" },
+        { "id": "c6", "comment": "Pavardė", "command": "sendKeys", "target": "css=input[placeholder='Pavardė']", "value": "Jonaitis" },
+        { "id": "c7", "comment": "Telefono numeris", "command": "sendKeys", "target": "css=input[type='tel']", "value": "+37060000000" },
+        { "id": "c8", "comment": "Slaptažodis", "command": "sendKeys", "target": "xpath=(//input[@type='password'])[1]", "value": "Slaptas123" },
+        { "id": "c9", "comment": "Pakartojamas skirtingas slaptažodis", "command": "sendKeys", "target": "xpath=(//input[@type='password'])[2]", "value": "Kitoks999" },
+        { "id": "c10", "comment": "Siunčiama forma", "command": "click", "target": "xpath=//form//button[@type='submit']", "value": "" },
+        { "id": "c11", "comment": "Pasirodo klaidos pranešimas", "command": "waitForElementVisible", "target": "xpath=//*[contains(normalize-space(.),'Slaptažodžiai nesutampa')]", "value": "5000" }
+      ]
+    },
+    {
+      "id": "t18-register-weak-password",
+      "name": "18 Registracija: per silpnas slaptažodis rodo klaidą apie reikalavimus",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/register", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "command": "waitForElementVisible", "target": "css=input[type='email']", "value": "10000" },
+        { "id": "c4", "command": "sendKeys", "target": "css=input[type='email']", "value": "pavyzdys@ratai24.lt" },
+        { "id": "c5", "command": "sendKeys", "target": "css=input[placeholder='Vardas']", "value": "Jonas" },
+        { "id": "c6", "command": "sendKeys", "target": "css=input[placeholder='Pavardė']", "value": "Jonaitis" },
+        { "id": "c7", "command": "sendKeys", "target": "css=input[type='tel']", "value": "+37060000000" },
+        { "id": "c8", "comment": "Įvedamas per trumpas slaptažodis be skaitmenų", "command": "sendKeys", "target": "xpath=(//input[@type='password'])[1]", "value": "weak" },
+        { "id": "c9", "command": "sendKeys", "target": "xpath=(//input[@type='password'])[2]", "value": "weak" },
+        { "id": "c10", "command": "click", "target": "xpath=//form//button[@type='submit']", "value": "" },
+        { "id": "c11", "comment": "Pasirodo klaida apie slaptažodžio reikalavimus", "command": "waitForElementVisible", "target": "xpath=//*[contains(normalize-space(.),'Įvykdykite visus slaptažodžio reikalavimus')]", "value": "5000" }
+      ]
+    },
+    {
+      "id": "t19-register-missing-phone",
+      "name": "19 Registracija: tuščias telefono numeris neleidžia pateikti formos",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/register", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "command": "waitForElementVisible", "target": "css=input[type='email']", "value": "10000" },
+        { "id": "c4", "command": "sendKeys", "target": "css=input[type='email']", "value": "pavyzdys@ratai24.lt" },
+        { "id": "c5", "command": "sendKeys", "target": "css=input[placeholder='Vardas']", "value": "Jonas" },
+        { "id": "c6", "command": "sendKeys", "target": "css=input[placeholder='Pavardė']", "value": "Jonaitis" },
+        { "id": "c7", "comment": "Telefono numerio laukas paliekamas tuščias (nieko nesiunčiame)", "command": "assertElementPresent", "target": "css=input[type='tel']", "value": "" },
+        { "id": "c8", "command": "sendKeys", "target": "xpath=(//input[@type='password'])[1]", "value": "Slaptas123" },
+        { "id": "c9", "command": "sendKeys", "target": "xpath=(//input[@type='password'])[2]", "value": "Slaptas123" },
+        { "id": "c10", "command": "click", "target": "xpath=//form//button[@type='submit']", "value": "" },
+        { "id": "c11", "comment": "Trumpa pauzė, kad būtų laiko galimam nukreipimui", "command": "pause", "target": "1500", "value": "" },
+        { "id": "c12", "comment": "Patikrinama, kad forma nebuvo pateikta – vis dar esame registracijos puslapyje", "command": "executeScript", "target": "return window.location.pathname;", "value": "path" },
+        { "id": "c13", "command": "assert", "target": "path", "value": "/register" },
+        { "id": "c14", "comment": "Patikrinama, kad tel. įvesties laukas yra HTML5 :invalid būsenos (forma neprasileido dėl required)", "command": "executeScript", "target": "return document.querySelector(\"input[type='tel']\").matches(':invalid');", "value": "telIsInvalid" },
+        { "id": "c15", "command": "assert", "target": "telIsInvalid", "value": "true" }
+      ]
+    },
+    {
+      "id": "t20-contacts-page-loads",
+      "name": "20 Kontaktų puslapio užkrovimas",
+      "commands": [
+        { "id": "c1", "command": "open", "target": "/contacts", "value": "" },
+        { "id": "c2", "command": "setWindowSize", "target": "1366x768", "value": "" },
+        { "id": "c3", "command": "waitForElementVisible", "target": "xpath=//h1[contains(normalize-space(.),'Susisiekite')]", "value": "10000" },
+        { "id": "c4", "comment": "Patikrinama, kad URL yra /contacts", "command": "executeScript", "target": "return window.location.pathname;", "value": "path" },
+        { "id": "c5", "command": "assert", "target": "path", "value": "/contacts" }
+      ]
+    }
+  ],
+  "suites": [
+    {
+      "id": "suite-all",
+      "name": "Pilnas UI regresinis rinkinys",
+      "persistSession": false,
+      "parallel": false,
+      "timeout": 600,
+      "tests": [
+        "t01-home-loads",
+        "t02-nav-home-to-cars",
+        "t03-nav-home-to-contacts",
+        "t04-nav-logo-back-home",
+        "t05-footer-privacy-link",
+        "t06-footer-rental-terms-link",
+        "t07-protected-dashboard-redirect",
+        "t08-protected-admin-redirect",
+        "t09-cars-catalog-opens",
+        "t10-cars-search-no-results",
+        "t11-cars-advanced-filters-toggle",
+        "t12-cars-filter-fuel-petrol",
+        "t13-cars-filter-reset",
+        "t14-cars-detail-login-to-book",
+        "t15-login-empty-captcha-error",
+        "t16-login-forgot-password-link",
+        "t17-register-password-mismatch",
+        "t18-register-weak-password",
+        "t19-register-missing-phone",
+        "t20-contacts-page-loads"
+      ]
+    },
+    {
+      "id": "suite-smoke",
+      "name": "Smoke – greitas pagrindinių srautų patikrinimas",
+      "persistSession": false,
+      "parallel": false,
+      "timeout": 300,
+      "tests": [
+        "t01-home-loads",
+        "t02-nav-home-to-cars",
+        "t09-cars-catalog-opens",
+        "t14-cars-detail-login-to-book",
+        "t15-login-empty-captcha-error",
+        "t17-register-password-mismatch"
+      ]
+    }
+  ],
+  "urls": ["http://localhost:5173"],
+  "plugins": []
+}

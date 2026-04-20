@@ -228,6 +228,11 @@ function UserFormModal({
     userFormFromUser(user)
   );
 
+  const extractApiError = (err: unknown, fallback: string) => {
+    const message = (err as { response?: { data?: { error?: string } } })?.response?.data?.error;
+    return typeof message === 'string' && message.trim() !== '' ? message : fallback;
+  };
+
   const editingKey = user?.id ?? 'new';
 
   useEffect(() => {
@@ -247,7 +252,7 @@ function UserFormModal({
     },
     onError: (error: any) => {
       console.error('Create user error:', error);
-      setError(t('userCreateError') || 'Failed to create user');
+      setError(extractApiError(error, t('userCreateError') || 'Failed to create user'));
     },
   });
 
@@ -261,7 +266,7 @@ function UserFormModal({
     },
     onError: (error: any) => {
       console.error('Update user error:', error);
-      setError(t('userUpdateError') || 'Failed to update user');
+      setError(extractApiError(error, t('userUpdateError') || 'Failed to update user'));
     },
   });
 

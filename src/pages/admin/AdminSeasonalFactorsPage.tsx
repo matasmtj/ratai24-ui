@@ -12,6 +12,7 @@ import { LoadingSpinner } from '../../components/ui/Loading';
 import { useLanguage } from '../../contexts/useLanguage';
 import { Alert } from '../../components/ui/Alert';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
+import { DateRangePicker } from '../../components/ui/DateRangePicker';
 
 export function AdminSeasonalFactorsPage() {
   const { t } = useLanguage();
@@ -276,22 +277,13 @@ export function AdminSeasonalFactorsPage() {
             required
           />
 
-          <div className="grid grid-cols-2 gap-4">
-            <Input
-              label={t('common.startDate')}
-              type="date"
-              value={formData.startDate}
-              onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-              required
-            />
-            <Input
-              label={t('common.endDate')}
-              type="date"
-              value={formData.endDate}
-              onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-              required
-            />
-          </div>
+          <DateRangePicker
+            label={t('pricing.admin.validPeriod') || `${t('common.startDate')} - ${t('common.endDate')}`}
+            startDate={formData.startDate}
+            endDate={formData.endDate}
+            onChange={(startDate, endDate) => setFormData({ ...formData, startDate, endDate })}
+            required
+          />
 
           <div>
             <Input

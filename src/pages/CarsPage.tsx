@@ -307,12 +307,12 @@ export function CarsPage() {
                         <div className="flex-1">
                           {car.useDynamicPricing ? (
                             <>
-                              <div className="flex items-center gap-2 mb-1">
-                                <div className="text-sm text-gray-500">{t('startsFrom')}</div>
+                              <div className="mb-1">
                                 <span className="inline-flex items-center text-[11px] px-2 py-0.5 rounded-full border border-purple-200 bg-purple-50 text-purple-700 font-semibold">
                                   {t('dynamicLabel')}
                                 </span>
                               </div>
+                              <div className="text-sm text-gray-500">{t('startsFrom')}</div>
                               <div className="text-2xl font-bold text-primary-600">
                                 €{car.minPricePerDay || car.basePricePerDay || car.pricePerDay}
                                 <span className="text-sm font-normal text-gray-500">{t('perDay')}</span>

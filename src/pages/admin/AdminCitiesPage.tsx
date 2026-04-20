@@ -141,7 +141,7 @@ export function AdminCitiesPage() {
             required
           />
           <Input
-            label="Country code"
+            label={t('countryCode')}
             value={formData.country}
             onChange={(e) => setFormData({ ...formData, country: e.target.value })}
             required

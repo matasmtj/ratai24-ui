@@ -28,7 +28,7 @@ export function Layout({ children }: LayoutProps) {
       <main className="flex-grow">{children}</main>
       <footer className="bg-gray-900 text-gray-300 mt-auto">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Company Info */}
             <div className="col-span-1">
               <div className="flex items-center mb-4">
@@ -38,20 +38,12 @@ export function Layout({ children }: LayoutProps) {
               <p className="text-sm text-gray-400">
                 {t('footerTagline')}
               </p>
-              <p className="text-sm text-gray-400 mt-4">
-                {t('aboutUs')}
-              </p>
             </div>
 
             {/* Information */}
             <div>
               <h3 className="text-white font-semibold mb-4">{t('information')}</h3>
               <ul className="space-y-2 text-sm">
-                <li>
-                  <Link to="/contacts" className="hover:text-white transition-colors">
-                    {t('aboutUs')}
-                  </Link>
-                </li>
                 <li>
                   <Link to="/contacts" className="hover:text-white transition-colors">
                     {t('workingHours')}
@@ -98,15 +90,6 @@ export function Layout({ children }: LayoutProps) {
                     <PhoneIcon className="h-5 w-5 mr-2 mt-0.5 flex-shrink-0" />
                     <span>{contactInfo.phone}</span>
                   </li>
-                  <li className="text-sm">
-                    <div className="text-white font-semibold">{t('workingHours')}</div>
-                    <div className="text-gray-300">
-                      {t('mondayFriday')}: {contactInfo.businessHoursWeekdays}
-                    </div>
-                    <div className="text-gray-300">
-                      {t('weekend')}: {contactInfo.businessHoursWeekend}
-                    </div>
-                  </li>
                   {contactInfo.operationAreasDetails && contactInfo.operationAreasDetails.length > 0 ? (
                     contactInfo.operationAreasDetails.map((detail) => (
                       <li key={detail.id} className="flex items-start text-sm">
@@ -140,6 +123,19 @@ export function Layout({ children }: LayoutProps) {
                   </li>
                 </ul>
               )}
+            </div>
+
+            {/* Working Hours */}
+            <div>
+              <h3 className="text-white font-semibold mb-4">{t('workingHours')}</h3>
+              <div className="space-y-2 text-sm">
+                <div className="text-gray-300">
+                  {t('mondayFriday')}: {contactInfo?.businessHoursWeekdays || '8:00 - 18:00'}
+                </div>
+                <div className="text-gray-300">
+                  {t('weekend')}: {contactInfo?.businessHoursWeekend || '9:00 - 15:00'}
+                </div>
+              </div>
             </div>
           </div>
 

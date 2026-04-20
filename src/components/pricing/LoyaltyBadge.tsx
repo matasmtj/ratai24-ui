@@ -68,7 +68,7 @@ export function LoyaltyBadge() {
           <div className="flex items-center gap-2 mb-1">
             <span className="text-2xl">{getTierIcon(loyalty.tier)}</span>
             <span className="font-bold text-lg">
-              {tierLabel} {t('pricing.loyalty.tier')}
+              {t('pricing.loyalty.tier')}: {tierLabel}
             </span>
           </div>
           <p className="text-sm opacity-90">

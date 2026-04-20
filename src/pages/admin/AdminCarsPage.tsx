@@ -42,20 +42,7 @@ export function AdminCarsPage() {
 
   const { data: cars, isLoading } = useQuery({
     queryKey: ['cars'],
-    queryFn: async () => {
-      const cars = await carsApi.getAll();
-      console.log('Fetched cars:', cars);
-      if (cars.length > 0) {
-        console.log('First car pricing config:', {
-          id: cars[0].id,
-          useDynamicPricing: cars[0].useDynamicPricing,
-          basePricePerDay: cars[0].basePricePerDay,
-          minPricePerDay: cars[0].minPricePerDay,
-          maxPricePerDay: cars[0].maxPricePerDay,
-        });
-      }
-      return cars;
-    },
+    queryFn: async () => carsApi.getAll(),
   });
 
   const filteredAndSortedCars = useMemo(() => {
@@ -246,10 +233,6 @@ export function AdminCarsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {paginatedCars.map((car) => {
             const mainImage = car.images?.find(img => img.isMain);
-            console.log(`Car ${car.id}:`, { 
-              totalImages: car.images?.length, 
-              mainImage: mainImage ? { id: mainImage.id, url: mainImage.url, isMain: mainImage.isMain } : null 
-            });
             
             return (
             <Card key={car.id} className="overflow-hidden">
@@ -285,9 +268,6 @@ export function AdminCarsPage() {
                 <p className="text-gray-600 text-sm mb-2">{car.year} {t('year')} • {car.numberPlate}</p>
                 <div className="flex justify-between items-center mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="text-primary-600 font-bold">
-                      €{car.useDynamicPricing && car.basePricePerDay ? car.basePricePerDay : car.pricePerDay}/d
-                    </span>
                     {car.useDynamicPricing && (
                       <span className="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
                         {t('dynamicLabel')}
@@ -301,6 +281,12 @@ export function AdminCarsPage() {
                   }`}>
                     {car.state === 'AVAILABLE' ? t('availableLabel') : car.state === 'LEASED' ? t('leasedLabel') : t('maintenanceLabel')}
                   </span>
+                </div>
+                <div className="text-xs text-gray-500">
+                  {car.useDynamicPricing ? t('startsFrom') : t('pricePerDay')}
+                </div>
+                <div className="text-primary-600 font-bold mb-2">
+                  €{car.useDynamicPricing && car.basePricePerDay ? car.basePricePerDay : car.pricePerDay}{t('perDay')}
                 </div>
                 <div className="flex space-x-2">
                   <Button 

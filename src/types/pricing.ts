@@ -131,8 +131,8 @@ export interface PricingRuleCreate {
   cityId?: number;
   startDate?: string;
   endDate?: string;
-  fixedPrice?: number;
-  multiplier?: number;
+  fixedPrice?: number | null;
+  multiplier?: number | null;
   priority?: number;
 }
 

@@ -10,7 +10,7 @@ import { authApi } from '../api/auth';
 import { EnvelopeIcon } from '@heroicons/react/24/outline';
 
 export function ForgotPasswordPage() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const recaptchaRef = useRef<ReCaptchaHandle>(null);
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
@@ -28,7 +28,7 @@ export function ForgotPasswordPage() {
 
     setIsLoading(true);
     try {
-      await authApi.forgotPassword({ email: email.trim() });
+      await authApi.forgotPassword({ email: email.trim(), language });
       setSuccess(true);
     } catch (err: unknown) {
       const message =

@@ -156,16 +156,19 @@ export function HomePage() {
                   <p className="text-gray-600 mb-4">{car.year} {t('year')}</p>
                   <div className="flex justify-between items-center">
                     <div>
-                      <span className="text-2xl font-bold text-primary-600">
-                        €{car.useDynamicPricing && car.basePricePerDay ? car.basePricePerDay : car.pricePerDay}{t('perDay')}
-                      </span>
                       {car.useDynamicPricing && (
-                        <div>
-                          <span className="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-700 font-medium ml-2">
+                        <div className="mb-1">
+                          <span className="text-xs px-2 py-0.5 rounded bg-purple-100 text-purple-700 font-medium">
                             {t('dynamicLabel')}
                           </span>
                         </div>
                       )}
+                      <div className="text-sm text-gray-500">
+                        {car.useDynamicPricing ? t('startsFrom') : t('pricePerDay')}
+                      </div>
+                      <span className="text-2xl font-bold text-primary-600">
+                        €{car.useDynamicPricing && car.basePricePerDay ? car.basePricePerDay : car.pricePerDay}{t('perDay')}
+                      </span>
                     </div>
                     <Link to="/rent-cars">
                       <Button size="sm">{t('view')}</Button>

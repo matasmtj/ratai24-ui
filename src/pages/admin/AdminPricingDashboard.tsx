@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/Button';
 import { LoadingSpinner } from '../../components/ui/Loading';
 import { useLanguage } from '../../contexts/useLanguage';
 import { Alert } from '../../components/ui/Alert';
+import { DateRangePicker } from '../../components/ui/DateRangePicker';
 
 export function AdminPricingDashboard() {
   const { t } = useLanguage();
@@ -98,26 +99,16 @@ export function AdminPricingDashboard() {
       {/* Date filters */}
       <Card className="p-4">
         <div className="flex flex-wrap gap-4 items-end">
-          <div className="flex-1 min-w-[10rem]">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('common.startDate')}
-            </label>
-            <input
-              type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
-            />
-          </div>
-          <div className="flex-1 min-w-[10rem]">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {t('common.endDate')}
-            </label>
-            <input
-              type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md"
+          <div className="flex-1 min-w-[16rem]">
+            <DateRangePicker
+              label={t('pricing.admin.validPeriod') || `${t('common.startDate')} - ${t('common.endDate')}`}
+              startDate={startDate}
+              endDate={endDate}
+              onChange={(nextStartDate, nextEndDate) => {
+                setStartDate(nextStartDate);
+                setEndDate(nextEndDate);
+              }}
+              required
             />
           </div>
           <Button onClick={() => fetchData()} size="sm" isLoading={analyticsLoading}>
@@ -172,7 +163,7 @@ export function AdminPricingDashboard() {
             <Card className="p-6">
               <div className="text-sm text-gray-600 mb-1">{t('pricing.admin.revenueImpact') || 'Revenue Impact'}</div>
               <div className="text-2xl font-bold text-green-600">
-                +{(analytics.pricingPerformance.revenueImpact || 0).toFixed(1)}%
+                {`${analytics.pricingPerformance.revenueImpact >= 0 ? '+' : ''}${(analytics.pricingPerformance.revenueImpact || 0).toFixed(1)}%`}
               </div>
             </Card>
             <Card className="p-6">

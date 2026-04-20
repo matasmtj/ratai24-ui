@@ -294,22 +294,20 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {images.map((image, index) => (
-                <div 
-                  key={image.id} 
-                  className="relative group"
-                  draggable
-                  onDragStart={() => handleDragStart(index)}
-                  onDragOver={handleDragOver}
-                  onDrop={(e) => handleDrop(e, index)}
-                >
+                <div key={image.id} className="relative group">
                   <div 
                     className="aspect-video bg-gray-100 rounded-lg overflow-hidden cursor-move"
                     onClick={() => setLightboxImageIndex(index)}
+                    draggable
+                    onDragStart={() => handleDragStart(index)}
+                    onDragOver={handleDragOver}
+                    onDrop={(e) => handleDrop(e, index)}
                   >
                     <img
                       src={image.url}
                       alt={`Car image ${image.id}`}
                       className="w-full h-full object-cover"
+                      draggable={false}
                     />
                   </div>
                   
@@ -317,10 +315,13 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
                   <div className="absolute top-2 left-2 flex gap-1">
                     {index > 0 && (
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           moveImage(index, 'left');
                         }}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        disabled={reorderMutation.isPending}
                         className="p-1.5 rounded-full bg-white/90 text-gray-700 hover:bg-primary-500 hover:text-white transition-colors"
                         title={t('moveLeft')}
                       >
@@ -331,10 +332,13 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
                     )}
                     {index < images.length - 1 && (
                       <button
+                        type="button"
                         onClick={(e) => {
                           e.stopPropagation();
                           moveImage(index, 'right');
                         }}
+                        onMouseDown={(e) => e.stopPropagation()}
+                        disabled={reorderMutation.isPending}
                         className="p-1.5 rounded-full bg-white/90 text-gray-700 hover:bg-primary-500 hover:text-white transition-colors"
                         title={t('moveRight')}
                       >

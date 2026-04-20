@@ -108,9 +108,7 @@ export function CarDetailPage() {
         notes: bookingData.notes || undefined,
       };
 
-      console.log('Creating contract with data:', contractData);
-      const result = await contractsApi.create(contractData);
-      console.log('Contract created successfully:', result);
+      await contractsApi.create(contractData);
       
       // Invalidate queries to refresh data
       await queryClient.invalidateQueries({ queryKey: ['my-contracts'] });
@@ -461,7 +459,7 @@ export function CarDetailPage() {
           />
 
           {/* Loyalty Badge for authenticated users */}
-          {isAuthenticated && role === 'USER' && (
+          {isAuthenticated && role === 'USER' && car.useDynamicPricing && (
             <div className="pt-2">
               <LoyaltyBadge />
             </div>
