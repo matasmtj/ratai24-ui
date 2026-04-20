@@ -21,6 +21,14 @@ interface AdminContractDetailModalProps {
 
 type ModalMode = 'view' | 'edit' | 'complete';
 
+/** Local form state: allow empty numeric fields until submit (API still receives numbers). */
+type CompleteFormFields = {
+  mileageEndKm: number;
+  fuelLevelEndPct: number | '';
+  damageFee: number | '';
+  notes: string;
+};
+
 export function AdminContractDetailModal({
   isOpen,
   onClose,
@@ -57,10 +65,10 @@ export function AdminContractDetailModal({
     return String(d.getHours()).padStart(2, '0');
   });
 
-  const [completeFormData, setCompleteFormData] = useState<ContractComplete>({
+  const [completeFormData, setCompleteFormData] = useState<CompleteFormFields>({
     mileageEndKm: contract.mileageEndKm || 0,
-    fuelLevelEndPct: contract.fuelLevelEndPct || 100,
-    damageFee: 0,
+    fuelLevelEndPct: '',
+    damageFee: '',
     notes: '',
   });
 
@@ -98,6 +106,11 @@ export function AdminContractDetailModal({
     return dates;
   }, [carCalendar, contract.id]);
 
+  const editEndMinDate = useMemo(() => {
+    if (!editStartDate) return undefined;
+    return new Date(`${editStartDate}T00:00:00`);
+  }, [editStartDate]);
+
   // Calculate price details
   const calculatePriceDetails = () => {
     if (!car) return { days: 0, basePrice: 0, fuelFee: 0, damageFee: 0, total: 0 };
@@ -110,11 +123,22 @@ export function AdminContractDetailModal({
     
     // Calculate fuel fee based on missing percentage
     // Assume €1.50 per liter and average tank size of 50L
-    const fuelLevelEnd = mode === 'complete' ? completeFormData.fuelLevelEndPct : (contract.fuelLevelEndPct || 100);
-    const missingFuelPct = 100 - fuelLevelEnd;
+    const fuelLevelEnd =
+      mode === 'complete'
+        ? completeFormData.fuelLevelEndPct === ''
+          ? null
+          : completeFormData.fuelLevelEndPct
+        : contract.fuelLevelEndPct || 100;
+    const missingFuelPct =
+      fuelLevelEnd === null ? 0 : Math.max(0, 100 - fuelLevelEnd);
     const fuelFee = missingFuelPct > 0 ? (missingFuelPct / 100) * 50 * 1.5 : 0;
-    
-    const damageFee = mode === 'complete' ? (completeFormData.damageFee || 0) : contract.extraFees;
+
+    const damageFee =
+      mode === 'complete'
+        ? completeFormData.damageFee === ''
+          ? 0
+          : Number(completeFormData.damageFee)
+        : contract.extraFees;
     
     const total = basePrice + fuelFee + damageFee;
 
@@ -212,8 +236,8 @@ export function AdminContractDetailModal({
     setError(null);
     setCompleteFormData({
       mileageEndKm: contract.mileageEndKm || contract.mileageStartKm,
-      fuelLevelEndPct: contract.fuelLevelEndPct || 100,
-      damageFee: 0,
+      fuelLevelEndPct: '',
+      damageFee: '',
       notes: '',
     });
     setMode('complete');
@@ -227,15 +251,22 @@ export function AdminContractDetailModal({
       return;
     }
     
-    if (completeFormData.fuelLevelEndPct === null || completeFormData.fuelLevelEndPct === undefined || 
-        completeFormData.fuelLevelEndPct < 0 || completeFormData.fuelLevelEndPct > 100) {
-      setError(t('invalidFuelLevel') || 'Fuel level must be between 0 and 100');
+    if (
+      completeFormData.fuelLevelEndPct === '' ||
+      completeFormData.fuelLevelEndPct < 0 ||
+      completeFormData.fuelLevelEndPct > 100
+    ) {
+      setError(t('invalidFuelLevel'));
       return;
     }
-    
-    // Notes are optional - no validation needed
-    console.log('Completing contract with data:', completeFormData);
-    completeMutation.mutate({ id: contract.id, data: completeFormData });
+
+    const payload: ContractComplete = {
+      mileageEndKm: completeFormData.mileageEndKm,
+      fuelLevelEndPct: completeFormData.fuelLevelEndPct,
+      damageFee: completeFormData.damageFee === '' ? 0 : Number(completeFormData.damageFee),
+      notes: completeFormData.notes,
+    };
+    completeMutation.mutate({ id: contract.id, data: payload });
   };
 
   const handleCancel = () => {
@@ -326,6 +357,7 @@ export function AdminContractDetailModal({
                 selectedTime={editEndTime}
                 onDateChange={setEditEndDate}
                 onTimeChange={setEditEndTime}
+                minDate={editEndMinDate}
                 blockedDates={blockedDates}
               />
             </>
@@ -379,10 +411,19 @@ export function AdminContractDetailModal({
             <Input
               label={t('fuelLevelEnd')}
               type="number"
-              value={completeFormData.fuelLevelEndPct ?? ''}
+              value={completeFormData.fuelLevelEndPct === '' ? '' : String(completeFormData.fuelLevelEndPct)}
               onChange={(e) => {
-                const val = e.target.value === '' ? 0 : Math.max(0, Math.min(100, parseInt(e.target.value) || 0));
-                setCompleteFormData({ ...completeFormData, fuelLevelEndPct: val });
+                const raw = e.target.value;
+                if (raw === '') {
+                  setCompleteFormData({ ...completeFormData, fuelLevelEndPct: '' });
+                  return;
+                }
+                const n = parseInt(raw, 10);
+                if (Number.isNaN(n)) return;
+                setCompleteFormData({
+                  ...completeFormData,
+                  fuelLevelEndPct: Math.max(0, Math.min(100, n)),
+                });
               }}
               min={0}
               max={100}
@@ -418,8 +459,17 @@ export function AdminContractDetailModal({
               <Input
                 label={t('damageFee')}
                 type="number"
-                value={completeFormData.damageFee ?? ''}
-                onChange={(e) => setCompleteFormData({ ...completeFormData, damageFee: e.target.value === '' ? 0 : parseFloat(e.target.value) })}
+                value={completeFormData.damageFee === '' ? '' : String(completeFormData.damageFee)}
+                onChange={(e) => {
+                  const raw = e.target.value;
+                  if (raw === '') {
+                    setCompleteFormData({ ...completeFormData, damageFee: '' });
+                    return;
+                  }
+                  const n = parseFloat(raw);
+                  if (Number.isNaN(n)) return;
+                  setCompleteFormData({ ...completeFormData, damageFee: n });
+                }}
                 min={0}
                 step={0.01}
               />

@@ -90,9 +90,9 @@ export function AdminPricingDashboard() {
 
       {/* Info about analytics */}
       {analytics && analytics.revenue.totalContracts === 0 && (
-        <Alert 
-          type="info" 
-          message={`${t('pricing.admin.noDataYet') || 'No pricing data yet. Analytics are calculated from completed contracts within the selected date range.'} (${startDate} to ${endDate}). Check browser console for API response details.`} 
+        <Alert
+          type="info"
+          message={`${t('pricing.admin.noDataYet')} ${t('pricing.admin.validPeriodNote').replace('{start}', startDate).replace('{end}', endDate)}`}
         />
       )}
 

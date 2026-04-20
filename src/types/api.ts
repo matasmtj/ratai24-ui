@@ -264,6 +264,7 @@ export interface LogoutRequest {
 export interface ForgotPasswordRequest {
   email: string;
   language?: 'lt' | 'en' | 'ru';
+  language?: string;
 }
 
 export interface ForgotPasswordResponse {

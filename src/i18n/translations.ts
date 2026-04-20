@@ -598,6 +598,8 @@ export const translations = {
           guest: 'Svečias',
           unknown: 'Nežinoma',
         },
+        unavailable:
+          'Nepavyko įkelti lojalumo duomenų. Rodoma numatyta informacija (Svečias).',
       },
       errors: {
         calculationFailed: 'Nepavyko apskaičiuoti kainos',
@@ -677,6 +679,7 @@ export const translations = {
         seasonalNamePlaceholder: 'pvz., Vasaros nuolaida 2024',
         multiplierExplanation: 'Daugiklis 1.0 = jokio pasikeitimo. Mažiau nei 1.0 = nuolaida. Daugiau nei 1.0 = kainų padidėjimas.',
         noDataYet: 'Duomenų dar nėra. Analitika skaičiuojama iš užbaigtų sutarčių pasirinktame laikotarpyje.',
+        validPeriodNote: 'Laikotarpis: nuo {start} iki {end}',
         validation: {
           nameRequired: 'Pavadinimas yra privalomas.',
           fixedOrMultiplierRequired: 'Nurodykite bent vieną: fiksuotą kainą arba daugiklį.',
@@ -1306,6 +1309,7 @@ export const translations = {
           guest: 'Guest',
           unknown: 'Unknown',
         },
+        unavailable: 'Could not load loyalty data. Showing default information (Guest).',
       },
       errors: {
         calculationFailed: 'Failed to calculate price',
@@ -1385,6 +1389,7 @@ export const translations = {
         seasonalNamePlaceholder: 'e.g., Summer Discount 2024',
         multiplierExplanation: 'Multiplier 1.0 = no change. Less than 1.0 = discount. More than 1.0 = price increase.',
         noDataYet: 'No pricing data yet. Analytics are calculated from completed contracts within the selected date range.',
+        validPeriodNote: 'Period: {start} to {end}',
         validation: {
           nameRequired: 'Name is required.',
           fixedOrMultiplierRequired: 'Provide at least one: fixed price or multiplier.',
@@ -2013,6 +2018,8 @@ export const translations = {
           guest: 'Гость',
           unknown: 'Неизвестно',
         },
+        unavailable:
+          'Не удалось загрузить данные лояльности. Показана информация по умолчанию (Гость).',
       },
       errors: {
         calculationFailed: 'Не удалось рассчитать цену',
@@ -2092,6 +2099,7 @@ export const translations = {
         seasonalNamePlaceholder: 'напр., Летняя скидка 2024',
         multiplierExplanation: 'Множитель 1.0 = без изменений. Меньше 1.0 = скидка. Больше 1.0 = увеличение цены.',
         noDataYet: 'Данных пока нет. Аналитика рассчитывается из завершенных контрактов в выбранном диапазоне дат.',
+        validPeriodNote: 'Период: с {start} по {end}',
         validation: {
           nameRequired: 'Название обязательно.',
           fixedOrMultiplierRequired: 'Укажите хотя бы одно: фиксированную цену или множитель.',

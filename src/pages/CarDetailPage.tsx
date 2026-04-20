@@ -162,6 +162,16 @@ export function CarDetailPage() {
     return new Date();
   };
 
+  /** End date cannot be before start date; also not before today (same as start picker). */
+  const bookingEndMinDate = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (!bookingData.startDate) return today;
+    const start = new Date(`${bookingData.startDate}T00:00:00`);
+    start.setHours(0, 0, 0, 0);
+    return start > today ? start : today;
+  }, [bookingData.startDate]);
+
   if (isLoading) return <LoadingPage />;
   if (!car) return <div>{t('carNotFound')}</div>;
   const canBookThisCar = car.availableForLease !== false && car.state !== 'MAINTENANCE';
@@ -447,7 +457,7 @@ export function CarDetailPage() {
             selectedTime={bookingData.endTime}
             onDateChange={(date) => setBookingData({ ...bookingData, endDate: date })}
             onTimeChange={(time) => setBookingData({ ...bookingData, endTime: time })}
-            minDate={getMinDate()}
+            minDate={bookingEndMinDate}
             blockedDates={blockedDates}
             required
           />

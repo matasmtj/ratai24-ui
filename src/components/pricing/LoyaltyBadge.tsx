@@ -3,18 +3,29 @@ import { pricingApi } from '../../api/pricing';
 import type { CustomerLoyalty } from '../../types/pricing';
 import { useLanguage } from '../../contexts/useLanguage';
 
+const GUEST_FALLBACK: CustomerLoyalty = {
+  tier: 'Guest',
+  discount: 0,
+  rentalsCount: 0,
+  lifetimeValue: 0,
+};
+
 export function LoyaltyBadge() {
   const { t } = useLanguage();
   const [loyalty, setLoyalty] = useState<CustomerLoyalty | null>(null);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     const fetchLoyalty = async () => {
+      setFetchError(false);
       try {
         const data = await pricingApi.getCustomerLoyalty();
         setLoyalty(data);
       } catch (error) {
         console.error('Error fetching loyalty:', error);
+        setLoyalty(GUEST_FALLBACK);
+        setFetchError(true);
       } finally {
         setLoading(false);
       }
@@ -23,7 +34,16 @@ export function LoyaltyBadge() {
     fetchLoyalty();
   }, []);
 
-  if (loading || !loyalty) {
+  if (loading) {
+    return (
+      <div className="p-4 rounded-lg shadow-md bg-gray-100 border border-gray-200 animate-pulse">
+        <div className="h-5 bg-gray-200 rounded w-2/3 mb-2" />
+        <div className="h-4 bg-gray-200 rounded w-1/2" />
+      </div>
+    );
+  }
+
+  if (!loyalty) {
     return null;
   }
 
@@ -63,6 +83,11 @@ export function LoyaltyBadge() {
 
   return (
     <div className={`p-4 rounded-lg shadow-md ${getTierColor(loyalty.tier)}`}>
+      {fetchError && (
+        <p className="text-xs opacity-90 mb-2 border-b border-white/20 pb-2">
+          {t('pricing.loyalty.unavailable')}
+        </p>
+      )}
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2 mb-1">
