@@ -269,7 +269,7 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
                   </ul>
                   <div className="flex gap-2 justify-center">
                     <Button onClick={handleUpload} isLoading={uploading} disabled={uploading}>
-                      {t('uploadButton')} {selectedFiles.length} {t('photos')}
+                      {t('uploadButtonWithCount').replace('{count}', String(selectedFiles.length))}
                     </Button>
                     <Button variant="ghost" onClick={() => setSelectedFiles([])}>
                       {t('cancel')}

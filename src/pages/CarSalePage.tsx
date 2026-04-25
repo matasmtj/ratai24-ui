@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
 import { Layout } from '../components/Layout';
@@ -18,6 +18,10 @@ import {
   ChevronDownIcon,
   ChevronUpIcon
 } from '@heroicons/react/24/outline';
+import { PaginationBar } from '../components/ui/PaginationBar';
+import { slicePage, visibleRange } from '../lib/pagination';
+import { compareCarsSaleCatalog } from '../lib/carCatalogSort';
+import { useScrollToTopOnPageChange } from '../hooks/useScrollToTopOnPageChange';
 
 export function CarSalePage() {
   const [searchParams] = useSearchParams();
@@ -32,6 +36,8 @@ export function CarSalePage() {
   const [sortBy, setSortBy] = useState<string>('');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState<number>(3);
+  const [page, setPage] = useState(1);
+  const listAnchorRef = useRef<HTMLDivElement>(null);
 
   // Auto-select city from URL params
   useEffect(() => {
@@ -51,35 +57,70 @@ export function CarSalePage() {
     queryFn: () => carsApi.getAllForSale(selectedCity ? Number(selectedCity) : undefined),
   });
 
-  const filteredAndSortedCars = cars?.filter((car) => {
-    const matchesSearch = 
-      car.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      car.model.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFuel = !fuelFilter || car.fuelType === fuelFilter;
-    const matchesBody = !bodyFilter || car.bodyType === bodyFilter;
-    const matchesGearbox = !gearboxFilter || car.gearbox === gearboxFilter;
-    const matchesEngine = !engineCapacityFilter || !car.engineCapacityL ||
-      (engineCapacityFilter === '<1.5' && car.engineCapacityL < 1.5) ||
-      (engineCapacityFilter === '1.5-2.0' && car.engineCapacityL >= 1.5 && car.engineCapacityL <= 2.0) ||
-      (engineCapacityFilter === '2.0-3.0' && car.engineCapacityL > 2.0 && car.engineCapacityL <= 3.0) ||
-      (engineCapacityFilter === '>3.0' && car.engineCapacityL > 3.0);
-    const matchesSeats = !seatCountFilter || car.seatCount.toString() === seatCountFilter;
-    const matchesAvailableForSale = car.availableForSale === true; // Must be explicitly true
+  const filteredAndSortedCars = useMemo(() => {
+    if (!cars) return [];
+    const filtered = cars.filter((car) => {
+      const matchesSearch =
+        car.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        car.model.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesFuel = !fuelFilter || car.fuelType === fuelFilter;
+      const matchesBody = !bodyFilter || car.bodyType === bodyFilter;
+      const matchesGearbox = !gearboxFilter || car.gearbox === gearboxFilter;
+      const matchesEngine =
+        !engineCapacityFilter ||
+        !car.engineCapacityL ||
+        (engineCapacityFilter === '<1.5' && car.engineCapacityL < 1.5) ||
+        (engineCapacityFilter === '1.5-2.0' && car.engineCapacityL >= 1.5 && car.engineCapacityL <= 2.0) ||
+        (engineCapacityFilter === '2.0-3.0' && car.engineCapacityL > 2.0 && car.engineCapacityL <= 3.0) ||
+        (engineCapacityFilter === '>3.0' && car.engineCapacityL > 3.0);
+      const matchesSeats = !seatCountFilter || car.seatCount.toString() === seatCountFilter;
+      const matchesAvailableForSale = car.availableForSale === true;
+      return (
+        matchesSearch &&
+        matchesFuel &&
+        matchesBody &&
+        matchesGearbox &&
+        matchesEngine &&
+        matchesSeats &&
+        matchesAvailableForSale
+      );
+    });
+    return [...filtered].sort((a, b) => compareCarsSaleCatalog(a, b, sortBy));
+  }, [
+    cars,
+    searchTerm,
+    fuelFilter,
+    bodyFilter,
+    gearboxFilter,
+    engineCapacityFilter,
+    seatCountFilter,
+    sortBy,
+  ]);
 
-    return matchesSearch && matchesFuel && matchesBody && matchesGearbox && matchesEngine && matchesSeats && matchesAvailableForSale;
-  }).sort((a, b) => {
-    if (!sortBy) return 0;
-    if (sortBy === 'priceAsc') return (a.salePrice || 0) - (b.salePrice || 0);
-    if (sortBy === 'priceDesc') return (b.salePrice || 0) - (a.salePrice || 0);
-    return 0;
-  });
+  useScrollToTopOnPageChange(page, listAnchorRef);
 
-  const paginatedCars = useMemo(() => {
-    if (!filteredAndSortedCars) return [];
-    const carsPerRow = 3;
-    const totalCars = rowsPerPage === -1 ? filteredAndSortedCars.length : rowsPerPage * carsPerRow;
-    return filteredAndSortedCars.slice(0, totalCars);
-  }, [filteredAndSortedCars, rowsPerPage]);
+  const carsPerRow = 3;
+  const list = filteredAndSortedCars;
+  const pageSize = rowsPerPage === -1 ? -1 : rowsPerPage * carsPerRow;
+
+  const paginatedCars = useMemo(
+    () => slicePage(list, page, pageSize),
+    [list, page, pageSize]
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [
+    searchTerm,
+    selectedCity,
+    fuelFilter,
+    bodyFilter,
+    gearboxFilter,
+    engineCapacityFilter,
+    seatCountFilter,
+    sortBy,
+    rowsPerPage,
+  ]);
 
   const handleResetFilters = () => {
     setSearchTerm('');
@@ -140,6 +181,9 @@ export function CarSalePage() {
               onChange={(e) => setSortBy(e.target.value)}
               options={[
                 { value: '', label: t('sortBy') },
+                { value: 'popularityDesc', label: t('sortByPopularity') },
+                { value: 'yearDesc', label: t('yearDesc') },
+                { value: 'yearAsc', label: t('yearAsc') },
                 { value: 'priceAsc', label: t('salePriceAsc') },
                 { value: 'priceDesc', label: t('salePriceDesc') },
               ]}
@@ -169,6 +213,7 @@ export function CarSalePage() {
                 options={[
                   { value: '', label: t('allFuel') },
                   { value: 'PETROL', label: t('petrol') },
+                  { value: 'PETROL_LPG', label: t('petrolLpg') },
                   { value: 'DIESEL', label: t('diesel') },
                   { value: 'ELECTRIC', label: t('electric') },
                   { value: 'HYBRID_HEV', label: t('hybridHev') },
@@ -188,6 +233,8 @@ export function CarSalePage() {
                   { value: 'CONVERTIBLE', label: t('convertible') },
                   { value: 'VAN', label: t('van') },
                   { value: 'PICKUP', label: t('pickup') },
+                  { value: 'MINIBUS_PASSENGER', label: t('minibusPassenger') },
+                  { value: 'MINIBUS_CARGO', label: t('minibusCargo') },
                 ]}
               />
               <Select
@@ -248,10 +295,19 @@ export function CarSalePage() {
           <div className="flex justify-center py-12">
             <LoadingSpinner size="lg" />
           </div>
-        ) : filteredAndSortedCars && filteredAndSortedCars.length > 0 ? (
+        ) : filteredAndSortedCars.length > 0 ? (
           <>
+            <div ref={listAnchorRef} className="h-0" aria-hidden />
             <div className="mb-4 text-gray-600">
-              {t('carsFound')}: {paginatedCars.length} / {filteredAndSortedCars.length}
+              {rowsPerPage === -1
+                ? `${t('carsFound')}: ${paginatedCars.length} / ${list.length}`
+                : (() => {
+                    const { from, to } = visibleRange(page, pageSize, list.length, paginatedCars.length);
+                    return t('showingRangeFromTo')
+                      .replace('{from}', from ? String(from) : '0')
+                      .replace('{to}', to ? String(to) : '0')
+                      .replace('{total}', String(list.length));
+                  })()}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {paginatedCars.map((car) => {
@@ -342,6 +398,15 @@ export function CarSalePage() {
                 );
               })}
             </div>
+            {rowsPerPage !== -1 && (
+              <PaginationBar
+                page={page}
+                pageSize={pageSize}
+                totalItems={list.length}
+                onPageChange={setPage}
+                className="mt-4"
+              />
+            )}
           </>
         ) : (
           <Card className="p-12 text-center">

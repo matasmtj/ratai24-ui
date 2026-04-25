@@ -17,6 +17,10 @@ interface SearchableSelectProps {
   required?: boolean;
   disabled?: boolean;
   multiple?: boolean;
+  /** Allow values not present in `options` (type to search, then pick “Use …” or press Enter). */
+  allowCustom?: boolean;
+  /** Shown for the custom row; {value} is replaced with the typed text. */
+  customOptionLabel?: string;
 }
 
 export function SearchableSelect({
@@ -28,14 +32,14 @@ export function SearchableSelect({
   required = false,
   disabled = false,
   multiple = false,
+  allowCustom = false,
+  customOptionLabel,
 }: SearchableSelectProps) {
   const [query, setQuery] = useState('');
 
   // Normalize options to always be Option[]
   const normalizedOptions: Option[] = useMemo(() => {
-    return options.map(opt => 
-      typeof opt === 'string' ? { value: opt, label: opt } : opt
-    );
+    return options.map((opt) => (typeof opt === 'string' ? { value: opt, label: opt } : opt));
   }, [options]);
 
   const filteredOptions = useMemo(() => {
@@ -47,8 +51,21 @@ export function SearchableSelect({
     );
   }, [normalizedOptions, query]);
 
+  const optionsForList = useMemo(() => {
+    if (!allowCustom) return filteredOptions;
+    const q = query.trim();
+    if (!q) return filteredOptions;
+    const hasExact = normalizedOptions.some((o) => o.value.toLowerCase() === q.toLowerCase());
+    if (hasExact) return filteredOptions;
+    const customLabel = customOptionLabel
+      ? customOptionLabel.replace(/\{value\}/g, q)
+      : `«${q}»`;
+    return [{ value: q, label: customLabel }, ...filteredOptions];
+  }, [allowCustom, query, filteredOptions, normalizedOptions, customOptionLabel]);
+
   const handleChange = (newValue: string | string[] | null) => {
     if (newValue !== null) {
+      setQuery('');
       onChange(newValue);
     }
   };
@@ -56,12 +73,12 @@ export function SearchableSelect({
   const getDisplayValue = (val: string | string[]) => {
     if (multiple && Array.isArray(val)) {
       if (val.length === 0) return '';
-      const labels = val.map(v => 
-        normalizedOptions.find(opt => opt.value === v)?.label || v
+      const labels = val.map(
+        (v) => normalizedOptions.find((opt) => opt.value === v)?.label || v
       );
       return labels.join(', ');
     }
-    return normalizedOptions.find(opt => opt.value === val)?.label || val;
+    return normalizedOptions.find((opt) => opt.value === val)?.label || (val as string) || '';
   };
 
   return (
@@ -80,7 +97,17 @@ export function SearchableSelect({
               'sm:text-sm'
             )}
             onChange={(event) => setQuery(event.target.value)}
-            displayValue={(val: string | string[]) => Array.isArray(val) ? val.join(', ') : (getDisplayValue(val) as string)}
+            onKeyDown={(e) => {
+              if (!allowCustom || e.key !== 'Enter' || multiple) return;
+              const q = query.trim();
+              if (!q) return;
+              e.preventDefault();
+              setQuery('');
+              onChange(q);
+            }}
+            displayValue={(val: string | string[]) =>
+              Array.isArray(val) ? val.join(', ') : (getDisplayValue(val) as string)
+            }
             placeholder={placeholder}
             required={required}
           />
@@ -88,11 +115,11 @@ export function SearchableSelect({
             <ChevronDownIcon className="h-5 w-5 text-gray-400" aria-hidden="true" />
           </Combobox.Button>
 
-          {filteredOptions.length > 0 && (
+          {optionsForList.length > 0 && (
             <Combobox.Options className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-              {filteredOptions.map((option) => (
+              {optionsForList.map((option) => (
                 <Combobox.Option
-                  key={option.value}
+                  key={option.value + option.label}
                   value={option.value}
                   className={({ active }) =>
                     clsx(

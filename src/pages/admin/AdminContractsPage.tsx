@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -14,6 +14,9 @@ import { format } from 'date-fns';
 import { CheckCircleIcon, XCircleIcon, FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import { AdminContractDetailModal } from '../../components/admin/AdminContractDetailModal';
 import type { Contract } from '../../types/api';
+import { PaginationBar } from '../../components/ui/PaginationBar';
+import { slicePage, visibleRange } from '../../lib/pagination';
+import { useScrollToTopOnPageChange } from '../../hooks/useScrollToTopOnPageChange';
 
 export function AdminContractsPage() {
   const { t } = useLanguage();
@@ -23,6 +26,8 @@ export function AdminContractsPage() {
   const [sortBy, setSortBy] = useState<string>('');
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [page, setPage] = useState(1);
+  const listAnchorRef = useRef<HTMLDivElement>(null);
 
   const { data: contracts, isLoading } = useQuery({
     queryKey: ['admin-contracts'],
@@ -104,10 +109,18 @@ export function AdminContractsPage() {
     [pendingDrafts, attentionNeeded, regularContracts]
   );
 
-  const pageSlice = useMemo(() => {
-    if (itemsPerPage === -1) return flatOrdered;
-    return flatOrdered.slice(0, itemsPerPage);
-  }, [flatOrdered, itemsPerPage]);
+  const pageSize = itemsPerPage === -1 ? -1 : itemsPerPage;
+
+  const pageSlice = useMemo(
+    () => slicePage(flatOrdered, page, pageSize),
+    [flatOrdered, page, pageSize]
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, stateFilter, sortBy, itemsPerPage]);
+
+  useScrollToTopOnPageChange(page, listAnchorRef);
 
   const idsOnPage = useMemo(() => new Set(pageSlice.map((c) => c.id)), [pageSlice]);
 
@@ -220,10 +233,19 @@ export function AdminContractsPage() {
         </div>
       ) : filteredAndSortedContracts && filteredAndSortedContracts.length > 0 ? (
         <>
+          <div ref={listAnchorRef} className="h-0" aria-hidden />
           <div className="mb-4 text-gray-600">
-            {t('showingXofY')
-              .replace('{current}', pageSlice.length.toString())
-              .replace('{total}', flatOrdered.length.toString())}
+            {itemsPerPage === -1
+              ? t('showingXofY')
+                  .replace('{current}', pageSlice.length.toString())
+                  .replace('{total}', flatOrdered.length.toString())
+              : (() => {
+                  const { from, to } = visibleRange(page, pageSize, flatOrdered.length, pageSlice.length);
+                  return t('showingRangeFromTo')
+                    .replace('{from}', from ? String(from) : '0')
+                    .replace('{to}', to ? String(to) : '0')
+                    .replace('{total}', String(flatOrdered.length));
+                })()}
           </div>
 
           {/* Pending approval (DRAFT) */}
@@ -314,6 +336,16 @@ export function AdminContractsPage() {
                   />
                 ))}
             </div>
+          )}
+
+          {itemsPerPage !== -1 && (
+            <PaginationBar
+              page={page}
+              pageSize={pageSize}
+              totalItems={flatOrdered.length}
+              onPageChange={setPage}
+              className="mt-6"
+            />
           )}
         </>
       ) : (

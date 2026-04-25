@@ -101,7 +101,7 @@ export function AdminPricingDashboard() {
         <div className="flex flex-wrap gap-4 items-end">
           <div className="flex-1 min-w-[16rem]">
             <DateRangePicker
-              label={t('pricing.admin.validPeriod') || `${t('common.startDate')} - ${t('common.endDate')}`}
+              label={t('pricing.admin.validPeriod')}
               startDate={startDate}
               endDate={endDate}
               onChange={(nextStartDate, nextEndDate) => {

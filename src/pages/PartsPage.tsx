@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
@@ -19,6 +19,9 @@ import {
   ChevronDownIcon,
   ChevronUpIcon
 } from '@heroicons/react/24/outline';
+import { PaginationBar } from '../components/ui/PaginationBar';
+import { slicePage, visibleRange } from '../lib/pagination';
+import { useScrollToTopOnPageChange } from '../hooks/useScrollToTopOnPageChange';
 
 export function PartsPage() {
   const { t } = useLanguage();
@@ -31,6 +34,8 @@ export function PartsPage() {
   const [sortBy, setSortBy] = useState<string>('');
   const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
   const [rowsPerPage, setRowsPerPage] = useState<number>(3);
+  const [page, setPage] = useState(1);
+  const listAnchorRef = useRef<HTMLDivElement>(null);
 
   const { data: parts, isLoading } = useQuery({
     queryKey: ['parts'],
@@ -86,11 +91,20 @@ export function PartsPage() {
       });
   }, [parts, searchTerm, makeFilter, modelFilter, yearFilter, conditionFilter, categoryFilter, sortBy]);
 
-  const paginatedParts = useMemo(() => {
-    const partsPerRow = 3;
-    const totalParts = rowsPerPage === -1 ? filteredAndSortedParts.length : rowsPerPage * partsPerRow;
-    return filteredAndSortedParts.slice(0, totalParts);
-  }, [filteredAndSortedParts, rowsPerPage]);
+  const partsPerRow = 3;
+  const list = filteredAndSortedParts;
+  const pageSize = rowsPerPage === -1 ? -1 : rowsPerPage * partsPerRow;
+
+  const paginatedParts = useMemo(
+    () => slicePage(list, page, pageSize),
+    [list, page, pageSize]
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, makeFilter, modelFilter, yearFilter, conditionFilter, categoryFilter, sortBy, rowsPerPage]);
+
+  useScrollToTopOnPageChange(page, listAnchorRef);
 
   const handleResetFilters = () => {
     setSearchTerm('');
@@ -277,10 +291,19 @@ export function PartsPage() {
           </div>
         ) : filteredAndSortedParts && filteredAndSortedParts.length > 0 ? (
           <>
+            <div ref={listAnchorRef} className="h-0" aria-hidden />
             <div className="mb-6 text-gray-600">
-              {t('showingXofY')
-                .replace('{current}', paginatedParts.length.toString())
-                .replace('{total}', filteredAndSortedParts.length.toString())}
+              {rowsPerPage === -1
+                ? t('showingXofY')
+                    .replace('{current}', paginatedParts.length.toString())
+                    .replace('{total}', list.length.toString())
+                : (() => {
+                    const { from, to } = visibleRange(page, pageSize, list.length, paginatedParts.length);
+                    return t('showingRangeFromTo')
+                      .replace('{from}', from ? String(from) : '0')
+                      .replace('{to}', to ? String(to) : '0')
+                      .replace('{total}', String(list.length));
+                  })()}
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {paginatedParts.map((part) => {
@@ -337,6 +360,15 @@ export function PartsPage() {
                 </Link>
               )})}
             </div>
+            {rowsPerPage !== -1 && (
+              <PaginationBar
+                page={page}
+                pageSize={pageSize}
+                totalItems={list.length}
+                onPageChange={setPage}
+                className="mt-4"
+              />
+            )}
           </>
         ) : (
           <div className="text-center py-12">

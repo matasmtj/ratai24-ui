@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -18,6 +18,9 @@ import type { Car, CarCreate } from '../../types/api';
 import { PlusIcon, PencilIcon, TrashIcon, TruckIcon, PhotoIcon, FunnelIcon, XMarkIcon, EyeIcon } from '@heroicons/react/24/outline';
 import { CarImagesManager } from '../../components/admin/CarImagesManager';
 import { useNavigate } from 'react-router-dom';
+import { PaginationBar } from '../../components/ui/PaginationBar';
+import { slicePage, visibleRange } from '../../lib/pagination';
+import { useScrollToTopOnPageChange } from '../../hooks/useScrollToTopOnPageChange';
 
 export function AdminCarsPage() {
   const queryClient = useQueryClient();
@@ -32,6 +35,8 @@ export function AdminCarsPage() {
   const [stateFilter, setStateFilter] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('');
   const [rowsPerPage, setRowsPerPage] = useState<number>(3); // 3 rows x 3 columns = 9 cars
+  const [page, setPage] = useState(1);
+  const listAnchorRef = useRef<HTMLDivElement>(null);
   const [lightboxCarId, setLightboxCarId] = useState<number | null>(null);
   const [lightboxImageIndex, setLightboxImageIndex] = useState(0);
 
@@ -79,11 +84,20 @@ export function AdminCarsPage() {
 
   const hasActiveFilters = searchTerm || cityFilter || stateFilter || sortBy;
 
-  const paginatedCars = useMemo(() => {
-    const carsPerRow = 3; // Grid has 3 columns
-    const totalCars = rowsPerPage === -1 ? filteredAndSortedCars.length : rowsPerPage * carsPerRow;
-    return filteredAndSortedCars.slice(0, totalCars);
-  }, [filteredAndSortedCars, rowsPerPage]);
+  const carsPerRow = 3;
+  const list = filteredAndSortedCars;
+  const pageSize = rowsPerPage === -1 ? -1 : rowsPerPage * carsPerRow;
+
+  const paginatedCars = useMemo(
+    () => slicePage(list, page, pageSize),
+    [list, page, pageSize]
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, cityFilter, stateFilter, sortBy, rowsPerPage]);
+
+  useScrollToTopOnPageChange(page, listAnchorRef);
 
   const deleteMutation = useMutation({
     mutationFn: carsApi.delete,
@@ -225,10 +239,19 @@ export function AdminCarsPage() {
         </div>
       ) : filteredAndSortedCars && filteredAndSortedCars.length > 0 ? (
         <>
+          <div ref={listAnchorRef} className="h-0" aria-hidden />
           <div className="mb-4 text-gray-600">
-            {t('showingXofY')
-              .replace('{current}', paginatedCars.length.toString())
-              .replace('{total}', filteredAndSortedCars.length.toString())}
+            {rowsPerPage === -1
+              ? t('showingXofY')
+                  .replace('{current}', paginatedCars.length.toString())
+                  .replace('{total}', list.length.toString())
+              : (() => {
+                  const { from, to } = visibleRange(page, pageSize, list.length, paginatedCars.length);
+                  return t('showingRangeFromTo')
+                    .replace('{from}', from ? String(from) : '0')
+                    .replace('{to}', to ? String(to) : '0')
+                    .replace('{total}', String(list.length));
+                })()}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {paginatedCars.map((car) => {
@@ -330,6 +353,15 @@ export function AdminCarsPage() {
             </Card>
           )})}
         </div>
+        {rowsPerPage !== -1 && (
+          <PaginationBar
+            page={page}
+            pageSize={pageSize}
+            totalItems={list.length}
+            onPageChange={setPage}
+            className="mt-4"
+          />
+        )}
         </>
       ) : (
         <Card className="p-12 text-center">
@@ -502,6 +534,22 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
   // Update form data when car changes (for edit mode)
   useEffect(() => {
     if (car) {
+      // Align with backend calculatePriceConstraints / calculateBasePrice: when dedicated
+      // dynamic-pricing fields are null but the car uses dynamic pricing (or we need defaults
+      // for the form), derive base from basePricePerDay ?? pricePerDay, min = 60%, max = 250%.
+      const priceDay = Number(car.pricePerDay);
+      const baseFromDb = car.basePricePerDay;
+      const effectiveBase =
+        baseFromDb != null && Number.isFinite(Number(baseFromDb))
+          ? Number(baseFromDb)
+          : priceDay;
+      const round2 = (n: number) => Math.round(n * 100) / 100;
+      const defaultMin = round2(effectiveBase * 0.6);
+      const defaultMax = round2(effectiveBase * 2.5);
+      const minFromDb = car.minPricePerDay;
+      const maxFromDb = car.maxPricePerDay;
+      const fmt = (n: number) => (Number.isFinite(n) ? String(round2(n)) : '');
+
       setFormData({
         vin: car.vin,
         numberPlate: car.numberPlate,
@@ -523,9 +571,15 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
         state: car.state,
         odometerKm: car.odometerKm.toString(),
         useDynamicPricing: car.useDynamicPricing ?? false,
-        basePricePerDay: car.basePricePerDay?.toString() || '',
-        minPricePerDay: car.minPricePerDay?.toString() || '',
-        maxPricePerDay: car.maxPricePerDay?.toString() || '',
+        basePricePerDay: fmt(
+          baseFromDb != null && Number.isFinite(Number(baseFromDb)) ? Number(baseFromDb) : effectiveBase
+        ),
+        minPricePerDay: fmt(
+          minFromDb != null && Number.isFinite(Number(minFromDb)) ? Number(minFromDb) : defaultMin
+        ),
+        maxPricePerDay: fmt(
+          maxFromDb != null && Number.isFinite(Number(maxFromDb)) ? Number(maxFromDb) : defaultMax
+        ),
         applyUtilizationPricing: car.applyUtilizationPricing !== false,
         utilizationMultiplierOverride:
           car.utilizationMultiplierOverride != null
@@ -563,6 +617,25 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
       });
     }
   }, [car, cities]);
+
+  const makeOptionsList = useMemo(() => {
+    const m = formData.make?.trim();
+    if (m && !carMakes.includes(m)) {
+      return [m, ...carMakes];
+    }
+    return carMakes;
+  }, [formData.make]);
+
+  const modelOptionsList = useMemo(() => {
+    const mk = formData.make?.trim();
+    if (!mk) return [] as string[];
+    const fromData = carModels[mk] || [];
+    const mod = formData.model?.trim();
+    if (mod && !fromData.includes(mod)) {
+      return [mod, ...fromData];
+    }
+    return fromData;
+  }, [formData.make, formData.model]);
 
   const createMutation = useMutation({
     mutationFn: carsApi.create,
@@ -852,15 +925,19 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
             label={t('manufacturer')} 
             value={formData.make} 
             onChange={(value) => setFormData({ ...formData, make: Array.isArray(value) ? value[0] : value, model: '' })} 
-            options={carMakes}
+            options={makeOptionsList}
+            allowCustom
+            customOptionLabel={t('common.comboboxUseCustom')}
             required 
           />
           <SearchableSelect 
             label={t('model')} 
             value={formData.model} 
             onChange={(value) => setFormData({ ...formData, model: Array.isArray(value) ? value[0] : value })} 
-            options={formData.make ? (carModels[formData.make] || []) : []}
-            disabled={!formData.make}
+            options={modelOptionsList}
+            disabled={!formData.make?.trim()}
+            allowCustom
+            customOptionLabel={t('common.comboboxUseCustom')}
             required 
           />
           <Input 
@@ -915,6 +992,7 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
           <Input label={t('seatsCount')} type="number" value={formData.seatCount || ''} onChange={(e) => setFormData({ ...formData, seatCount: e.target.value })} />
           <Select label={t('fuel')} value={formData.fuelType} onChange={(e) => setFormData({ ...formData, fuelType: e.target.value as any })} options={[
             { value: 'PETROL', label: t('petrol') },
+            { value: 'PETROL_LPG', label: t('petrolLpg') },
             { value: 'DIESEL', label: t('diesel') },
             { value: 'ELECTRIC', label: t('electric') },
             { value: 'HYBRID_HEV', label: t('hybridHev') },
@@ -927,6 +1005,12 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
             { value: 'HATCHBACK', label: t('hatchback') },
             { value: 'SUV', label: t('suv') },
             { value: 'WAGON', label: t('wagon') },
+            { value: 'COUPE', label: t('coupe') },
+            { value: 'CONVERTIBLE', label: t('convertible') },
+            { value: 'VAN', label: t('van') },
+            { value: 'PICKUP', label: t('pickup') },
+            { value: 'MINIBUS_PASSENGER', label: t('minibusPassenger') },
+            { value: 'MINIBUS_CARGO', label: t('minibusCargo') },
           ]} />
           <Select label={t('gearboxField')} value={formData.gearbox} onChange={(e) => setFormData({ ...formData, gearbox: e.target.value as any })} options={[
             { value: 'MANUAL', label: t('manual') },

@@ -68,6 +68,7 @@ export const translations = {
     priceDesc: 'Kaina: didžiausia',
     salePriceAsc: 'Pardavimo kaina: mažiausia',
     salePriceDesc: 'Pardavimo kaina: didžiausia',
+    sortByPopularity: 'Populiariausios (pagal nuomos apkrovą)',
     available: 'Laisvas',
     leased: 'Išnuomotas',
     occupiedToday: 'Šiandien užimtas',
@@ -127,6 +128,7 @@ export const translations = {
     electric: 'Elektrinis',
     hybridHev: 'Hibridas (HEV)',
     hybridPhev: 'Hibridas (PHEV)',
+    petrolLpg: 'Benzinas + dujos (LPG)',
     
     // Body Types
     sedan: 'Sedanas',
@@ -137,6 +139,8 @@ export const translations = {
     convertible: 'Kabrioletas',
     van: 'Mikroautobusas',
     pickup: 'Pikapas',
+    minibusPassenger: 'Keleivinis mikroautobusas',
+    minibusCargo: 'Krovininis mikroautobusas',
     
     // Gearbox
     manual: 'Mechaninė',
@@ -223,6 +227,12 @@ export const translations = {
       all: 'Visi',
       apply: 'Taikyti',
       clear: 'Išvalyti',
+      selectDateRange: 'Pasirinkite datų intervalą',
+      comboboxUseCustom: 'Naudoti: {value}',
+      paginationNav: 'Puslapių navigacija',
+      paginationPrev: 'Atgal',
+      paginationNext: 'Pirmyn',
+      paginationPageOf: '{page} / {totalPages}',
       day: 'd.',
       days: 'dienų',
       total: 'Iš viso',
@@ -296,6 +306,7 @@ export const translations = {
     selectFiles: 'Pasirinkti failus',
     filesSelected: 'failų pasirinkta',
     uploadButton: 'Įkelti nuotraukas',
+    uploadButtonWithCount: 'Įkelti ({count})',
     currentImages: 'Dabartinės nuotraukos',
     noImagesUploaded: 'Nuotraukos dar neįkeltos',
     setAsMain: 'Nustatyti kaip pagrindinę',
@@ -409,6 +420,7 @@ export const translations = {
     itemsPerPage: 'Elementų puslapyje',
     rowsPerPage: 'Eilučių puslapyje',
     showingXofY: 'Rodoma {current} iš {total}',
+    showingRangeFromTo: 'Rodoma {from}–{to} iš {total}',
     all: 'Visi',
     
     // User Dashboard / My Reservations
@@ -679,6 +691,7 @@ export const translations = {
         seasonalNamePlaceholder: 'pvz., Vasaros nuolaida 2024',
         multiplierExplanation: 'Daugiklis 1.0 = jokio pasikeitimo. Mažiau nei 1.0 = nuolaida. Daugiau nei 1.0 = kainų padidėjimas.',
         noDataYet: 'Duomenų dar nėra. Analitika skaičiuojama iš užbaigtų sutarčių pasirinktame laikotarpyje.',
+        validPeriod: 'Datų intervalas',
         validPeriodNote: 'Laikotarpis: nuo {start} iki {end}',
         validation: {
           nameRequired: 'Pavadinimas yra privalomas.',
@@ -779,6 +792,7 @@ export const translations = {
     priceDesc: 'Price: High to Low',
     salePriceAsc: 'Sale Price: Low to High',
     salePriceDesc: 'Sale Price: High to Low',
+    sortByPopularity: 'Popularity (rental demand)',
     available: 'Available',
     leased: 'Leased',
     occupiedToday: 'Occupied today',
@@ -838,6 +852,7 @@ export const translations = {
     electric: 'Electric',
     hybridHev: 'Hybrid (HEV)',
     hybridPhev: 'Hybrid (PHEV)',
+    petrolLpg: 'Petrol + LPG',
     
     // Body Types
     sedan: 'Sedan',
@@ -848,6 +863,8 @@ export const translations = {
     convertible: 'Convertible',
     van: 'Van',
     pickup: 'Pickup',
+    minibusPassenger: 'Minibus (passenger)',
+    minibusCargo: 'Minibus (cargo)',
     
     // Gearbox
     manual: 'Manual',
@@ -934,6 +951,12 @@ export const translations = {
       all: 'All',
       apply: 'Apply',
       clear: 'Clear',
+      selectDateRange: 'Select date range',
+      comboboxUseCustom: 'Use: {value}',
+      paginationNav: 'Pagination',
+      paginationPrev: 'Previous',
+      paginationNext: 'Next',
+      paginationPageOf: 'Page {page} of {totalPages}',
       day: 'day',
       days: 'days',
       total: 'Total',
@@ -1007,6 +1030,7 @@ export const translations = {
     selectFiles: 'Select Files',
     filesSelected: 'files selected',
     uploadButton: 'Upload',
+    uploadButtonWithCount: 'Upload ({count})',
     currentImages: 'Current Images',
     noImagesUploaded: 'No images uploaded yet',
     setAsMain: 'Set as main image',
@@ -1120,6 +1144,7 @@ export const translations = {
     itemsPerPage: 'Items per page',
     rowsPerPage: 'Rows per page',
     showingXofY: 'Showing {current} of {total}',
+    showingRangeFromTo: 'Showing {from}–{to} of {total}',
     all: 'All',
     
     // User Dashboard / My Reservations
@@ -1389,6 +1414,7 @@ export const translations = {
         seasonalNamePlaceholder: 'e.g., Summer Discount 2024',
         multiplierExplanation: 'Multiplier 1.0 = no change. Less than 1.0 = discount. More than 1.0 = price increase.',
         noDataYet: 'No pricing data yet. Analytics are calculated from completed contracts within the selected date range.',
+        validPeriod: 'Date range',
         validPeriodNote: 'Period: {start} to {end}',
         validation: {
           nameRequired: 'Name is required.',
@@ -1488,6 +1514,7 @@ export const translations = {
     priceDesc: 'Цена: по убыванию',
     salePriceAsc: 'Цена продажи: по возрастанию',
     salePriceDesc: 'Цена продажи: по убыванию',
+    sortByPopularity: 'По популярности (загрузка)',
     available: 'Доступен',
     leased: 'Арендован',
     occupiedToday: 'Занят сегодня',
@@ -1547,6 +1574,7 @@ export const translations = {
     electric: 'Электрический',
     hybridHev: 'Гибрид (HEV)',
     hybridPhev: 'Гибрид (PHEV)',
+    petrolLpg: 'Бензин + газ (LPG)',
     
     // Body Types
     sedan: 'Седан',
@@ -1557,6 +1585,8 @@ export const translations = {
     convertible: 'Кабриолет',
     van: 'Микроавтобус',
     pickup: 'Пикап',
+    minibusPassenger: 'Пассажирский микроавтобус',
+    minibusCargo: 'Грузовой микроавтобус',
     
     // Gearbox
     manual: 'Механическая',
@@ -1643,6 +1673,12 @@ export const translations = {
       all: 'Все',
       apply: 'Применить',
       clear: 'Очистить',
+      selectDateRange: 'Выберите диапазон дат',
+      comboboxUseCustom: 'Использовать: {value}',
+      paginationNav: 'Страницы',
+      paginationPrev: 'Назад',
+      paginationNext: 'Вперёд',
+      paginationPageOf: 'Страница {page} из {totalPages}',
       day: 'д.',
       days: 'дн.',
       total: 'Итого',
@@ -1716,6 +1752,7 @@ export const translations = {
     selectFiles: 'Выбрать файлы',
     filesSelected: 'файлов выбрано',
     uploadButton: 'Загрузить',
+    uploadButtonWithCount: 'Загрузить ({count})',
     currentImages: 'Текущие изображения',
     noImagesUploaded: 'Изображения еще не загружены',
     setAsMain: 'Установить как главное',
@@ -1828,6 +1865,7 @@ export const translations = {
     itemsPerPage: 'Элементов на странице',
     rowsPerPage: 'Строк на странице',
     showingXofY: 'Показано {current} из {total}',
+    showingRangeFromTo: 'Показано {from}–{to} из {total}',
     all: 'Все',
     
     // User Dashboard / My Reservations
@@ -2099,6 +2137,7 @@ export const translations = {
         seasonalNamePlaceholder: 'напр., Летняя скидка 2024',
         multiplierExplanation: 'Множитель 1.0 = без изменений. Меньше 1.0 = скидка. Больше 1.0 = увеличение цены.',
         noDataYet: 'Данных пока нет. Аналитика рассчитывается из завершенных контрактов в выбранном диапазоне дат.',
+        validPeriod: 'Диапазон дат',
         validPeriodNote: 'Период: с {start} по {end}',
         validation: {
           nameRequired: 'Название обязательно.',

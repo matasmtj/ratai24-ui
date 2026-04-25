@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../../components/ui/Card';
@@ -24,6 +24,9 @@ import {
   XMarkIcon, 
   EyeIcon 
 } from '@heroicons/react/24/outline';
+import { PaginationBar } from '../../components/ui/PaginationBar';
+import { slicePage, visibleRange } from '../../lib/pagination';
+import { useScrollToTopOnPageChange } from '../../hooks/useScrollToTopOnPageChange';
 
 export function AdminPartsPage() {
   const queryClient = useQueryClient();
@@ -40,6 +43,8 @@ export function AdminPartsPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('');
   const [rowsPerPage, setRowsPerPage] = useState<number>(3);
+  const [page, setPage] = useState(1);
+  const listAnchorRef = useRef<HTMLDivElement>(null);
   const [lightboxPartId, setLightboxPartId] = useState<number | null>(null);
   const [lightboxImageIndex, setLightboxImageIndex] = useState(0);
 
@@ -99,11 +104,20 @@ export function AdminPartsPage() {
 
   const hasActiveFilters = searchTerm || makeFilter || modelFilter || yearFilter || conditionFilter || categoryFilter || sortBy;
 
-  const paginatedParts = useMemo(() => {
-    const partsPerRow = 3;
-    const totalParts = rowsPerPage === -1 ? filteredAndSortedParts.length : rowsPerPage * partsPerRow;
-    return filteredAndSortedParts.slice(0, totalParts);
-  }, [filteredAndSortedParts, rowsPerPage]);
+  const partsPerRow = 3;
+  const list = filteredAndSortedParts;
+  const pageSize = rowsPerPage === -1 ? -1 : rowsPerPage * partsPerRow;
+
+  const paginatedParts = useMemo(
+    () => slicePage(list, page, pageSize),
+    [list, page, pageSize]
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, makeFilter, modelFilter, yearFilter, conditionFilter, categoryFilter, sortBy, rowsPerPage]);
+
+  useScrollToTopOnPageChange(page, listAnchorRef);
 
   const deleteMutation = useMutation({
     mutationFn: partsApi.delete,
@@ -282,10 +296,19 @@ export function AdminPartsPage() {
         </div>
       ) : filteredAndSortedParts && filteredAndSortedParts.length > 0 ? (
         <>
+          <div ref={listAnchorRef} className="h-0" aria-hidden />
           <div className="mb-6 text-gray-600">
-            {t('showingXofY')
-              .replace('{current}', paginatedParts.length.toString())
-              .replace('{total}', filteredAndSortedParts.length.toString())}
+            {rowsPerPage === -1
+              ? t('showingXofY')
+                  .replace('{current}', paginatedParts.length.toString())
+                  .replace('{total}', list.length.toString())
+              : (() => {
+                  const { from, to } = visibleRange(page, pageSize, list.length, paginatedParts.length);
+                  return t('showingRangeFromTo')
+                    .replace('{from}', from ? String(from) : '0')
+                    .replace('{to}', to ? String(to) : '0')
+                    .replace('{total}', String(list.length));
+                })()}
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {paginatedParts.map((part) => {
@@ -362,6 +385,15 @@ export function AdminPartsPage() {
             </Card>
           )})}
         </div>
+        {rowsPerPage !== -1 && (
+          <PaginationBar
+            page={page}
+            pageSize={pageSize}
+            totalItems={list.length}
+            onPageChange={setPage}
+            className="mt-4"
+          />
+        )}
         </>
       ) : (
         <Card className="p-12 text-center">

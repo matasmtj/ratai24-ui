@@ -468,7 +468,7 @@ export function AdminPricingRulesPage() {
           />
 
           <DateRangePicker
-            label={t('pricing.admin.validPeriod') || `${t('common.startDate')} - ${t('common.endDate')}`}
+            label={t('pricing.admin.validPeriod')}
             startDate={formData.startDate}
             endDate={formData.endDate}
             onChange={(startDate, endDate) => setFormData({ ...formData, startDate, endDate })}

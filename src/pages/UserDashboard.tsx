@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Layout } from '../components/Layout';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
@@ -19,12 +19,17 @@ import {
 import { format } from 'date-fns';
 import { useLanguage } from '../contexts/useLanguage';
 import { useAuth } from '../contexts/AuthContext';
+import { PaginationBar } from '../components/ui/PaginationBar';
+import { slicePage, visibleRange } from '../lib/pagination';
+import { useScrollToTopOnPageChange } from '../hooks/useScrollToTopOnPageChange';
 
 export function UserDashboard() {
   const queryClient = useQueryClient();
   const { t } = useLanguage();
   const { isAuthenticated, role } = useAuth();
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [page, setPage] = useState(1);
+  const listAnchorRef = useRef<HTMLDivElement>(null);
   const accessToken = localStorage.getItem('accessToken');
 
   const { data: contracts, isLoading, error, isError } = useQuery({
@@ -43,11 +48,19 @@ export function UserDashboard() {
     },
   });
 
-  const paginatedContracts = useMemo(() => {
-    if (!contracts) return [];
-    if (itemsPerPage === -1) return contracts;
-    return contracts.slice(0, itemsPerPage);
-  }, [contracts, itemsPerPage]);
+  const list = contracts ?? [];
+  const pageSize = itemsPerPage === -1 ? -1 : itemsPerPage;
+
+  const paginatedContracts = useMemo(
+    () => slicePage(list, page, pageSize),
+    [list, page, pageSize]
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [itemsPerPage]);
+
+  useScrollToTopOnPageChange(page, listAnchorRef);
 
   const getStatusBadge = (state: string) => {
     const styles = {
@@ -119,9 +132,17 @@ export function UserDashboard() {
 
         {contracts && contracts.length > 0 && (
           <div className="mb-4 text-sm text-gray-600">
-            {t('showingXofY')
-              .replace('{current}', paginatedContracts.length.toString())
-              .replace('{total}', contracts.length.toString())}
+            {itemsPerPage === -1
+              ? t('showingXofY')
+                  .replace('{current}', paginatedContracts.length.toString())
+                  .replace('{total}', list.length.toString())
+              : (() => {
+                  const { from, to } = visibleRange(page, pageSize, list.length, paginatedContracts.length);
+                  return t('showingRangeFromTo')
+                    .replace('{from}', from ? String(from) : '0')
+                    .replace('{to}', to ? String(to) : '0')
+                    .replace('{total}', String(list.length));
+                })()}
           </div>
         )}
 
@@ -142,6 +163,7 @@ export function UserDashboard() {
           </Card>
         ) : contracts && contracts.length > 0 ? (
           <div className="space-y-4">
+            <div ref={listAnchorRef} className="h-0" aria-hidden />
             {paginatedContracts.map((contract) => (
               <ContractCard
                 key={contract.id}
@@ -156,6 +178,15 @@ export function UserDashboard() {
                 getStatusText={getStatusText}
               />
             ))}
+            {itemsPerPage !== -1 && (
+              <PaginationBar
+                page={page}
+                pageSize={pageSize}
+                totalItems={list.length}
+                onPageChange={setPage}
+                className="mt-2"
+              />
+            )}
           </div>
         ) : (
           <Card className="p-12 text-center">

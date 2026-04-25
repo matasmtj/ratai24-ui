@@ -3,6 +3,7 @@ import type { FuelType, BodyType, Gearbox } from '../types/api';
 export function getFuelTypeKey(fuelType: FuelType): string {
   const map: Record<FuelType, string> = {
     PETROL: 'petrol',
+    PETROL_LPG: 'petrolLpg',
     DIESEL: 'diesel',
     ELECTRIC: 'electric',
     HYBRID_HEV: 'hybridHev',
@@ -21,6 +22,8 @@ export function getBodyTypeKey(bodyType: BodyType): string {
     CONVERTIBLE: 'convertible',
     VAN: 'van',
     PICKUP: 'pickup',
+    MINIBUS_PASSENGER: 'minibusPassenger',
+    MINIBUS_CARGO: 'minibusCargo',
   };
   return map[bodyType] || bodyType;
 }

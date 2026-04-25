@@ -35,10 +35,18 @@ export function DateRangePicker({
     return 'en-US';
   }, [language]);
 
-  const calendarValue: [Date, Date] | undefined = useMemo(() => {
-    if (!startDate || !endDate) return undefined;
-    return [new Date(`${startDate}T12:00:00`), new Date(`${endDate}T12:00:00`)];
+  const calendarValue: [Date, Date] | [Date, null] | undefined = useMemo(() => {
+    if (!startDate) return undefined;
+    const start = new Date(`${startDate}T12:00:00`);
+    if (!endDate) return [start, null];
+    return [start, new Date(`${endDate}T12:00:00`)];
   }, [startDate, endDate]);
+
+  const rangeDisplay = useMemo(() => {
+    if (startDate && endDate) return `${startDate} – ${endDate}`;
+    if (startDate) return `${startDate} – …`;
+    return t('common.selectDateRange');
+  }, [startDate, endDate, t]);
 
   const handleSelect: CalendarProps['onChange'] = (value) => {
     if (!value || !Array.isArray(value)) return;
@@ -47,6 +55,7 @@ export function DateRangePicker({
     const startIso = toIsoDate(start);
     const endIso = end ? toIsoDate(end) : '';
     onChange(startIso, endIso);
+    if (end) setIsOpen(false);
   };
 
   return (
@@ -55,22 +64,13 @@ export function DateRangePicker({
         {label}
         {required && <span className="text-red-500 ml-1">*</span>}
       </label>
-      <div className="grid grid-cols-2 gap-2">
-        <input
-          readOnly
-          value={startDate}
-          placeholder="YYYY-MM-DD"
-          onClick={() => setIsOpen(true)}
-          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 cursor-pointer"
-        />
-        <input
-          readOnly
-          value={endDate}
-          placeholder="YYYY-MM-DD"
-          onClick={() => setIsOpen(true)}
-          className="block w-full rounded-lg border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-400 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 cursor-pointer"
-        />
-      </div>
+      <button
+        type="button"
+        onClick={() => setIsOpen((o) => !o)}
+        className="block w-full text-left rounded-lg border border-gray-300 px-3 py-2 text-gray-900 focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500 cursor-pointer bg-white"
+      >
+        {rangeDisplay}
+      </button>
       <div className="flex justify-end">
         <button
           type="button"

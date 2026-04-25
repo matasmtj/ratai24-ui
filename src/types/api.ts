@@ -1,8 +1,24 @@
 // API Types generated from OpenAPI spec
 
-export type FuelType = 'PETROL' | 'DIESEL' | 'ELECTRIC' | 'HYBRID_HEV' | 'HYBRID_PHEV';
+export type FuelType =
+  | 'PETROL'
+  | 'PETROL_LPG'
+  | 'DIESEL'
+  | 'ELECTRIC'
+  | 'HYBRID_HEV'
+  | 'HYBRID_PHEV';
 export type Gearbox = 'MANUAL' | 'AUTOMATIC';
-export type BodyType = 'SEDAN' | 'HATCHBACK' | 'SUV' | 'WAGON' | 'COUPE' | 'CONVERTIBLE' | 'VAN' | 'PICKUP';
+export type BodyType =
+  | 'SEDAN'
+  | 'HATCHBACK'
+  | 'SUV'
+  | 'WAGON'
+  | 'COUPE'
+  | 'CONVERTIBLE'
+  | 'VAN'
+  | 'PICKUP'
+  | 'MINIBUS_PASSENGER'
+  | 'MINIBUS_CARGO';
 export type CarState = 'AVAILABLE' | 'LEASED' | 'MAINTENANCE';
 export type ContractState = 'DRAFT' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 export type UserRole = 'USER' | 'ADMIN';
@@ -68,6 +84,8 @@ export interface Car {
   maxPricePerDay?: number;
   applyUtilizationPricing?: boolean;
   utilizationMultiplierOverride?: number | null;
+  /** From API; used for “popularity” sort (rental utilization) */
+  utilizationRate?: number | null;
 }
 
 export interface CarCreate {

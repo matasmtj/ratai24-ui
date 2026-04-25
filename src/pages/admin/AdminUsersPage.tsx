@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -12,6 +12,9 @@ import { useLanguage } from '../../contexts/useLanguage';
 import { usersApi } from '../../api/users';
 import type { User, UserCreate, UserAdminUpdate } from '../../types/api';
 import { PlusIcon, PencilIcon, TrashIcon, UserIcon } from '@heroicons/react/24/outline';
+import { PaginationBar } from '../../components/ui/PaginationBar';
+import { slicePage, visibleRange } from '../../lib/pagination';
+import { useScrollToTopOnPageChange } from '../../hooks/useScrollToTopOnPageChange';
 
 export function AdminUsersPage() {
   const queryClient = useQueryClient();
@@ -21,6 +24,9 @@ export function AdminUsersPage() {
   const [deleteUserId, setDeleteUserId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState<string>('');
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+  const [page, setPage] = useState(1);
+  const listAnchorRef = useRef<HTMLDivElement>(null);
 
   const { data: users, isLoading } = useQuery({
     queryKey: ['users'],
@@ -38,6 +44,18 @@ export function AdminUsersPage() {
       return matchesSearch && matchesRole;
     });
   }, [users, searchTerm, roleFilter]);
+
+  const pageSize = itemsPerPage === -1 ? -1 : itemsPerPage;
+  const pagedUsers = useMemo(
+    () => slicePage(filteredUsers, page, pageSize),
+    [filteredUsers, page, pageSize]
+  );
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchTerm, roleFilter, itemsPerPage]);
+
+  useScrollToTopOnPageChange(page, listAnchorRef);
 
   const deleteMutation = useMutation({
     mutationFn: usersApi.deleteUser,
@@ -93,6 +111,21 @@ export function AdminUsersPage() {
             ]}
           />
         </div>
+        <div className="flex items-center gap-2 mt-4 pt-4 border-t">
+          <label className="text-sm font-medium text-gray-700 whitespace-nowrap">{t('itemsPerPage')}:</label>
+          <div className="w-28">
+            <Select
+              value={itemsPerPage.toString()}
+              onChange={(e) => setItemsPerPage(Number(e.target.value))}
+              options={[
+                { value: '10', label: '10' },
+                { value: '20', label: '20' },
+                { value: '50', label: '50' },
+                { value: '-1', label: t('all') },
+              ]}
+            />
+          </div>
+        </div>
       </Card>
 
       {/* Users List */}
@@ -101,8 +134,27 @@ export function AdminUsersPage() {
           <LoadingSpinner size="lg" />
         </div>
       ) : filteredUsers && filteredUsers.length > 0 ? (
+        <>
+        <div ref={listAnchorRef} className="h-0" aria-hidden />
+        {itemsPerPage === -1 ? (
+          <div className="mb-4 text-sm text-gray-600">
+            {t('showingXofY')
+              .replace('{current}', String(pagedUsers.length))
+              .replace('{total}', String(filteredUsers.length))}
+          </div>
+        ) : (
+          <div className="mb-4 text-sm text-gray-600">
+            {(() => {
+              const { from, to } = visibleRange(page, pageSize, filteredUsers.length, pagedUsers.length);
+              return t('showingRangeFromTo')
+                .replace('{from}', from ? String(from) : '0')
+                .replace('{to}', to ? String(to) : '0')
+                .replace('{total}', String(filteredUsers.length));
+            })()}
+          </div>
+        )}
         <div className="grid grid-cols-1 gap-4">
-          {filteredUsers.map((user) => (
+          {pagedUsers.map((user) => (
             <Card key={user.id} className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -158,6 +210,16 @@ export function AdminUsersPage() {
             </Card>
           ))}
         </div>
+        {itemsPerPage !== -1 && (
+          <PaginationBar
+            page={page}
+            pageSize={pageSize}
+            totalItems={filteredUsers.length}
+            onPageChange={setPage}
+            className="mt-4"
+          />
+        )}
+        </>
       ) : (
         <Card className="p-12 text-center">
           <UserIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
