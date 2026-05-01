@@ -469,14 +469,14 @@ export function CarDetailPage() {
           />
 
           {/* Loyalty Badge for authenticated users */}
-          {isAuthenticated && role === 'USER' && car.useDynamicPricing && (
+          {isAuthenticated && role === 'USER' && (
             <div className="pt-2">
               <LoyaltyBadge />
             </div>
           )}
 
-          {/* Dynamic pricing preview */}
-          {car.useDynamicPricing && bookingData.startDate && bookingData.endDate && bookingData.startTime && bookingData.endTime && (() => {
+          {/* Price preview (dynamic and fixed-rate; loyalty shown in breakdown when applicable) */}
+          {bookingData.startDate && bookingData.endDate && bookingData.startTime && bookingData.endTime && (() => {
             // Construct full ISO datetime strings for price calculation
             const startDateTime = new Date(`${bookingData.startDate}T${bookingData.startTime.padStart(2, '0')}:00:00`);
             const endDateTime = new Date(`${bookingData.endDate}T${bookingData.endTime.padStart(2, '0')}:00:00`);

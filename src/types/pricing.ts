@@ -11,6 +11,13 @@ export interface PriceMultipliers {
 export interface PriceBreakdown {
   base: number;
   multipliers: PriceMultipliers;
+  dynamicPrice?: number;
+  constraints?: { min: number; max: number; applied: boolean };
+  rules?: Array<{
+    name: string;
+    description?: string;
+    adjustment: number;
+  }>;
 }
 
 export interface PriceCalculation {

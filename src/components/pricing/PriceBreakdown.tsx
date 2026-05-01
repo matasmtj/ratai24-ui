@@ -71,6 +71,25 @@ export function PriceBreakdown({ breakdown, pricePerDay, totalPrice, duration }:
           ))}
         </div>
 
+        {breakdown.rules && breakdown.rules.length > 0 ? (
+          <div className="space-y-2 pt-3 border-t">
+            <p className="text-sm font-medium text-gray-700">
+              {t('pricing.breakdown.ruleAdjustments')}
+            </p>
+            {breakdown.rules.map((rule) => (
+              <div
+                key={`${rule.name}-${rule.adjustment}`}
+                className="flex justify-between items-center text-sm pl-4"
+              >
+                <span className="text-gray-600">{rule.name}</span>
+                <span className={rule.adjustment <= 0 ? 'text-green-600 font-medium' : 'text-red-600 font-medium'}>
+                  {rule.adjustment > 0 ? '+' : ''}€{rule.adjustment.toFixed(2)}/{t('common.day')}
+                </span>
+              </div>
+            ))}
+          </div>
+        ) : null}
+
         <div className="flex justify-between items-center pt-3 border-t">
           <span className="font-medium">{t('pricing.breakdown.finalPrice')}</span>
           <span className="font-bold text-lg">€{pricePerDay.toFixed(2)}/{t('common.day')}</span>
