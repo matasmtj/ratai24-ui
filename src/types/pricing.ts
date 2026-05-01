@@ -26,6 +26,8 @@ export interface PriceCalculation {
   totalPrice: number;
   duration: number;
   breakdown: PriceBreakdown;
+  /** When false, pricing uses fixed listing + optional loyalty only (no demand/seasonal stack). */
+  isDynamic?: boolean;
 }
 
 export interface PricePreview {

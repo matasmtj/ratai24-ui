@@ -8,10 +8,66 @@ interface PriceBreakdownProps {
   pricePerDay: number;
   totalPrice: number;
   duration: number;
+  /** Cars with fixed daily pricing: show a short summary instead of the full multiplier grid. */
+  isDynamic?: boolean;
 }
 
-export function PriceBreakdown({ breakdown, pricePerDay, totalPrice, duration }: PriceBreakdownProps) {
+export function PriceBreakdown({
+  breakdown,
+  pricePerDay,
+  totalPrice,
+  duration,
+  isDynamic = true,
+}: PriceBreakdownProps) {
   const { t } = useLanguage();
+
+  const loyaltyMult = breakdown.multipliers.customer;
+
+  if (!isDynamic) {
+    const loyaltyPct =
+      loyaltyMult < 1 - 1e-6 ? Math.round((1 - loyaltyMult) * 1000) / 10 : 0;
+
+    return (
+      <Card className="p-4">
+        <h3 className="text-lg font-semibold mb-2">{t('pricing.breakdown.fixedTitle')}</h3>
+        <p className="text-sm text-gray-500 mb-4">{t('pricing.breakdown.fixedHint')}</p>
+
+        <div className="space-y-3">
+          <div className="flex justify-between items-center pb-3 border-b">
+            <span className="text-gray-600">{t('pricing.breakdown.listedDailyRate')}</span>
+            <span className="font-medium">€{breakdown.base.toFixed(2)}/{t('common.day')}</span>
+          </div>
+
+          {loyaltyPct > 0 ? (
+            <div className="flex justify-between items-center pb-3 border-b text-sm">
+              <div className="flex items-center gap-1.5 group relative max-w-[70%]">
+                <span className="text-gray-600">{t('pricing.multipliers.customer')}</span>
+                <QuestionMarkCircleIcon className="h-4 w-4 text-gray-400 shrink-0 hover:text-gray-600 cursor-help" />
+                <div className="absolute left-0 bottom-full mb-2 hidden group-hover:block z-10 w-64 p-2 bg-gray-900 text-white text-xs rounded shadow-lg">
+                  {t('pricing.multipliersHelp.customer' as any)}
+                </div>
+              </div>
+              <span className="text-green-600 font-medium">
+                −{loyaltyPct.toFixed(loyaltyPct % 1 === 0 ? 0 : 1)}%
+              </span>
+            </div>
+          ) : null}
+
+          <div className="flex justify-between items-center pt-3 border-t">
+            <span className="font-medium">{t('pricing.breakdown.finalPrice')}</span>
+            <span className="font-bold text-lg">€{pricePerDay.toFixed(2)}/{t('common.day')}</span>
+          </div>
+
+          <div className="flex justify-between items-center pt-2 border-t-2 border-gray-300">
+            <span className="font-semibold text-lg">
+              {t('pricing.breakdown.total')} ({duration} {t('common.days')})
+            </span>
+            <span className="font-bold text-xl text-primary-600">€{totalPrice.toFixed(2)}</span>
+          </div>
+        </div>
+      </Card>
+    );
+  }
 
   const multipliers = [
     { key: 'demand', label: t('pricing.multipliers.demand'), value: breakdown.multipliers.demand },

@@ -100,6 +100,7 @@ export function PricePreviewWidget({
           pricePerDay={price.pricePerDay}
           totalPrice={price.totalPrice}
           duration={price.duration}
+          isDynamic={price.isDynamic !== false}
         />
       )}
     </div>
