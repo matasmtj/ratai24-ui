@@ -29,8 +29,7 @@ export function PriceBreakdown({
 
     return (
       <Card className="p-4">
-        <h3 className="text-lg font-semibold mb-2">{t('pricing.breakdown.fixedTitle')}</h3>
-        <p className="text-sm text-gray-500 mb-4">{t('pricing.breakdown.fixedHint')}</p>
+        <h3 className="text-lg font-semibold mb-4">{t('pricing.breakdown.fixedTitle')}</h3>
 
         <div className="space-y-3">
           <div className="flex justify-between items-center pb-3 border-b">

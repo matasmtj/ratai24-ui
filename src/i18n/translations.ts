@@ -576,8 +576,6 @@ export const translations = {
         total: 'Viso',
         ruleAdjustments: 'Kainos taisyklės',
         fixedTitle: 'Fiksuota paros kaina',
-        fixedHint:
-          'Šiam automobiliui netaikomos paklausai ar sezonui pagrįstos kainos korekcijos.',
         listedDailyRate: 'Skelbiamas tarifas už parą',
       },
       multipliers: {
@@ -1305,7 +1303,6 @@ export const translations = {
         total: 'Total',
         ruleAdjustments: 'Pricing rules',
         fixedTitle: 'Fixed daily rate',
-        fixedHint: 'Demand-based and seasonal adjustments do not apply to this car.',
         listedDailyRate: 'Listed daily rate',
       },
       multipliers: {
@@ -2031,8 +2028,6 @@ export const translations = {
         total: 'Итого',
         ruleAdjustments: 'Правила ценообразования',
         fixedTitle: 'Фиксированная суточная ставка',
-        fixedHint:
-          'Для этого автомобиля не применяются корректировки по спросу и сезону.',
         listedDailyRate: 'Объявленная ставка за сутки',
       },
       multipliers: {
