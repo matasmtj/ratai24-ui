@@ -272,23 +272,10 @@ export function PrivacyPolicyPage() {
   const activeLanguage = language === 'en' || language === 'ru' ? language : 'lt';
   const content = contentByLanguage[activeLanguage];
   const withEmail = (text: string) => text.replaceAll('{email}', contactEmail);
-  const renderParagraphWithEmail = (text: string, className = 'text-gray-700') => {
-    const parts = withEmail(text).split(contactEmail);
-    return (
-      <p className={className}>
-        {parts.map((part, index) => (
-          <span key={`${part}-${index}`}>
-            {part}
-            {index < parts.length - 1 && (
-              <a className="text-primary-600" href={`mailto:${contactEmail}`}>
-                {contactEmail}
-              </a>
-            )}
-          </span>
-        ))}
-      </p>
-    );
-  };
+  /** Email as plain text (no mailto) so it matches body styling and is not link-styled. */
+  const renderParagraphWithEmail = (text: string, className = 'text-gray-700') => (
+    <p className={className}>{withEmail(text)}</p>
+  );
 
   return (
     <Layout>
