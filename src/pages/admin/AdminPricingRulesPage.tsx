@@ -91,7 +91,13 @@ export function AdminPricingRulesPage() {
       setPriorityInput(String(rule.priority ?? 10));
       setFixedPriceInput(rule.fixedPrice != null ? String(rule.fixedPrice) : '');
       setMultiplierInput(rule.multiplier != null ? String(rule.multiplier) : '');
-      setSelectedCarIds(rule.carId ? [rule.carId] : []);
+      setSelectedCarIds(
+        rule.carIds?.length
+          ? rule.carIds
+          : rule.carId
+            ? [rule.carId]
+            : []
+      );
     } else {
       setEditingRule(null);
       setFormData({
@@ -170,36 +176,22 @@ export function AdminPricingRulesPage() {
         multiplier: parsedMultiplier,
       };
 
+      const scopePayload =
+        selectedCarIds.length > 0
+          ? { carIds: selectedCarIds, carId: undefined }
+          : { carIds: [], carId: undefined };
+
       if (editingRule) {
-        const ids = selectedCarIds.length > 0 ? selectedCarIds : [undefined];
         await pricingApi.updatePricingRule(editingRule.id, {
           ...basePayload,
-          carId: ids[0],
+          ...scopePayload,
         });
-        if (ids.length > 1) {
-          await Promise.all(
-            ids.slice(1).map((carId) =>
-              pricingApi.createPricingRule({
-                ...basePayload,
-                carId,
-              })
-            )
-          );
-        }
         setSuccessMessage(t('pricing.admin.ruleUpdated'));
       } else {
-        if (selectedCarIds.length === 0) {
-          await pricingApi.createPricingRule({ ...basePayload, carId: undefined });
-        } else {
-          await Promise.all(
-            selectedCarIds.map((carId) =>
-              pricingApi.createPricingRule({
-                ...basePayload,
-                carId,
-              })
-            )
-          );
-        }
+        await pricingApi.createPricingRule({
+          ...basePayload,
+          ...scopePayload,
+        });
         setSuccessMessage(t('pricing.admin.ruleCreated'));
       }
       handleCloseModal();
@@ -276,7 +268,22 @@ export function AdminPricingRulesPage() {
                   )}
 
                   <div className="grid grid-cols-2 gap-4 text-sm">
-                    {rule.carId && (
+                    {rule.carIds && rule.carIds.length > 0 && (
+                      <div className="col-span-2">
+                        <span className="text-gray-500">{t('carLabel')}: </span>
+                        <span className="font-medium">
+                          {rule.carIds.length} {t('cars')}
+                          {' — '}
+                          {rule.carIds
+                            .map((id) => {
+                              const c = cars.find((car) => car.id === id);
+                              return c ? `${c.make} ${c.model}` : `#${id}`;
+                            })
+                            .join(', ')}
+                        </span>
+                      </div>
+                    )}
+                    {rule.carId && !(rule.carIds && rule.carIds.length > 0) && (
                       <div>
                         <span className="text-gray-500">{t('carLabel')}: </span>
                         <span className="font-medium">

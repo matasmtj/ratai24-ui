@@ -123,6 +123,8 @@ export interface PricingRule {
   name: string;
   description?: string;
   carId?: number;
+  /** Cars linked via junction table (multi-car rule). */
+  carIds?: number[];
   cityId?: number;
   startDate?: string;
   endDate?: string;
@@ -137,6 +139,7 @@ export interface PricingRuleCreate {
   name: string;
   description?: string;
   carId?: number;
+  carIds?: number[];
   cityId?: number;
   startDate?: string;
   endDate?: string;
