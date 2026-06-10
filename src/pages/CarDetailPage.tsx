@@ -12,6 +12,7 @@ import { PricePreviewWidget } from '../components/pricing/PricePreviewWidget';
 import { DemandIndicator } from '../components/pricing/DemandIndicator';
 import { LoyaltyBadge } from '../components/pricing/LoyaltyBadge';
 import { carsApi, normalizeCarContractsCalendar } from '../api/cars';
+import { sortImagesByOrder } from '../lib/sortImages';
 import { citiesApi } from '../api/cities';
 import { usersApi } from '../api/users';
 import { useAuth } from '../contexts/AuthContext';
@@ -111,7 +112,7 @@ export function CarDetailPage() {
         notes: bookingData.notes || undefined,
       };
 
-      await contractsApi.create(contractData);
+      const created = await contractsApi.create(contractData);
       
       // Invalidate queries to refresh data
       await queryClient.invalidateQueries({ queryKey: ['my-contracts'] });
@@ -119,7 +120,7 @@ export function CarDetailPage() {
       await queryClient.invalidateQueries({ queryKey: ['admin-contracts'] });
       
       setIsBookingModalOpen(false);
-      navigate('/dashboard');
+      navigate('/dashboard', { state: { reservationCreated: true, contractId: created.id } });
     } catch (error) {
       console.error('Booking error:', error);
       const apiError = (error as any)?.response?.data?.error;
@@ -179,7 +180,7 @@ export function CarDetailPage() {
   if (!car) return <div>{t('carNotFound')}</div>;
   const canBookThisCar = car.availableForLease !== false && car.state !== 'MAINTENANCE';
 
-  const carImages = car.images || [];
+  const carImages = sortImagesByOrder(car.images || []);
   const currentImage = carImages[currentImageIndex];
 
   const nextImage = () => {

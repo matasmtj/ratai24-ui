@@ -93,20 +93,7 @@ export function ContactsPage() {
           </Card>
         </div>
 
-        {(contact.companyName || contact.companyCode || contact.bankAccount || contact.companyEmail || contact.mainAddress) && (
-          <Card className="p-8 mb-8">
-            <h2 className="text-2xl font-bold mb-4">{t('rekvizitai')}</h2>
-            <div className="space-y-2 text-gray-700">
-              {contact.companyName && <div><span className="text-gray-500">{t('companyName')}:</span> <b>{contact.companyName}</b></div>}
-              {contact.companyCode && <div><span className="text-gray-500">{t('companyCode')}:</span> <b>{contact.companyCode}</b></div>}
-              {contact.bankAccount && <div><span className="text-gray-500">{t('bankAccount')}:</span> <b>{contact.bankAccount}</b></div>}
-              {contact.companyEmail && <div><span className="text-gray-500">{t('companyEmail')}:</span> <b>{contact.companyEmail}</b></div>}
-              {contact.mainAddress && <div><span className="text-gray-500">{t('mainAddress')}:</span> <b>{contact.mainAddress}</b></div>}
-            </div>
-          </Card>
-        )}
-
-        <Card className="p-8">
+        <Card className="p-8 mb-8">
           <h2 className="text-2xl font-bold mb-4">{t('businessHours')}</h2>
           <div className="space-y-2 text-gray-600">
             <div className="flex justify-between">
@@ -119,6 +106,20 @@ export function ContactsPage() {
             </div>
           </div>
         </Card>
+
+        {(contact.companyName || contact.companyCode || contact.bankAccount || contact.companyEmail || contact.mainAddress) && (
+          <Card className="p-8" id="payment-details">
+            <h2 className="text-2xl font-bold mb-4">{t('rekvizitai')}</h2>
+            <p className="text-gray-600 mb-4">{t('depositPaymentDetailsHint')}</p>
+            <div className="space-y-2 text-gray-700">
+              {contact.companyName && <div><span className="text-gray-500">{t('companyName')}:</span> <b>{contact.companyName}</b></div>}
+              {contact.companyCode && <div><span className="text-gray-500">{t('companyCode')}:</span> <b>{contact.companyCode}</b></div>}
+              {contact.bankAccount && <div><span className="text-gray-500">{t('bankAccount')}:</span> <b>{contact.bankAccount}</b></div>}
+              {contact.companyEmail && <div><span className="text-gray-500">{t('companyEmail')}:</span> <b>{contact.companyEmail}</b></div>}
+              {contact.mainAddress && <div><span className="text-gray-500">{t('mainAddress')}:</span> <b>{contact.mainAddress}</b></div>}
+            </div>
+          </Card>
+        )}
       </div>
     </Layout>
   );

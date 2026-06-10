@@ -50,4 +50,19 @@ export const contractsApi = {
     const response = await api.post<Contract>(`/contracts/${id}/activate`);
     return response.data;
   },
+
+  confirmDeposit: async (id: number): Promise<Contract> => {
+    const response = await api.post<Contract>(`/contracts/${id}/confirm-deposit`);
+    return response.data;
+  },
+
+  acquireLock: async (id: number): Promise<Contract> => {
+    const response = await api.post<Contract>(`/contracts/${id}/lock`);
+    return response.data;
+  },
+
+  releaseLock: async (id: number): Promise<Contract> => {
+    const response = await api.delete<Contract>(`/contracts/${id}/lock`);
+    return response.data;
+  },
 };

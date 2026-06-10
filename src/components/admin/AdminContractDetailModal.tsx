@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { Modal } from '../ui/Modal';
 import { Button } from '../ui/Button';
@@ -9,8 +9,15 @@ import { Alert } from '../ui/Alert';
 import { useLanguage } from '../../contexts/useLanguage';
 import { contractsApi } from '../../api/contracts';
 import { carsApi, normalizeCarContractsCalendar } from '../../api/cars';
-import type { Contract, ContractUpdate, ContractComplete, Car } from '../../types/api';
+import type { Contract, ContractUpdate, ContractComplete, Car, ContractLockHolder } from '../../types/api';
 import { format } from 'date-fns';
+const LOCK_HEARTBEAT_MS = 90_000;
+
+function formatLockHolderName(holder: ContractLockHolder | null | undefined): string {
+  if (!holder) return '';
+  const name = [holder.firstName, holder.lastName].filter(Boolean).join(' ').trim();
+  return name || holder.email;
+}
 
 interface AdminContractDetailModalProps {
   isOpen: boolean;
@@ -20,6 +27,7 @@ interface AdminContractDetailModalProps {
 }
 
 type ModalMode = 'view' | 'edit' | 'complete';
+type LockState = 'acquiring' | 'held' | 'blocked';
 
 /** Local form state: allow empty numeric fields until submit (API still receives numbers). */
 type CompleteFormFields = {
@@ -39,6 +47,9 @@ export function AdminContractDetailModal({
   const queryClient = useQueryClient();
   const [mode, setMode] = useState<ModalMode>('view');
   const [error, setError] = useState<string | null>(null);
+  const [lockState, setLockState] = useState<LockState>('acquiring');
+  const [lockHolder, setLockHolder] = useState<ContractLockHolder | null>(null);
+  const readOnly = lockState === 'blocked';
   
   const [editFormData, setEditFormData] = useState<ContractUpdate>({
     startDate: contract.startDate,
@@ -71,6 +82,47 @@ export function AdminContractDetailModal({
     damageFee: '',
     notes: '',
   });
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let cancelled = false;
+
+    const acquire = async () => {
+      setLockState('acquiring');
+      setLockHolder(null);
+      try {
+        const updated = await contractsApi.acquireLock(contract.id);
+        if (cancelled) return;
+        Object.assign(contract, updated);
+        setLockState('held');
+      } catch (err: unknown) {
+        if (cancelled) return;
+        const axiosErr = err as { response?: { status?: number; data?: { details?: { lockedBy?: ContractLockHolder } } } };
+        const status = axiosErr?.response?.status;
+        if (status === 404 || status === 501) {
+          // Backend without lock endpoints yet — allow editing until deployed
+          setLockState('held');
+          return;
+        }
+        if (status === 409) {
+          setLockHolder(axiosErr.response.data?.details?.lockedBy ?? null);
+        }
+        setLockState('blocked');
+      }
+    };
+
+    acquire();
+    const heartbeat = window.setInterval(() => {
+      contractsApi.acquireLock(contract.id).catch(() => {});
+    }, LOCK_HEARTBEAT_MS);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(heartbeat);
+      contractsApi.releaseLock(contract.id).catch(() => {});
+    };
+  }, [isOpen, contract.id]);
 
   const { data: carCalendar } = useQuery({
     queryKey: ['car-contracts', contract.carId],
@@ -159,9 +211,15 @@ export function AdminContractDetailModal({
       setError(null);
       setMode('view');
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
       console.error('Update error:', error);
-      const errorMsg = error?.response?.data?.error || error?.response?.data?.message || t('errorUpdatingReservation');
+      const axiosErr = error as { response?: { status?: number; data?: { error?: string; message?: string; details?: { lockedBy?: ContractLockHolder } } } };
+      if (axiosErr?.response?.status === 409) {
+        setLockHolder(axiosErr.response.data?.details?.lockedBy ?? null);
+        setLockState('blocked');
+        setMode('view');
+      }
+      const errorMsg = axiosErr?.response?.data?.error || axiosErr?.response?.data?.message || t('errorUpdatingReservation');
       setError(`${t('errorUpdatingReservation')}: ${errorMsg}`);
     },
   });
@@ -189,12 +247,29 @@ export function AdminContractDetailModal({
     },
   });
 
+  const confirmDepositMutation = useMutation({
+    mutationFn: () => contractsApi.confirmDeposit(contract.id),
+    onSuccess: (updated) => {
+      Object.assign(contract, updated);
+      queryClient.invalidateQueries({ queryKey: ['admin-contracts'] });
+      setError(null);
+    },
+    onError: (error: unknown) => {
+      const axiosErr = error as { response?: { data?: { error?: string } } };
+      setError(axiosErr?.response?.data?.error || t('errorConfirmingDeposit'));
+    },
+  });
+
   const activateMutation = useMutation({
     mutationFn: contractsApi.activate,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['admin-contracts'] });
       setMode('view');
       onClose();
+    },
+    onError: (error: unknown) => {
+      const axiosErr = error as { response?: { data?: { error?: string } } };
+      setError(axiosErr?.response?.data?.error || t('errorActivatingReservation'));
     },
   });
 
@@ -275,7 +350,17 @@ export function AdminContractDetailModal({
     }
   };
 
+  const handleConfirmDeposit = () => {
+    if (window.confirm(t('confirmDepositPrompt'))) {
+      confirmDepositMutation.mutate();
+    }
+  };
+
   const handleActivate = () => {
+    if (!contract.depositConfirmed) {
+      setError(t('adminCannotActivateWithoutDeposit'));
+      return;
+    }
     if (window.confirm(t('confirmActivateReservation'))) {
       activateMutation.mutate(contract.id);
     }
@@ -283,6 +368,8 @@ export function AdminContractDetailModal({
 
   const handleModalClose = () => {
     setMode('view');
+    setLockState('acquiring');
+    setLockHolder(null);
     onClose();
   };
 
@@ -313,7 +400,55 @@ export function AdminContractDetailModal({
         {error && (
           <Alert type="error" message={error} onClose={() => setError(null)} />
         )}
+
+        {lockState === 'acquiring' && (
+          <Alert type="info" message={t('contractAcquiringLock')} />
+        )}
+
+        {readOnly && (
+          <Alert
+            type="warning"
+            message={t('contractEditLockedBy').replace(
+              '{name}',
+              formatLockHolderName(lockHolder) || t('contractLockConflict')
+            )}
+          />
+        )}
         
+        {/* Deposit status (DRAFT) */}
+        {contract.state === 'DRAFT' && (
+          <div
+            className={`rounded-lg border p-4 ${
+              contract.depositConfirmed
+                ? 'border-green-200 bg-green-50 text-green-900'
+                : 'border-amber-200 bg-amber-50 text-amber-900'
+            }`}
+          >
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="font-medium">
+                  {contract.depositConfirmed
+                    ? t('adminDepositConfirmed')
+                    : t('adminDepositNotConfirmed')}
+                </p>
+                {!contract.depositConfirmed && (
+                  <p className="text-sm mt-1">{t('adminDepositRequiredHint')}</p>
+                )}
+              </div>
+              {!readOnly && lockState === 'held' && !contract.depositConfirmed && mode === 'view' && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={handleConfirmDeposit}
+                  disabled={confirmDepositMutation.isPending}
+                >
+                  {t('adminConfirmDeposit')}
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Status Badge */}
         <div className="flex items-center justify-between">
           <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(mode === 'edit' ? editFormData.state! : contract.state)}`}>
@@ -534,12 +669,17 @@ export function AdminContractDetailModal({
         <div className="flex gap-3 pt-4 border-t">
           {mode === 'view' ? (
             <>
-              {contract.state === 'DRAFT' && (
-                <Button onClick={handleActivate} variant="primary">
+              {!readOnly && lockState === 'held' && contract.state === 'DRAFT' && (
+                <Button
+                  onClick={handleActivate}
+                  variant="primary"
+                  disabled={!contract.depositConfirmed || activateMutation.isPending}
+                  title={!contract.depositConfirmed ? t('adminCannotActivateWithoutDeposit') : undefined}
+                >
                   {t('activateReservation')}
                 </Button>
               )}
-              {(contract.state === 'DRAFT' || contract.state === 'ACTIVE') && (
+              {!readOnly && lockState === 'held' && (contract.state === 'DRAFT' || contract.state === 'ACTIVE') && (
                 <>
                   <Button onClick={handleEdit} variant="secondary">
                     {t('edit')}
@@ -558,7 +698,7 @@ export function AdminContractDetailModal({
                 {t('closeModal')}
               </Button>
             </>
-          ) : mode === 'edit' ? (
+          ) : mode === 'edit' && !readOnly ? (
             <>
               <Button onClick={handleSaveEdit} variant="primary" disabled={updateMutation.isPending}>
                 {t('save')}
@@ -567,7 +707,7 @@ export function AdminContractDetailModal({
                 {t('cancel')}
               </Button>
             </>
-          ) : (
+          ) : !readOnly ? (
             <>
               <Button onClick={handleSaveComplete} variant="primary" disabled={completeMutation.isPending}>
                 {t('completeReservation')}
@@ -576,6 +716,10 @@ export function AdminContractDetailModal({
                 {t('cancel')}
               </Button>
             </>
+          ) : (
+            <Button onClick={handleModalClose} variant="ghost" className="ml-auto">
+              {t('closeModal')}
+            </Button>
           )}
         </div>
       </div>

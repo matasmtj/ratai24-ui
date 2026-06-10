@@ -17,6 +17,8 @@ import type { Contract } from '../../types/api';
 import { PaginationBar } from '../../components/ui/PaginationBar';
 import { slicePage, visibleRange } from '../../lib/pagination';
 import { useScrollToTopOnPageChange } from '../../hooks/useScrollToTopOnPageChange';
+import { getCurrentUserId } from '../../lib/authToken';
+import type { ContractLockHolder } from '../../types/api';
 
 export function AdminContractsPage() {
   const { t } = useLanguage();
@@ -261,6 +263,9 @@ export function AdminContractsPage() {
                 <p className="text-sm text-blue-700 mt-1">
                   {t('pendingActivationHint')}
                 </p>
+                <p className="text-sm text-blue-700 mt-1">
+                  {t('pendingDepositHint')}
+                </p>
               </div>
               <div className="space-y-4">
                 {pendingDrafts
@@ -367,6 +372,12 @@ export function AdminContractsPage() {
   );
 }
 
+function formatLockHolderName(holder: ContractLockHolder | null | undefined): string {
+  if (!holder) return '';
+  const name = [holder.firstName, holder.lastName].filter(Boolean).join(' ').trim();
+  return name || holder.email;
+}
+
 function ContractCard({
   contract,
   getStatusBadge,
@@ -404,6 +415,13 @@ function ContractCard({
       ? 'border-2 border-blue-300 bg-blue-50'
       : '';
 
+  const currentUserId = getCurrentUserId();
+  const lockedByOther =
+    contract.editLockActive &&
+    contract.editLockedByUserId != null &&
+    currentUserId != null &&
+    Number(contract.editLockedByUserId) !== Number(currentUserId);
+
   return (
     <Card 
       className={`p-6 cursor-pointer hover:shadow-lg transition-shadow ${highlightClass}`}
@@ -419,6 +437,19 @@ function ContractCard({
               {getStatusIcon(contract.state)}
               <span className="ml-1">{getStateLabel(contract.state)}</span>
             </span>
+            {lockedByOther && (
+              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-900">
+                {t('contractEditLockedList').replace(
+                  '{name}',
+                  formatLockHolderName(contract.editLockedBy)
+                )}
+              </span>
+            )}
+            {contract.state === 'DRAFT' && !contract.depositConfirmed && (
+              <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-900">
+                {t('depositPendingBadge')}
+              </span>
+            )}
           </div>
           <div className="text-sm text-gray-600 space-y-1">
             <div>

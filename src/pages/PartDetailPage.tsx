@@ -9,6 +9,7 @@ import { ImageLightbox } from '../components/ui/ImageLightbox';
 import { partsApi } from '../api/parts';
 import { useLanguage } from '../contexts/useLanguage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
+import { sortImagesByOrder } from '../lib/sortImages';
 import { 
   WrenchScrewdriverIcon,
   TagIcon,
@@ -34,7 +35,7 @@ export function PartDetailPage() {
   if (isLoading) return <LoadingPage />;
   if (!part) return <div>{t('partNotFound')}</div>;
 
-  const partImages = part.images || [];
+  const partImages = sortImagesByOrder(part.images || []);
   const currentImage = partImages[currentImageIndex];
 
   const nextImage = () => {

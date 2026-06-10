@@ -1,10 +1,12 @@
+import { Fragment } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { ScrollToTop } from './components/ScrollToTop';
 import { LocaleLayout } from './components/LocaleLayout';
-import { DEFAULT_LANG } from './i18n/routes';
+import { DEFAULT_LANG, localizedPath } from './i18n/routes';
+import { getAllSlugsForRoute } from './i18n/routeSlugs';
 
 // Pages
 import { HomePage } from './pages/HomePage';
@@ -48,7 +50,7 @@ const queryClient = new QueryClient({
 function LegacyRedirect({ path }: { path: string }) {
   const { id } = useParams<{ id: string }>();
   const target = id ? `${path}/${id}` : path;
-  return <Navigate to={`/${DEFAULT_LANG}${target}`} replace />;
+  return <Navigate to={localizedPath(DEFAULT_LANG, target)} replace />;
 }
 
 function AppRoutes() {
@@ -57,33 +59,51 @@ function AppRoutes() {
       {/* Locale-prefixed public routes */}
       <Route path="/:lang" element={<LocaleLayout />}>
         <Route index element={<HomePage />} />
-        <Route path="rent-cars" element={<CarsPage />} />
-        <Route path="rent-cars/:id" element={<CarDetailPage />} />
-        <Route path="sale-cars" element={<CarSalePage />} />
-        <Route path="sale-cars/:id" element={<CarSaleDetailPage />} />
-        <Route path="parts" element={<PartsPage />} />
-        <Route path="parts/:id" element={<PartDetailPage />} />
-        <Route path="contacts" element={<ContactsPage />} />
-        <Route path="privacy-policy" element={<PrivacyPolicyPage />} />
-        <Route path="rental-terms" element={<RentalTermsPage />} />
+        {getAllSlugsForRoute('rent-cars').map((slug) => (
+          <Fragment key={`rent-cars-${slug}`}>
+            <Route path={slug} element={<CarsPage />} />
+            <Route path={`${slug}/:id`} element={<CarDetailPage />} />
+          </Fragment>
+        ))}
+        {getAllSlugsForRoute('sale-cars').map((slug) => (
+          <Fragment key={`sale-cars-${slug}`}>
+            <Route path={slug} element={<CarSalePage />} />
+            <Route path={`${slug}/:id`} element={<CarSaleDetailPage />} />
+          </Fragment>
+        ))}
+        {getAllSlugsForRoute('parts').map((slug) => (
+          <Fragment key={`parts-${slug}`}>
+            <Route path={slug} element={<PartsPage />} />
+            <Route path={`${slug}/:id`} element={<PartDetailPage />} />
+          </Fragment>
+        ))}
+        {getAllSlugsForRoute('contacts').map((slug) => (
+          <Route key={`contacts-${slug}`} path={slug} element={<ContactsPage />} />
+        ))}
+        {getAllSlugsForRoute('privacy-policy').map((slug) => (
+          <Route key={`privacy-${slug}`} path={slug} element={<PrivacyPolicyPage />} />
+        ))}
+        {getAllSlugsForRoute('rental-terms').map((slug) => (
+          <Route key={`rental-terms-${slug}`} path={slug} element={<RentalTermsPage />} />
+        ))}
       </Route>
 
       {/* Root redirect */}
       <Route path="/" element={<Navigate to={`/${DEFAULT_LANG}`} replace />} />
 
       {/* Legacy redirects (no locale prefix) */}
-      <Route path="/rent-cars" element={<Navigate to={`/${DEFAULT_LANG}/rent-cars`} replace />} />
+      <Route path="/rent-cars" element={<Navigate to={localizedPath(DEFAULT_LANG, '/rent-cars')} replace />} />
       <Route path="/rent-cars/:id" element={<LegacyRedirect path="/rent-cars" />} />
-      <Route path="/sale-cars" element={<Navigate to={`/${DEFAULT_LANG}/sale-cars`} replace />} />
+      <Route path="/sale-cars" element={<Navigate to={localizedPath(DEFAULT_LANG, '/sale-cars')} replace />} />
       <Route path="/sale-cars/:id" element={<LegacyRedirect path="/sale-cars" />} />
-      <Route path="/parts" element={<Navigate to={`/${DEFAULT_LANG}/parts`} replace />} />
+      <Route path="/parts" element={<Navigate to={localizedPath(DEFAULT_LANG, '/parts')} replace />} />
       <Route path="/parts/:id" element={<LegacyRedirect path="/parts" />} />
-      <Route path="/contacts" element={<Navigate to={`/${DEFAULT_LANG}/contacts`} replace />} />
-      <Route path="/privacy-policy" element={<Navigate to={`/${DEFAULT_LANG}/privacy-policy`} replace />} />
-      <Route path="/rental-terms" element={<Navigate to={`/${DEFAULT_LANG}/rental-terms`} replace />} />
-      <Route path="/cars" element={<Navigate to={`/${DEFAULT_LANG}/rent-cars`} replace />} />
+      <Route path="/contacts" element={<Navigate to={localizedPath(DEFAULT_LANG, '/contacts')} replace />} />
+      <Route path="/privacy-policy" element={<Navigate to={localizedPath(DEFAULT_LANG, '/privacy-policy')} replace />} />
+      <Route path="/rental-terms" element={<Navigate to={localizedPath(DEFAULT_LANG, '/rental-terms')} replace />} />
+      <Route path="/cars" element={<Navigate to={localizedPath(DEFAULT_LANG, '/rent-cars')} replace />} />
       <Route path="/cars/:id" element={<LegacyRedirect path="/rent-cars" />} />
-      <Route path="/car-sale" element={<Navigate to={`/${DEFAULT_LANG}/sale-cars`} replace />} />
+      <Route path="/car-sale" element={<Navigate to={localizedPath(DEFAULT_LANG, '/sale-cars')} replace />} />
       <Route path="/car-sale/:id" element={<LegacyRedirect path="/sale-cars" />} />
 
       {/* Auth routes (no locale prefix) */}

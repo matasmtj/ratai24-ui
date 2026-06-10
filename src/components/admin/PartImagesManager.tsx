@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { partsApi } from '../../api/parts';
+import { sortImagesByOrder } from '../../lib/sortImages';
+import type { PartImage } from '../../types/api';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
 import { Alert } from '../ui/Alert';
@@ -32,7 +34,10 @@ export function PartImagesManager({ partId, isOpen, onClose }: PartImagesManager
     enabled: isOpen,
   });
 
-  const images = imagesData?.images || [];
+  const images = useMemo(
+    () => sortImagesByOrder(imagesData?.images ?? []),
+    [imagesData?.images]
+  );
 
   const invalidate = () => {
     queryClient.invalidateQueries({ queryKey: ['part-images', partId] });
@@ -69,7 +74,33 @@ export function PartImagesManager({ partId, isOpen, onClose }: PartImagesManager
 
   const reorderMutation = useMutation({
     mutationFn: (imageIds: number[]) => partsApi.reorderImages(partId, imageIds),
-    onSuccess: invalidate,
+    onMutate: async (imageIds) => {
+      await queryClient.cancelQueries({ queryKey: ['part-images', partId] });
+      const previous = queryClient.getQueryData<{ images: PartImage[] }>(['part-images', partId]);
+      if (previous?.images) {
+        const byId = new Map(previous.images.map((img) => [img.id, img]));
+        queryClient.setQueryData(['part-images', partId], {
+          images: imageIds
+            .map((id, order) => {
+              const img = byId.get(id);
+              return img ? { ...img, order } : null;
+            })
+            .filter(Boolean) as PartImage[],
+        });
+      }
+      return { previous };
+    },
+    onError: (_error, _imageIds, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['part-images', partId], context.previous);
+      }
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(['part-images', partId], {
+        images: sortImagesByOrder(data.images),
+      });
+      invalidate();
+    },
   });
 
   const handleUpload = () => {
@@ -131,8 +162,8 @@ export function PartImagesManager({ partId, isOpen, onClose }: PartImagesManager
                     </button>
                   </div>
                   <div className="flex justify-center gap-2 mt-2">
-                    <Button size="sm" variant="ghost" disabled={index === 0} onClick={() => moveImage(index, 'left')}>←</Button>
-                    <Button size="sm" variant="ghost" disabled={index === images.length - 1} onClick={() => moveImage(index, 'right')}>→</Button>
+                    <Button size="sm" variant="ghost" disabled={index === 0 || reorderMutation.isPending} onClick={() => moveImage(index, 'left')}>←</Button>
+                    <Button size="sm" variant="ghost" disabled={index === images.length - 1 || reorderMutation.isPending} onClick={() => moveImage(index, 'right')}>→</Button>
                   </div>
                 </div>
               ))}

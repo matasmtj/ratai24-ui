@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { carsApi } from '../../api/cars';
+import { sortImagesByOrder } from '../../lib/sortImages';
+import type { CarImage } from '../../types/api';
 import { Button } from '../ui/Button';
 import { Modal } from '../ui/Modal';
 import { Alert } from '../ui/Alert';
@@ -34,12 +36,38 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
     enabled: isOpen,
   });
 
-  const images = imagesData?.images || [];
+  const images = useMemo(
+    () => sortImagesByOrder(imagesData?.images ?? []),
+    [imagesData?.images]
+  );
 
   const reorderMutation = useMutation({
     mutationFn: (imageIds: number[]) => carsApi.reorderImages(carId, imageIds),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['car-images', carId] });
+    onMutate: async (imageIds) => {
+      await queryClient.cancelQueries({ queryKey: ['car-images', carId] });
+      const previous = queryClient.getQueryData<{ images: CarImage[] }>(['car-images', carId]);
+      if (previous?.images) {
+        const byId = new Map(previous.images.map((img) => [img.id, img]));
+        queryClient.setQueryData(['car-images', carId], {
+          images: imageIds
+            .map((id, order) => {
+              const img = byId.get(id);
+              return img ? { ...img, order } : null;
+            })
+            .filter(Boolean) as CarImage[],
+        });
+      }
+      return { previous };
+    },
+    onError: (_error, _imageIds, context) => {
+      if (context?.previous) {
+        queryClient.setQueryData(['car-images', carId], context.previous);
+      }
+    },
+    onSuccess: (data) => {
+      queryClient.setQueryData(['car-images', carId], {
+        images: sortImagesByOrder(data.images),
+      });
       queryClient.invalidateQueries({ queryKey: ['cars'] });
       queryClient.invalidateQueries({ queryKey: ['car', carId] });
     },
@@ -379,7 +407,7 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
                       <TrashIcon className="h-4 w-4" />
                     </button>
                   </div>
-                  {index === 0 && (
+                  {image.isMain && (
                     <div className="absolute bottom-2 left-2 px-2 py-1 bg-yellow-500 text-white text-xs font-semibold rounded">
                       {t('mainImage')}
                     </div>

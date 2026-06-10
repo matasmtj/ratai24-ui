@@ -61,7 +61,8 @@ export const partsApi = {
     await api.put(`/parts/${partId}/images/${imageId}/main`);
   },
 
-  reorderImages: async (partId: number, imageIds: number[]): Promise<void> => {
-    await api.put(`/parts/${partId}/images/reorder`, { imageIds });
+  reorderImages: async (partId: number, imageIds: number[]): Promise<{ images: PartImage[] }> => {
+    const response = await api.put<{ images: PartImage[] }>(`/parts/${partId}/images/reorder`, { imageIds });
+    return response.data;
   },
 };

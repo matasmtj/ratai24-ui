@@ -11,6 +11,7 @@ import { citiesApi } from '../api/cities';
 import { useLanguage } from '../contexts/useLanguage';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { getFuelTypeKey, getBodyTypeKey } from '../lib/translationHelpers';
+import { sortImagesByOrder } from '../lib/sortImages';
 import { 
   TruckIcon,
   PhoneIcon,
@@ -57,8 +58,8 @@ export function CarSaleDetailPage() {
     );
   }
 
-  const carImages = car.images || [];
-  const mainImage = carImages.find(img => img.isMain) || carImages[0];
+  const carImages = sortImagesByOrder(car.images || []);
+  const mainImage = carImages.find((img) => img.isMain) || carImages[0];
 
   const handlePrevImage = () => {
     setCurrentImageIndex((prev) => (prev === 0 ? carImages.length - 1 : prev - 1));

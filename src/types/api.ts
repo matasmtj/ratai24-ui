@@ -48,6 +48,7 @@ export interface CarImage {
   filename: string;
   url: string;
   isMain: boolean;
+  order?: number;
   createdAt: string;
 }
 
@@ -159,6 +160,13 @@ export interface UserAdminUpdate {
 }
 
 // Contract
+export interface ContractLockHolder {
+  id: number;
+  email: string;
+  firstName?: string | null;
+  lastName?: string | null;
+}
+
 export interface Contract {
   id: number;
   userId: number;
@@ -173,8 +181,14 @@ export interface Contract {
   fuelLevelEndPct: number | null;
   extraFees: number;
   notes: string | null;
+  depositConfirmed?: boolean;
   user?: User; // Populated user data (admin endpoint)
   car?: Car; // Populated car data (admin endpoint)
+  editLockedByUserId?: number | null;
+  editLockedAt?: string | null;
+  editLockedBy?: ContractLockHolder | null;
+  editLockActive?: boolean;
+  editLockExpiresAt?: string | null;
 }
 
 /** Internal calendar holds returned with GET /cars/:id/contracts (not shown as contracts to users). */
