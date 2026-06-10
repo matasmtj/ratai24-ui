@@ -1,23 +1,37 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { Menu } from '@headlessui/react';
 import { UserCircleIcon, Bars3Icon, XMarkIcon, CalendarDaysIcon } from '@heroicons/react/24/outline';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/useLanguage';
+import { useLocalizedPath } from '../hooks/useLocalizedPath';
+import { stripLangPrefix, switchLangPath } from '../i18n/routes';
 import { Button } from './ui/Button';
 import type { Language } from '../i18n/translations';
 
 export function Navbar() {
   const { isAuthenticated, role, logout } = useAuth();
   const { language, setLanguage, t } = useLanguage();
+  const lp = useLocalizedPath();
   const navigate = useNavigate();
+  const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogout = async () => {
     await logout();
     setMobileMenuOpen(false);
-    navigate('/', { replace: true });
+    navigate(lp('/'), { replace: true });
     window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+  };
+
+  const handleLanguageChange = (lang: Language) => {
+    const { lang: urlLang } = stripLangPrefix(location.pathname);
+    if (urlLang) {
+      navigate(switchLangPath(location.pathname, lang));
+    } else {
+      setLanguage(lang);
+    }
+    setMobileMenuOpen(false);
   };
 
   return (
@@ -25,31 +39,37 @@ export function Navbar() {
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-6">
-            <Link to="/" className="flex items-center flex-shrink-0 text-xl font-bold text-gray-900">
+            <Link to={lp('/')} className="flex items-center flex-shrink-0 text-xl font-bold text-gray-900">
               Ratai24
             </Link>
 
             <div className="hidden lg:flex lg:space-x-3">
               <Link
-                to="/"
+                to={lp('/')}
                 className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
               >
                 {t('home')}
               </Link>
               <Link
-                to="/rent-cars"
+                to={lp('/rent-cars')}
                 className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
               >
                 {t('carLease')}
               </Link>
               <Link
-                to="/sale-cars"
+                to={lp('/sale-cars')}
                 className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
               >
                 {t('carSale')}
               </Link>
               <Link
-                to="/contacts"
+                to={lp('/parts')}
+                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
+              >
+                {t('parts')}
+              </Link>
+              <Link
+                to={lp('/contacts')}
                 className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
               >
                 {t('contacts')}
@@ -58,7 +78,6 @@ export function Navbar() {
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Mobile menu button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none"
@@ -176,7 +195,7 @@ export function Navbar() {
                     <Menu.Item key={lang}>
                       {({ active }) => (
                         <button
-                          onClick={() => setLanguage(lang)}
+                          onClick={() => handleLanguageChange(lang)}
                           className={`${active ? 'bg-gray-100' : ''} ${language === lang ? 'font-semibold text-primary-700' : 'text-gray-700'} block w-full text-left px-4 py-2 text-sm`}
                         >
                           {lang === 'lt' && 'Lietuvių'}
@@ -192,33 +211,39 @@ export function Navbar() {
           </div>
         </div>
 
-        {/* Mobile menu */}
         {mobileMenuOpen && (
           <div className="lg:hidden border-t border-gray-200">
             <div className="px-2 pt-2 pb-3 space-y-1">
               <Link
-                to="/"
+                to={lp('/')}
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
               >
                 {t('home')}
               </Link>
               <Link
-                to="/rent-cars"
+                to={lp('/rent-cars')}
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
               >
                 {t('carLease')}
               </Link>
               <Link
-                to="/sale-cars"
+                to={lp('/sale-cars')}
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
               >
                 {t('carSale')}
               </Link>
               <Link
-                to="/contacts"
+                to={lp('/parts')}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
+              >
+                {t('parts')}
+              </Link>
+              <Link
+                to={lp('/contacts')}
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
               >

@@ -22,6 +22,11 @@ export function AdminContactsPage() {
     phone: '',
     businessHoursWeekdays: '8:00 - 18:00',
     businessHoursWeekend: '9:00 - 15:00',
+    companyName: '',
+    companyCode: '',
+    bankAccount: '',
+    companyEmail: '',
+    mainAddress: '',
     operationAreas: [],
   });
 
@@ -80,6 +85,11 @@ export function AdminContactsPage() {
         phone: contact.phone,
         businessHoursWeekdays: contact.businessHoursWeekdays,
         businessHoursWeekend: contact.businessHoursWeekend,
+        companyName: contact.companyName || '',
+        companyCode: contact.companyCode || '',
+        bankAccount: contact.bankAccount || '',
+        companyEmail: contact.companyEmail || '',
+        mainAddress: contact.mainAddress || '',
         operationAreas,
       });
       setIsEditing(true);
@@ -100,6 +110,11 @@ export function AdminContactsPage() {
         phone: contact.phone,
         businessHoursWeekdays: contact.businessHoursWeekdays,
         businessHoursWeekend: contact.businessHoursWeekend,
+        companyName: contact.companyName || '',
+        companyCode: contact.companyCode || '',
+        bankAccount: contact.bankAccount || '',
+        companyEmail: contact.companyEmail || '',
+        mainAddress: contact.mainAddress || '',
         operationAreas,
       });
     }
@@ -187,6 +202,17 @@ export function AdminContactsPage() {
                   placeholder="9:00 - 15:00"
                   required
                 />
+              </div>
+
+              <div className="border-t pt-6">
+                <h3 className="text-lg font-semibold mb-4">{t('rekvizitai')}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input label={t('companyName')} value={formData.companyName || ''} onChange={(e) => setFormData({ ...formData, companyName: e.target.value })} />
+                  <Input label={t('companyCode')} value={formData.companyCode || ''} onChange={(e) => setFormData({ ...formData, companyCode: e.target.value })} />
+                  <Input label={t('bankAccount')} value={formData.bankAccount || ''} onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })} />
+                  <Input label={t('companyEmail')} type="email" value={formData.companyEmail || ''} onChange={(e) => setFormData({ ...formData, companyEmail: e.target.value })} />
+                  <Input label={t('mainAddress')} value={formData.mainAddress || ''} onChange={(e) => setFormData({ ...formData, mainAddress: e.target.value })} className="md:col-span-2" />
+                </div>
               </div>
 
               <div>
@@ -320,6 +346,17 @@ export function AdminContactsPage() {
                   disabled={!isEditing}
                   required
                 />
+              </div>
+
+              <div className="border-t pt-6">
+                <h3 className="text-lg font-semibold mb-4">{t('rekvizitai')}</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Input label={t('companyName')} value={isEditing ? formData.companyName || '' : contact?.companyName || ''} onChange={(e) => setFormData({ ...formData, companyName: e.target.value })} disabled={!isEditing} />
+                  <Input label={t('companyCode')} value={isEditing ? formData.companyCode || '' : contact?.companyCode || ''} onChange={(e) => setFormData({ ...formData, companyCode: e.target.value })} disabled={!isEditing} />
+                  <Input label={t('bankAccount')} value={isEditing ? formData.bankAccount || '' : contact?.bankAccount || ''} onChange={(e) => setFormData({ ...formData, bankAccount: e.target.value })} disabled={!isEditing} />
+                  <Input label={t('companyEmail')} type="email" value={isEditing ? formData.companyEmail || '' : contact?.companyEmail || ''} onChange={(e) => setFormData({ ...formData, companyEmail: e.target.value })} disabled={!isEditing} />
+                  <Input label={t('mainAddress')} value={isEditing ? formData.mainAddress || '' : contact?.mainAddress || ''} onChange={(e) => setFormData({ ...formData, mainAddress: e.target.value })} disabled={!isEditing} className="md:col-span-2" />
+                </div>
               </div>
 
               <div>

@@ -49,10 +49,16 @@ npm install
 cp .env.example .env
 ```
 
-4. Update the `.env` file with your API URL:
+4. Update the `.env` file (remote API URL for production / dev fallback):
 ```
 VITE_API_URL=https://ratai24.onrender.com
 ```
+
+In **development**, the app automatically probes `http://localhost:3000/health`. If your local backend is running, it uses that; otherwise it falls back to `VITE_API_URL`. No need to swap env vars when switching between local and hosted API testing.
+
+Optional:
+- `VITE_API_URL_LOCAL` — local backend URL (default `http://localhost:3000`)
+- `VITE_API_FORCE_REMOTE=true` — always use hosted API during dev
 
 ### Development
 
@@ -108,7 +114,9 @@ The frontend integrates with the Ratai24 REST API. Key features:
 
 ## Environment Variables
 
-- `VITE_API_URL`: Backend API base URL (default: https://ratai24.onrender.com)
+- `VITE_API_URL`: Remote/production API URL (default: https://ratai24.onrender.com)
+- `VITE_API_URL_LOCAL`: Local API URL for dev auto-detection (default: http://localhost:3000)
+- `VITE_API_FORCE_REMOTE`: Set to `true` to skip local probe and always use `VITE_API_URL` in dev
 
 ## License
 

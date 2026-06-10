@@ -2,6 +2,7 @@ import { Layout } from '../components/Layout';
 import { useLanguage } from '../contexts/useLanguage';
 import { useQuery } from '@tanstack/react-query';
 import { contactsApi } from '../api/contacts';
+import { legalPagesApi } from '../api/legalPages';
 
 type PolicyContent = {
   intro: string;
@@ -270,7 +271,18 @@ export function PrivacyPolicyPage() {
   };
 
   const activeLanguage = language === 'en' || language === 'ru' ? language : 'lt';
-  const content = contentByLanguage[activeLanguage];
+  const { data: legalPage } = useQuery({
+    queryKey: ['legal-page', 'privacy-policy', activeLanguage],
+    queryFn: async () => {
+      try {
+        return await legalPagesApi.get('privacy-policy', activeLanguage);
+      } catch {
+        return null;
+      }
+    },
+    retry: false,
+  });
+  const content = legalPage?.content ?? contentByLanguage[activeLanguage];
   const withEmail = (text: string) => text.replaceAll('{email}', contactEmail);
   /** Email as plain text (no mailto) so it matches body styling and is not link-styled. */
   const renderParagraphWithEmail = (text: string, className = 'text-gray-700') => (

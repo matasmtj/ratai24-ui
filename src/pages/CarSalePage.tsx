@@ -8,7 +8,7 @@ import { Select } from '../components/ui/Select';
 import { LoadingSpinner } from '../components/ui/Loading';
 import { Button } from '../components/ui/Button';
 import { useLanguage } from '../contexts/useLanguage';
-import { getFuelTypeKey, getGearboxKey } from '../lib/translationHelpers';
+import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { carsApi } from '../api/cars';
 import { citiesApi } from '../api/cities';
 import { 
@@ -26,6 +26,7 @@ import { useScrollToTopOnPageChange } from '../hooks/useScrollToTopOnPageChange'
 export function CarSalePage() {
   const [searchParams] = useSearchParams();
   const { t } = useLanguage();
+  const lp = useLocalizedPath();
   const [selectedCity, setSelectedCity] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
   const [fuelFilter, setFuelFilter] = useState<string>('');
@@ -312,87 +313,40 @@ export function CarSalePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {paginatedCars.map((car) => {
                 const mainImage = car.images?.find(img => img.isMain);
-                const cityName = cities?.find(c => c.id === car.cityId)?.name || '';
 
                 return (
-                  <Link key={car.id} to={`/car-sale/${car.id}`} className="block">
+                  <Link key={car.id} to={`${lp('/sale-cars')}/${car.id}`} className="block">
                     <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
                       <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
-                      {mainImage ? (
-                        <img 
-                          src={mainImage.url} 
-                          alt={`${car.make} ${car.model}`}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <TruckIcon className="h-16 w-16 text-gray-400" />
-                      )}
-                      {car.availableForLease && (
-                        <div className="absolute top-2 left-2 bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
-                          {t('alsoForLease')}
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-6">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h3 className="font-bold text-xl text-gray-900 mb-1">
-                            {car.make} {car.model}
-                          </h3>
-                          <p className="text-sm text-gray-600">{car.year} {t('year')}</p>
-                        </div>
-                        <div className="text-right">
+                        {mainImage ? (
+                          <img
+                            src={mainImage.url}
+                            alt={`${car.make} ${car.model}`}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <TruckIcon className="h-16 w-16 text-gray-400" />
+                        )}
+                      </div>
+                      <div className="p-6">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <h3 className="font-bold text-xl text-gray-900 mb-1">
+                              {car.make} {car.model}
+                            </h3>
+                            <p className="text-sm text-gray-600">{car.year} {t('year')}</p>
+                          </div>
                           <div className="text-2xl font-bold text-primary-600">
                             €{car.salePrice?.toLocaleString()}
                           </div>
                         </div>
-                      </div>
-
-                      <div className="space-y-2 mb-4 text-sm text-gray-600">
-                        <div className="flex items-center justify-between">
-                          <span>{t('fuelType')}:</span>
-                          <span className="font-medium">{t(getFuelTypeKey(car.fuelType) as any)}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span>{t('gearboxType')}:</span>
-                          <span className="font-medium">{t(getGearboxKey(car.gearbox) as any)}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span>{t('power')}:</span>
-                          <span className="font-medium">{car.powerKW} {t('kw')}</span>
-                        </div>
-                        {car.engineCapacityL && (
-                          <div className="flex items-center justify-between">
-                            <span>{t('engineCapacity')}:</span>
-                            <span className="font-medium">{car.engineCapacityL}L</span>
-                          </div>
-                        )}
-                        <div className="flex items-center justify-between">
-                          <span>{t('seats')}:</span>
-                          <span className="font-medium">{car.seatCount}</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span>{t('mileageLabel')}:</span>
-                          <span className="font-medium">{car.odometerKm.toLocaleString()} km</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <span>{t('location')}:</span>
-                          <span className="font-medium">{cityName}</span>
-                        </div>
-                      </div>
-
-                      {car.saleDescription && (
-                        <div className="mb-4 p-3 bg-gray-50 rounded text-sm text-gray-700 line-clamp-3">
-                          {car.saleDescription}
-                        </div>
-                      )}
-
-                      <div className="border-t pt-4">
+                        <p className="text-sm text-gray-600 mb-4">
+                          {t('mileageLabel')}: <span className="font-medium">{car.odometerKm.toLocaleString()} km</span>
+                        </p>
                         <Button variant="primary" size="sm" className="w-full">
                           {t('viewDetails')}
                         </Button>
                       </div>
-                    </div>
                     </Card>
                   </Link>
                 );

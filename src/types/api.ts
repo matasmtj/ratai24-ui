@@ -22,7 +22,7 @@ export type BodyType =
 export type CarState = 'AVAILABLE' | 'LEASED' | 'MAINTENANCE';
 export type ContractState = 'DRAFT' | 'ACTIVE' | 'COMPLETED' | 'CANCELLED';
 export type UserRole = 'USER' | 'ADMIN';
-export type PartCondition = 'NEW' | 'USED_GOOD' | 'USED_FAIR' | 'REFURBISHED';
+export type PartCondition = 'NEW' | 'USED' | 'DAMAGED';
 
 export interface ApiError {
   error: string;
@@ -221,6 +221,11 @@ export interface Contact {
   phone: string;
   businessHoursWeekdays: string;
   businessHoursWeekend: string;
+  companyName?: string;
+  companyCode?: string;
+  bankAccount?: string;
+  companyEmail?: string;
+  mainAddress?: string;
   operationAreas: string; // Comma-separated city names
   operationAreasDetails: OperationAreaDetail[];
   createdAt: string;
@@ -232,6 +237,11 @@ export interface ContactUpdate {
   phone: string;
   businessHoursWeekdays: string;
   businessHoursWeekend: string;
+  companyName?: string;
+  companyCode?: string;
+  bankAccount?: string;
+  companyEmail?: string;
+  mainAddress?: string;
   operationAreas: OperationArea[];
 }
 
@@ -300,87 +310,82 @@ export interface PartImage {
   filename: string;
   url: string;
   isMain: boolean;
+  order?: number;
   createdAt: string;
 }
 
 export interface Part {
   id: number;
-  name: string;
-  description?: string | null;
-  partNumber?: string | null;
+  partName: string;
+  oemNumber?: string | null;
   make: string;
   model: string;
   year: number;
-  price: number;
+  colour?: string | null;
+  engineCapacityL?: number | null;
+  powerKW?: number | null;
+  fuelType?: FuelType | null;
+  gearbox?: Gearbox | null;
+  bodyType?: BodyType | null;
+  description?: string | null;
   condition: PartCondition;
-  quantity: number;
-  categoryId?: number | null;
-  categoryName?: string | null;
-  location?: string | null;
+  price: number;
   images?: PartImage[];
-  isActive?: boolean;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface PartCreate {
-  name: string;
-  description?: string | null;
-  partNumber?: string | null;
+  partName: string;
+  oemNumber?: string | null;
   make: string;
   model: string;
   year: number;
-  price: number;
+  colour?: string | null;
+  engineCapacityL?: number | null;
+  powerKW?: number | null;
+  fuelType?: FuelType | null;
+  gearbox?: Gearbox | null;
+  bodyType?: BodyType | null;
+  description?: string | null;
   condition: PartCondition;
-  quantity: number;
-  categoryId?: number | null;
-  location?: string | null;
+  price: number;
 }
 
 export interface PartUpdate {
-  name?: string;
-  description?: string | null;
-  partNumber?: string | null;
+  partName?: string;
+  oemNumber?: string | null;
   make?: string;
   model?: string;
   year?: number;
-  price?: number;
+  colour?: string | null;
+  engineCapacityL?: number | null;
+  powerKW?: number | null;
+  fuelType?: FuelType | null;
+  gearbox?: Gearbox | null;
+  bodyType?: BodyType | null;
+  description?: string | null;
   condition?: PartCondition;
-  quantity?: number;
-  categoryId?: number | null;
-  location?: string | null;
-  isActive?: boolean;
+  price?: number;
 }
 
-// Part Category
-export interface PartCategory {
+// Legal pages CMS
+export interface LegalSection {
+  title: string;
+  paragraphs?: string[];
+  bullets?: string[];
+}
+
+export interface LegalPageContentData {
+  intro: string;
+  sections: LegalSection[];
+  note?: string;
+}
+
+export interface LegalPageContent {
   id: number;
-  name: string;
-  nameEn: string;
-  nameLt: string;
-  icon?: string | null;
-  parentId?: number | null;
-  sortOrder: number;
-  isActive: boolean;
-  createdAt: string;
+  pageKey: string;
+  language: string;
+  content: LegalPageContentData;
   updatedAt: string;
-}
-
-export interface PartCategoryCreate {
-  name: string;
-  nameEn: string;
-  nameLt: string;
-  icon?: string | null;
-  parentId?: number | null;
-  sortOrder?: number;
-}
-
-export interface PartCategoryUpdate {
-  name?: string;
-  nameEn?: string;
-  nameLt?: string;
-  icon?: string | null;
-  parentId?: number | null;
-  sortOrder?: number;
-  isActive?: boolean;
 }

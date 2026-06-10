@@ -7,6 +7,7 @@ import { Button } from '../components/ui/Button';
 import { ReCaptcha, type ReCaptchaHandle } from '../components/ui/ReCaptcha';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/useLanguage';
+import { isSafeInternalPath } from '../i18n/routes';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
 
 export function LoginPage() {
@@ -60,8 +61,8 @@ export function LoginPage() {
 
     try {
       await login(formData);
-      console.log('Login successful, navigating...');
-      navigate('/dashboard');
+      const from = (location.state as { from?: string } | null)?.from;
+      navigate(isSafeInternalPath(from) ? from : '/dashboard', { replace: true });
     } catch (err: any) {
       console.error('Login error:', err);
       const errorMessage = err.response?.data?.error || t('loginFailed');

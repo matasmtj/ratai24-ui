@@ -6,6 +6,7 @@ import { Card } from '../components/ui/Card';
 import { LoadingSpinner } from '../components/ui/Loading';
 import { useLanguage } from '../contexts/useLanguage';
 import { useAuth } from '../contexts/AuthContext';
+import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { citiesApi } from '../api/cities';
 import { carsApi } from '../api/cars';
 import { 
@@ -18,6 +19,7 @@ import {
 
 export function HomePage() {
   const { t } = useLanguage();
+  const lp = useLocalizedPath();
   const { isAuthenticated } = useAuth();
   const { data: cities, isLoading: citiesLoading } = useQuery({
     queryKey: ['cities'],
@@ -45,7 +47,7 @@ export function HomePage() {
             <p className="text-xl md:text-2xl mb-8 text-primary-100">
               {t('heroSubtitle')}
             </p>
-            <Link to="/rent-cars">
+            <Link to={lp('/rent-cars')}>
               <Button size="lg" variant="secondary">
                 <TruckIcon className="h-6 w-6 mr-2" />
                 {t('viewCars')}
@@ -68,7 +70,7 @@ export function HomePage() {
               {cities.map((city) => (
                 <Link
                   key={city.id}
-                  to={`/rent-cars?cityId=${city.id}`}
+                  to={`${lp('/rent-cars')}?cityId=${city.id}`}
                   className="inline-flex items-center px-6 py-3 bg-white rounded-lg shadow-sm border border-gray-200 hover:shadow-md hover:border-primary-300 transition-all cursor-pointer"
                 >
                   <MapPinIcon className="h-6 w-6 text-primary-600 mr-2" />
@@ -170,7 +172,7 @@ export function HomePage() {
                         €{car.useDynamicPricing && car.basePricePerDay ? car.basePricePerDay : car.pricePerDay}{t('perDay')}
                       </span>
                     </div>
-                    <Link to="/rent-cars">
+                    <Link to={lp('/rent-cars')}>
                       <Button size="sm">{t('view')}</Button>
                     </Link>
                   </div>
@@ -179,7 +181,7 @@ export function HomePage() {
             )})}
           </div>
           <div className="text-center mt-8">
-            <Link to="/rent-cars">
+            <Link to={lp('/rent-cars')}>
               <Button variant="secondary" size="lg">
                 {t('viewAllCars')}
               </Button>

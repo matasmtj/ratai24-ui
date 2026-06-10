@@ -2,6 +2,7 @@ import { type ReactNode, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar } from './Navbar';
 import { useLanguage } from '../contexts/useLanguage';
+import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { TruckIcon, EnvelopeIcon, PhoneIcon, MapPinIcon } from '@heroicons/react/24/outline';
 import { contactsApi } from '../api/contacts';
 import type { Contact } from '../types/api';
@@ -12,6 +13,7 @@ interface LayoutProps {
 
 export function Layout({ children }: LayoutProps) {
   const { t } = useLanguage();
+  const lp = useLocalizedPath();
   const [contactInfo, setContactInfo] = useState<Contact | null>(null);
 
   useEffect(() => {
@@ -45,32 +47,37 @@ export function Layout({ children }: LayoutProps) {
               <h3 className="text-white font-semibold mb-4">{t('information')}</h3>
               <ul className="space-y-2 text-sm">
                 <li>
-                  <Link to="/contacts" className="hover:text-white transition-colors">
+                  <Link to={lp('/contacts')} className="hover:text-white transition-colors">
                     {t('workingHours')}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/contacts" className="hover:text-white transition-colors">
+                  <Link to={lp('/contacts')} className="hover:text-white transition-colors">
                     {t('contacts')}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/rent-cars" className="hover:text-white transition-colors">
+                  <Link to={lp('/rent-cars')} className="hover:text-white transition-colors">
                     {t('carLease')}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/sale-cars" className="hover:text-white transition-colors">
+                  <Link to={lp('/sale-cars')} className="hover:text-white transition-colors">
                     {t('carSale')}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/privacy-policy" className="hover:text-white transition-colors">
+                  <Link to={lp('/parts')} className="hover:text-white transition-colors">
+                    {t('parts')}
+                  </Link>
+                </li>
+                <li>
+                  <Link to={lp('/privacy-policy')} className="hover:text-white transition-colors">
                     {t('privacyPolicy')}
                   </Link>
                 </li>
                 <li>
-                  <Link to="/rental-terms" className="hover:text-white transition-colors">
+                  <Link to={lp('/rental-terms')} className="hover:text-white transition-colors">
                     {t('rentalTerms')}
                   </Link>
                 </li>
@@ -117,7 +124,7 @@ export function Layout({ children }: LayoutProps) {
                 <ul className="space-y-2">
                   <li className="flex items-center text-sm">
                     <EnvelopeIcon className="h-5 w-5 mr-2" />
-                    <Link to="/contacts" className="hover:text-white transition-colors">
+                    <Link to={lp('/contacts')} className="hover:text-white transition-colors">
                       {t('viewContacts')}
                     </Link>
                   </li>

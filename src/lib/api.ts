@@ -1,6 +1,17 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
+import { REMOTE_API_URL } from './resolveApiBaseUrl';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://ratai24.onrender.com';
+let apiBaseUrl = REMOTE_API_URL.replace(/\/$/, '');
+
+/** Call once at startup after resolveApiBaseUrl(). */
+export function configureApiBaseUrl(url: string) {
+  apiBaseUrl = url.replace(/\/$/, '');
+  api.defaults.baseURL = apiBaseUrl;
+}
+
+export function getApiBaseUrl(): string {
+  return apiBaseUrl;
+}
 
 /** Login/register/forgot/reset: no Bearer; 401 means bad input, not “refresh token”. */
 const AUTH_PUBLIC_PATH = /^\/auth\/(login|register|forgot-password|reset-password)(?:\?|$)/;
@@ -11,7 +22,7 @@ function isAuthPublicEndpoint(url: string | undefined): boolean {
 }
 
 export const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: apiBaseUrl,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -20,6 +31,7 @@ export const api = axios.create({
 // Request interceptor to add auth token (skip public auth routes — avoid sending stale JWT on login)
 api.interceptors.request.use(
   (config: InternalAxiosRequestConfig) => {
+    config.baseURL = apiBaseUrl;
     const url = config.url || '';
     if (isAuthPublicEndpoint(url)) {
       if (config.headers) {
@@ -57,7 +69,7 @@ api.interceptors.response.use(
           throw new Error('No refresh token');
         }
 
-        const response = await axios.post(`${API_BASE_URL}/auth/refresh`, {
+        const response = await axios.post(`${getApiBaseUrl()}/auth/refresh`, {
           refreshToken,
         });
 
@@ -71,7 +83,6 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (refreshError) {
-        // Refresh failed, clear tokens and return to login (same origin as the SPA)
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('role');

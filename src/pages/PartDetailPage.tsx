@@ -8,19 +8,19 @@ import { LoadingPage } from '../components/ui/Loading';
 import { ImageLightbox } from '../components/ui/ImageLightbox';
 import { partsApi } from '../api/parts';
 import { useLanguage } from '../contexts/useLanguage';
+import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { 
   WrenchScrewdriverIcon,
-  MapPinIcon,
   TagIcon,
   CalendarIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
   CheckCircleIcon,
-  InformationCircleIcon
 } from '@heroicons/react/24/outline';
 
 export function PartDetailPage() {
   const { t } = useLanguage();
+  const lp = useLocalizedPath();
   const { id } = useParams<{ id: string }>();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
@@ -53,11 +53,9 @@ export function PartDetailPage() {
     switch (condition) {
       case 'NEW':
         return 'bg-green-100 text-green-800';
-      case 'REFURBISHED':
-        return 'bg-blue-100 text-blue-800';
-      case 'USED_GOOD':
+      case 'USED':
         return 'bg-yellow-100 text-yellow-800';
-      case 'USED_FAIR':
+      case 'DAMAGED':
         return 'bg-orange-100 text-orange-800';
       default:
         return 'bg-gray-100 text-gray-800';
@@ -68,36 +66,19 @@ export function PartDetailPage() {
     switch (condition) {
       case 'NEW':
         return t('partConditionNew');
-      case 'REFURBISHED':
-        return t('partConditionRefurbished');
-      case 'USED_GOOD':
-        return t('partConditionUsedGood');
-      case 'USED_FAIR':
-        return t('partConditionUsedFair');
+      case 'USED':
+        return t('partConditionUsed');
+      case 'DAMAGED':
+        return t('partConditionDamaged');
       default:
         return condition;
-    }
-  };
-
-  const getConditionDescription = (condition: string) => {
-    switch (condition) {
-      case 'NEW':
-        return t('partConditionNewDesc');
-      case 'REFURBISHED':
-        return t('partConditionRefurbishedDesc');
-      case 'USED_GOOD':
-        return t('partConditionUsedGoodDesc');
-      case 'USED_FAIR':
-        return t('partConditionUsedFairDesc');
-      default:
-        return '';
     }
   };
 
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link to="/parts" className="text-primary-600 hover:text-primary-700 mb-6 inline-flex items-center">
+        <Link to={lp('/parts')} className="text-primary-600 hover:text-primary-700 mb-6 inline-flex items-center">
           <ChevronLeftIcon className="h-5 w-5 mr-1" />
           {t('backToParts')}
         </Link>
@@ -111,7 +92,7 @@ export function PartDetailPage() {
                   <>
                     <img 
                       src={currentImage.url} 
-                      alt={part.name}
+                      alt={part.partName}
                       className="w-full h-full object-contain cursor-pointer"
                       onClick={() => setIsLightboxOpen(true)}
                     />
@@ -151,7 +132,7 @@ export function PartDetailPage() {
                       index === currentImageIndex ? 'border-primary-500' : 'border-transparent hover:border-gray-300'
                     }`}
                   >
-                    <img src={image.url} alt={`${part.name} ${index + 1}`} className="w-full h-full object-cover" />
+                    <img src={image.url} alt={`${part.partName} ${index + 1}`} className="w-full h-full object-cover" />
                   </button>
                 ))}
               </div>
@@ -161,7 +142,7 @@ export function PartDetailPage() {
           {/* Right Column - Details */}
           <div className="space-y-6">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{part.name}</h1>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{part.partName}</h1>
               <p className="text-xl text-gray-600">{part.make} {part.model} ({part.year})</p>
             </div>
 
@@ -171,63 +152,38 @@ export function PartDetailPage() {
                 <CheckCircleIcon className="h-5 w-5 mr-2" />
                 {getConditionLabel(part.condition)}
               </span>
-              <p className="text-sm text-gray-600 mt-2">{getConditionDescription(part.condition)}</p>
             </div>
 
-            {/* Price */}
             <Card className="p-6 bg-gradient-to-br from-primary-50 to-primary-100">
-              <div className="flex justify-between items-center">
-                <div>
-                  <div className="text-sm text-gray-600 mb-1">{t('price')}</div>
-                  <div className="text-4xl font-bold text-primary-600">
-                    €{part.price.toFixed(2)}
-                  </div>
-                </div>
-                {part.quantity > 0 && (
-                  <div className="text-right">
-                    <div className="text-sm text-gray-600 mb-1">{t('inStock')}</div>
-                    <div className="text-2xl font-semibold text-gray-900">
-                      {part.quantity} {part.quantity === 1 ? t('unit') : t('units')}
-                    </div>
-                  </div>
-                )}
+              <div className="text-sm text-gray-600 mb-1">{t('price')}</div>
+              <div className="text-4xl font-bold text-primary-600">
+                €{Number(part.price).toFixed(2)}
               </div>
             </Card>
 
-            {/* Action Buttons */}
             <div className="space-y-3">
-              <Button 
-                className="w-full" 
-                size="lg"
-                disabled={!part.quantity || part.quantity === 0}
-              >
-                {part.quantity > 0 ? t('contactSeller') : t('outOfStock')}
-              </Button>
-              {part.quantity > 0 && part.quantity <= 3 && (
-                <div className="flex items-start gap-2 p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                  <InformationCircleIcon className="h-5 w-5 text-orange-600 flex-shrink-0 mt-0.5" />
-                  <p className="text-sm text-orange-800">
-                    {t('onlyXLeftWarning').replace('{count}', part.quantity.toString())}
-                  </p>
-                </div>
-              )}
+              <Link to={lp('/contacts')}>
+                <Button className="w-full" size="lg">
+                  {t('contactSeller')}
+                </Button>
+              </Link>
             </div>
 
             {/* Details Card */}
             <Card className="p-6">
               <h2 className="text-lg font-semibold mb-4">{t('partDetails')}</h2>
               <dl className="space-y-3">
-                {part.partNumber && (
+                {part.oemNumber && (
                   <div className="flex items-center justify-between py-2 border-b">
                     <dt className="text-gray-600 flex items-center">
                       <TagIcon className="h-5 w-5 mr-2" />
                       {t('partNumber')}
                     </dt>
-                    <dd className="font-medium">{part.partNumber}</dd>
+                    <dd className="font-medium">{part.oemNumber}</dd>
                   </div>
                 )}
                 <div className="flex items-center justify-between py-2 border-b">
-                  <dt className="text-gray-600">{t('manufacturer')}</dt>
+                  <dt className="text-gray-600">{t('carMake')}</dt>
                   <dd className="font-medium">{part.make}</dd>
                 </div>
                 <div className="flex items-center justify-between py-2 border-b">
@@ -237,23 +193,26 @@ export function PartDetailPage() {
                 <div className="flex items-center justify-between py-2 border-b">
                   <dt className="text-gray-600 flex items-center">
                     <CalendarIcon className="h-5 w-5 mr-2" />
-                    {t('year')}
+                    {t('yearField')}
                   </dt>
                   <dd className="font-medium">{part.year}</dd>
                 </div>
-                {part.location && (
+                {part.colour && (
                   <div className="flex items-center justify-between py-2 border-b">
-                    <dt className="text-gray-600 flex items-center">
-                      <MapPinIcon className="h-5 w-5 mr-2" />
-                      {t('location')}
-                    </dt>
-                    <dd className="font-medium">{part.location}</dd>
+                    <dt className="text-gray-600">{t('colour')}</dt>
+                    <dd className="font-medium">{part.colour}</dd>
                   </div>
                 )}
-                {part.categoryName && (
-                  <div className="flex items-center justify-between py-2">
-                    <dt className="text-gray-600">{t('category')}</dt>
-                    <dd className="font-medium">{part.categoryName}</dd>
+                {part.engineCapacityL && (
+                  <div className="flex items-center justify-between py-2 border-b">
+                    <dt className="text-gray-600">{t('engineCapacity')}</dt>
+                    <dd className="font-medium">{part.engineCapacityL}L</dd>
+                  </div>
+                )}
+                {part.gearbox && (
+                  <div className="flex items-center justify-between py-2 border-b">
+                    <dt className="text-gray-600">{t('gearboxType')}</dt>
+                    <dd className="font-medium">{part.gearbox}</dd>
                   </div>
                 )}
               </dl>
@@ -262,7 +221,7 @@ export function PartDetailPage() {
             {/* Description */}
             {part.description && (
               <Card className="p-6">
-                <h2 className="text-lg font-semibold mb-4">{t('description')}</h2>
+                <h2 className="text-lg font-semibold mb-4">{t('common.description')}</h2>
                 <p className="text-gray-700 whitespace-pre-line">{part.description}</p>
               </Card>
             )}

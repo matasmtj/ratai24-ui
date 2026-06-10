@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNavigate, useParams, Link } from 'react-router-dom';
+import { useNavigate, useParams, Link, useLocation } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Layout } from '../components/Layout';
 import { Card } from '../components/ui/Card';
@@ -16,6 +16,7 @@ import { citiesApi } from '../api/cities';
 import { usersApi } from '../api/users';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/useLanguage';
+import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { Modal } from '../components/ui/Modal';
 import { Input } from '../components/ui/Input';
 import { contractsApi } from '../api/contracts';
@@ -30,6 +31,8 @@ import {
 
 export function CarDetailPage() {
   const { t } = useLanguage();
+  const lp = useLocalizedPath();
+  const location = useLocation();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -194,7 +197,7 @@ export function CarDetailPage() {
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link to="/rent-cars" className="text-primary-600 hover:text-primary-700 mb-4 inline-block">
+        <Link to={lp('/rent-cars')} className="text-primary-600 hover:text-primary-700 mb-4 inline-block">
           ← {t('backToList')}
         </Link>
 
@@ -396,7 +399,7 @@ export function CarDetailPage() {
                         {t('reserveCar')}
                       </Button>
                     ) : !isAuthenticated ? (
-                      <Link to="/login">
+                      <Link to="/login" state={{ from: location.pathname }}>
                         <Button size="lg">{t('loginToBook')}</Button>
                       </Link>
                     ) : null}

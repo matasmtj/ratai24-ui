@@ -1,13 +1,11 @@
 import api from '../lib/api';
-import type { Part, PartCreate, PartUpdate, PartCategory, PartCategoryCreate, PartCategoryUpdate, PartImage } from '../types/api';
+import type { Part, PartCreate, PartUpdate, PartImage } from '../types/api';
 
 export const partsApi = {
-  // Parts
   getAll: async (filters?: {
     make?: string;
     model?: string;
     year?: number;
-    categoryId?: number;
     condition?: string;
     search?: string;
   }): Promise<Part[]> => {
@@ -15,10 +13,9 @@ export const partsApi = {
     if (filters?.make) params.append('make', filters.make);
     if (filters?.model) params.append('model', filters.model);
     if (filters?.year) params.append('year', filters.year.toString());
-    if (filters?.categoryId) params.append('categoryId', filters.categoryId.toString());
     if (filters?.condition) params.append('condition', filters.condition);
     if (filters?.search) params.append('search', filters.search);
-    
+
     const queryString = params.toString();
     const response = await api.get<Part[]>(`/parts${queryString ? `?${queryString}` : ''}`);
     return response.data;
@@ -43,19 +40,17 @@ export const partsApi = {
     await api.delete(`/parts/${id}`);
   },
 
-  // Part Images
-  getImages: async (partId: number): Promise<PartImage[]> => {
-    const response = await api.get<PartImage[]>(`/parts/${partId}/images`);
+  getImages: async (partId: number): Promise<{ images: PartImage[] }> => {
+    const response = await api.get<{ images: PartImage[] }>(`/parts/${partId}/images`);
     return response.data;
   },
 
-  uploadImage: async (partId: number, file: File): Promise<PartImage> => {
+  uploadImages: async (partId: number, files: File[]): Promise<void> => {
     const formData = new FormData();
-    formData.append('image', file);
-    const response = await api.post<PartImage>(`/parts/${partId}/images`, formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
+    files.forEach((file) => formData.append('images', file));
+    await api.post(`/parts/${partId}/images`, formData, {
+      headers: { 'Content-Type': undefined },
     });
-    return response.data;
   },
 
   deleteImage: async (partId: number, imageId: number): Promise<void> => {
@@ -68,30 +63,5 @@ export const partsApi = {
 
   reorderImages: async (partId: number, imageIds: number[]): Promise<void> => {
     await api.put(`/parts/${partId}/images/reorder`, { imageIds });
-  },
-
-  // Categories
-  getAllCategories: async (): Promise<PartCategory[]> => {
-    const response = await api.get<PartCategory[]>('/parts/categories');
-    return response.data;
-  },
-
-  getCategoryById: async (id: number): Promise<PartCategory> => {
-    const response = await api.get<PartCategory>(`/parts/categories/${id}`);
-    return response.data;
-  },
-
-  createCategory: async (data: PartCategoryCreate): Promise<PartCategory> => {
-    const response = await api.post<PartCategory>('/admin/parts/categories', data);
-    return response.data;
-  },
-
-  updateCategory: async (id: number, data: PartCategoryUpdate): Promise<PartCategory> => {
-    const response = await api.put<PartCategory>(`/admin/parts/categories/${id}`, data);
-    return response.data;
-  },
-
-  deleteCategory: async (id: number): Promise<void> => {
-    await api.delete(`/admin/parts/categories/${id}`);
   },
 };

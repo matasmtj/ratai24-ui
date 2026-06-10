@@ -8,6 +8,7 @@ import { Select } from '../components/ui/Select';
 import { LoadingSpinner } from '../components/ui/Loading';
 import { Button } from '../components/ui/Button';
 import { useLanguage } from '../contexts/useLanguage';
+import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { useAuth } from '../contexts/AuthContext';
 import { getFuelTypeKey, getGearboxKey } from '../lib/translationHelpers';
 import { carsApi } from '../api/cars';
@@ -27,6 +28,7 @@ import { useScrollToTopOnPageChange } from '../hooks/useScrollToTopOnPageChange'
 export function CarsPage() {
   const [searchParams] = useSearchParams();
   const { t } = useLanguage();
+  const lp = useLocalizedPath();
   const { role } = useAuth();
   const [selectedCity, setSelectedCity] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState('');
@@ -317,7 +319,7 @@ export function CarsPage() {
                 const mainImage = car.images?.find(img => img.isMain);
                 
                 return (
-                <Link key={car.id} to={`/rent-cars/${car.id}`} className="block">
+                <Link key={car.id} to={`${lp('/rent-cars')}/${car.id}`} className="block">
                   <Card hover className="overflow-hidden h-full">
                     <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative">
                       {mainImage ? (

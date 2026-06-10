@@ -9,6 +9,7 @@ import { ImageLightbox } from '../components/ui/ImageLightbox';
 import { carsApi } from '../api/cars';
 import { citiesApi } from '../api/cities';
 import { useLanguage } from '../contexts/useLanguage';
+import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { getFuelTypeKey, getBodyTypeKey } from '../lib/translationHelpers';
 import { 
   TruckIcon,
@@ -19,6 +20,7 @@ import {
 
 export function CarSaleDetailPage() {
   const { t } = useLanguage();
+  const lp = useLocalizedPath();
   const { id } = useParams<{ id: string }>();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
@@ -46,7 +48,7 @@ export function CarSaleDetailPage() {
           <Card className="p-12 text-center">
             <TruckIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">{t('carNotFound')}</h2>
-            <Link to="/sale-cars">
+            <Link to={lp('/sale-cars')}>
               <Button>{t('backToCars')}</Button>
             </Link>
           </Card>
@@ -69,7 +71,7 @@ export function CarSaleDetailPage() {
   return (
     <Layout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <Link to="/sale-cars" className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-6">
+        <Link to={lp('/sale-cars')} className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-6">
           <ChevronLeftIcon className="h-5 w-5 mr-1" />
           {t('backToCars')}
         </Link>
@@ -222,7 +224,7 @@ export function CarSaleDetailPage() {
                 <p className="text-sm text-gray-700 mb-3">
                   {t('forMoreInfoContactSeller')}
                 </p>
-                <Link to="/contacts">
+                <Link to={lp('/contacts')}>
                   <Button size="lg" className="w-full">
                     <PhoneIcon className="h-5 w-5 mr-2" />
                     {t('contactSeller')}

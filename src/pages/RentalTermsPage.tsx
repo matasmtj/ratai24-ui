@@ -1,5 +1,7 @@
+import { useQuery } from '@tanstack/react-query';
 import { Layout } from '../components/Layout';
 import { useLanguage } from '../contexts/useLanguage';
+import { legalPagesApi } from '../api/legalPages';
 
 type TermsContent = {
   intro: string;
@@ -312,7 +314,18 @@ export function RentalTermsPage() {
   };
 
   const activeLanguage = language === 'en' || language === 'ru' ? language : 'lt';
-  const content = contentByLanguage[activeLanguage];
+  const { data: legalPage } = useQuery({
+    queryKey: ['legal-page', 'rental-terms', activeLanguage],
+    queryFn: async () => {
+      try {
+        return await legalPagesApi.get('rental-terms', activeLanguage);
+      } catch {
+        return null;
+      }
+    },
+    retry: false,
+  });
+  const content = legalPage?.content ?? contentByLanguage[activeLanguage];
 
   return (
     <Layout>

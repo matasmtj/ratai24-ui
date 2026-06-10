@@ -10,8 +10,10 @@ import { Alert } from '../../components/ui/Alert';
 import { SearchableSelect } from '../../components/ui/SearchableSelect';
 import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 import { ImageLightbox } from '../../components/ui/ImageLightbox';
-import { carMakes, carModels, carYears } from '../../data/carData';
+import { carYears } from '../../data/carData';
+import { getAllMakes, getModelsForMake, registerMakeModel } from '../../data/customCarData';
 import { useLanguage } from '../../contexts/useLanguage';
+import { useLocalizedPath } from '../../hooks/useLocalizedPath';
 import { carsApi } from '../../api/cars';
 import { citiesApi } from '../../api/cities';
 import type { Car, CarCreate } from '../../types/api';
@@ -25,6 +27,7 @@ import { useScrollToTopOnPageChange } from '../../hooks/useScrollToTopOnPageChan
 export function AdminCarsPage() {
   const queryClient = useQueryClient();
   const { t } = useLanguage();
+  const lp = useLocalizedPath();
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingCar, setEditingCar] = useState<Car | null>(null);
@@ -318,7 +321,7 @@ export function AdminCarsPage() {
                     className="flex-1"
                     onClick={(e) => {
                       e.stopPropagation();
-                      navigate(`/rent-cars/${car.id}`);
+                      navigate(`${lp('/rent-cars')}/${car.id}`);
                     }}
                     title={t('view')}
                   >
@@ -619,17 +622,18 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
   }, [car, cities]);
 
   const makeOptionsList = useMemo(() => {
+    const all = getAllMakes();
     const m = formData.make?.trim();
-    if (m && !carMakes.includes(m)) {
-      return [m, ...carMakes];
+    if (m && !all.includes(m)) {
+      return [m, ...all];
     }
-    return carMakes;
+    return all;
   }, [formData.make]);
 
   const modelOptionsList = useMemo(() => {
     const mk = formData.make?.trim();
     if (!mk) return [] as string[];
-    const fromData = carModels[mk] || [];
+    const fromData = getModelsForMake(mk);
     const mod = formData.model?.trim();
     if (mod && !fromData.includes(mod)) {
       return [mod, ...fromData];
@@ -760,6 +764,8 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
       return;
     }
     
+    registerMakeModel(formData.make, formData.model);
+
     if (car) {
       updateMutation.mutate({ id: car.id, data: submitData });
     } else {
