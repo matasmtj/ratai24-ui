@@ -4,13 +4,15 @@ import clsx from 'clsx';
 interface CardProps {
   children: ReactNode;
   className?: string;
+  id?: string;
   onClick?: () => void;
   hover?: boolean;
 }
 
-export function Card({ children, className, onClick, hover = false }: CardProps) {
+export function Card({ children, className, id, onClick, hover = false }: CardProps) {
   return (
     <div
+      id={id}
       className={clsx(
         'bg-white rounded-lg shadow-sm border border-gray-200',
         {

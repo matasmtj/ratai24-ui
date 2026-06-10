@@ -106,7 +106,7 @@ export function AdminContractDetailModal({
           return;
         }
         if (status === 409) {
-          setLockHolder(axiosErr.response.data?.details?.lockedBy ?? null);
+          setLockHolder(axiosErr.response?.data?.details?.lockedBy ?? null);
         }
         setLockState('blocked');
       }
