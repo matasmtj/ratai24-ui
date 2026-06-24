@@ -1,14 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import { Modal } from './ui/Modal';
 import { Button } from './ui/Button';
 import { LoadingSpinner } from './ui/Loading';
 import { useLanguage } from '../contexts/useLanguage';
-import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { contactsApi } from '../api/contacts';
 import { carsApi } from '../api/cars';
 import type { Contract } from '../types/api';
+import { resolveContractDeposit } from '../lib/deposit';
 
 interface PendingReservationModalProps {
   contract: Contract | null;
@@ -24,7 +23,6 @@ export function PendingReservationModal({
   onCancel,
 }: PendingReservationModalProps) {
   const { t } = useLanguage();
-  const lp = useLocalizedPath();
 
   const { data: car } = useQuery({
     queryKey: ['car', contract?.carId],
@@ -42,7 +40,15 @@ export function PendingReservationModal({
   if (!contract) return null;
 
   const paymentReference = `${t('reservationNumber')} #${contract.id}`;
-  const contactsHref = `${lp('/contacts')}#payment-details`;
+  const depositAmount = resolveContractDeposit(contract);
+  const hasBankDetails = !!(
+    contact &&
+    (contact.companyName ||
+      contact.companyCode ||
+      contact.bankAccount ||
+      contact.companyEmail ||
+      contact.mainAddress)
+  );
 
   const handleCopyReference = async () => {
     try {
@@ -98,15 +104,23 @@ export function PendingReservationModal({
           </dl>
         </div>
 
-        <div className="rounded-lg border border-primary-200 bg-primary-50 p-4">
-          <h3 className="text-sm font-semibold text-gray-900 mb-2">{t('depositPaymentTitle')}</h3>
-          <p className="text-sm text-gray-700 mb-3">
-            {t('reservationDepositNoticePrefix')} <strong>€50</strong>{' '}
-            {t('reservationDepositNoticeSuffix')}{' '}
-            <Link to={contactsHref} className="font-semibold text-primary-700 underline">
-              {t('reservationDepositContactLink')}
-            </Link>
-            .
+        <div className="rounded-lg border border-primary-200 bg-primary-50 p-4 space-y-4">
+          <h3 className="text-base font-semibold text-gray-900">
+            {t('depositBankDetailsTitle')}
+          </h3>
+
+          <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2 text-sm">
+            <div>
+              <dt className="text-gray-500">{t('reservationNumberLabel')}</dt>
+              <dd className="font-semibold text-gray-900">#{contract.id}</dd>
+            </div>
+            <div>
+              <dt className="text-gray-500">{t('depositAmountLabel')}</dt>
+              <dd className="font-semibold text-gray-900">€{depositAmount}</dd>
+            </div>
+          </dl>
+          <p className="text-xs text-gray-500 -mt-2">
+            {t('depositDurationDisclaimer')}
           </p>
 
           <div className="rounded-md bg-white border border-primary-100 p-3">
@@ -121,46 +135,38 @@ export function PendingReservationModal({
             </div>
             <p className="text-xs text-gray-600 mt-2">{t('paymentReferenceHint')}</p>
           </div>
-        </div>
 
-        <div>
-          <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('depositBankDetailsTitle')}</h3>
           {contactLoading ? (
             <div className="flex justify-center py-4">
               <LoadingSpinner />
             </div>
-          ) : contact &&
-            (contact.companyName ||
-              contact.companyCode ||
-              contact.bankAccount ||
-              contact.companyEmail ||
-              contact.mainAddress) ? (
-            <dl className="space-y-2 text-sm rounded-lg border border-gray-200 bg-gray-50 p-4">
-              {contact.companyName && (
+          ) : hasBankDetails ? (
+            <dl className="space-y-2 text-sm rounded-md border border-primary-100 bg-white p-3">
+              {contact?.companyName && (
                 <div>
                   <dt className="text-gray-500">{t('companyName')}</dt>
                   <dd className="font-medium text-gray-900">{contact.companyName}</dd>
                 </div>
               )}
-              {contact.companyCode && (
+              {contact?.companyCode && (
                 <div>
                   <dt className="text-gray-500">{t('companyCode')}</dt>
                   <dd className="font-medium text-gray-900">{contact.companyCode}</dd>
                 </div>
               )}
-              {contact.bankAccount && (
+              {contact?.bankAccount && (
                 <div>
                   <dt className="text-gray-500">{t('bankAccount')}</dt>
-                  <dd className="font-medium text-gray-900 font-mono">{contact.bankAccount}</dd>
+                  <dd className="font-medium text-gray-900 font-mono break-all">{contact.bankAccount}</dd>
                 </div>
               )}
-              {contact.companyEmail && (
+              {contact?.companyEmail && (
                 <div>
                   <dt className="text-gray-500">{t('companyEmail')}</dt>
                   <dd className="font-medium text-gray-900">{contact.companyEmail}</dd>
                 </div>
               )}
-              {contact.mainAddress && (
+              {contact?.mainAddress && (
                 <div>
                   <dt className="text-gray-500">{t('mainAddress')}</dt>
                   <dd className="font-medium text-gray-900">{contact.mainAddress}</dd>
@@ -168,13 +174,7 @@ export function PendingReservationModal({
               )}
             </dl>
           ) : (
-            <p className="text-sm text-gray-600">
-              {t('depositBankDetailsFallback')}{' '}
-              <Link to={contactsHref} className="font-semibold text-primary-700 underline">
-                {t('reservationDepositContactLink')}
-              </Link>
-              .
-            </p>
+            <p className="text-sm text-gray-600">{t('depositBankDetailsFallback')}</p>
           )}
         </div>
 

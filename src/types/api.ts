@@ -182,6 +182,8 @@ export interface Contract {
   extraFees: number;
   notes: string | null;
   depositConfirmed?: boolean;
+  /** Required reservation deposit (in euro), computed server-side from duration. */
+  requiredDeposit?: number;
   user?: User; // Populated user data (admin endpoint)
   car?: Car; // Populated car data (admin endpoint)
   editLockedByUserId?: number | null;
@@ -240,6 +242,8 @@ export interface Contact {
   bankAccount?: string;
   companyEmail?: string;
   mainAddress?: string;
+  /** Cloudinary URL for the landing hero background image. Null/empty = use default gradient. */
+  heroImageUrl?: string | null;
   operationAreas: string; // Comma-separated city names
   operationAreasDetails: OperationAreaDetail[];
   createdAt: string;

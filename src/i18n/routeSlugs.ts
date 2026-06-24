@@ -1,10 +1,12 @@
 import type { Language } from './translations';
 
-/** Internal canonical route keys used in code (lp('/parts'), etc.) */
+/** Internal canonical route keys used in code (e.g. lp('/rent-cars')). */
+// NOTE: 'parts' is intentionally omitted from the public route registry while
+// the parts section is hidden. The page files still exist in the repo but are
+// not routed; any direct visits to /parts URLs fall through to the catch-all.
 export const PUBLIC_ROUTES = [
   'rent-cars',
   'sale-cars',
-  'parts',
   'contacts',
   'privacy-policy',
   'rental-terms',
@@ -23,11 +25,6 @@ export const ROUTE_SLUGS: Record<PublicRouteKey, Record<Language, string>> = {
     lt: 'parduodami-automobiliai',
     en: 'sale-cars',
     ru: 'prodazha-avto',
-  },
-  parts: {
-    lt: 'dalys',
-    en: 'parts',
-    ru: 'zapchasti',
   },
   contacts: {
     lt: 'kontaktai',

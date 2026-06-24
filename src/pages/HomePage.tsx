@@ -9,6 +9,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { citiesApi } from '../api/cities';
 import { carsApi } from '../api/cars';
+import { contactsApi } from '../api/contacts';
 import { 
   TruckIcon, 
   MapPinIcon, 
@@ -31,20 +32,44 @@ export function HomePage() {
     queryFn: () => carsApi.getAll(),
   });
 
+  const { data: contact } = useQuery({
+    queryKey: ['contacts'],
+    queryFn: contactsApi.get,
+    staleTime: 5 * 60 * 1000,
+  });
+
   const featuredCars = cars
     ?.filter((car) => car.state !== 'MAINTENANCE' && car.availableForLease !== false)
     .slice(0, 3);
 
+  const heroImageUrl = contact?.heroImageUrl ?? null;
+
   return (
     <Layout>
       {/* Hero Section */}
-      <div className="bg-gradient-to-r from-primary-600 to-primary-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
+      <div
+        className={`relative overflow-hidden text-white ${
+          heroImageUrl ? 'bg-gray-900' : 'bg-gradient-to-r from-primary-600 to-primary-800'
+        }`}
+      >
+        {heroImageUrl && (
+          <>
+            <img
+              src={heroImageUrl}
+              alt=""
+              aria-hidden="true"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+            {/* Dark overlay keeps the headline + button readable on any image */}
+            <div className="absolute inset-0 bg-black/45" aria-hidden="true" />
+          </>
+        )}
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 min-h-[460px] md:min-h-[560px] flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 drop-shadow-sm">
               {t('heroTitle')}
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-primary-100">
+            <p className="text-xl md:text-2xl mb-8 text-primary-100 drop-shadow-sm">
               {t('heroSubtitle')}
             </p>
             <Link to={lp('/rent-cars')}>

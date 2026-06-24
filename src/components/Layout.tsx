@@ -67,11 +67,6 @@ export function Layout({ children }: LayoutProps) {
                   </Link>
                 </li>
                 <li>
-                  <Link to={lp('/parts')} className="hover:text-white transition-colors">
-                    {t('parts')}
-                  </Link>
-                </li>
-                <li>
                   <Link to={lp('/privacy-policy')} className="hover:text-white transition-colors">
                     {t('privacyPolicy')}
                   </Link>

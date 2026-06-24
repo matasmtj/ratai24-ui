@@ -63,12 +63,6 @@ export function Navbar() {
                 {t('carSale')}
               </Link>
               <Link
-                to={lp('/parts')}
-                className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
-              >
-                {t('parts')}
-              </Link>
-              <Link
                 to={lp('/contacts')}
                 className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md whitespace-nowrap"
               >
@@ -234,13 +228,6 @@ export function Navbar() {
                 className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
               >
                 {t('carSale')}
-              </Link>
-              <Link
-                to={lp('/parts')}
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md"
-              >
-                {t('parts')}
               </Link>
               <Link
                 to={lp('/contacts')}

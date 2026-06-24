@@ -26,6 +26,8 @@ import { carsApi } from '../api/cars';
 
 import type { Contract } from '../types/api';
 
+import { resolveContractDeposit } from '../lib/deposit';
+
 import { 
 
   DocumentTextIcon,
@@ -277,6 +279,10 @@ export function UserDashboard() {
             variant="success"
             className="mb-6"
             reservationId={createdBannerContractId}
+            depositAmount={(() => {
+              const created = contracts?.find((c) => c.id === createdBannerContractId);
+              return created ? resolveContractDeposit(created) : 50;
+            })()}
           />
         )}
 

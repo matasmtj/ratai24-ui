@@ -25,4 +25,20 @@ export const contactsApi = {
     const response = await api.post<Contact>('/contacts', data);
     return response.data;
   },
+
+  // Upload landing hero background image (admin only)
+  uploadHeroImage: async (file: File): Promise<Contact> => {
+    const formData = new FormData();
+    formData.append('image', file);
+    const response = await api.post<Contact>('/contacts/hero-image', formData, {
+      headers: { 'Content-Type': undefined as unknown as string },
+    });
+    return response.data;
+  },
+
+  // Remove the landing hero background image (admin only)
+  deleteHeroImage: async (): Promise<Contact> => {
+    const response = await api.delete<Contact>('/contacts/hero-image');
+    return response.data;
+  },
 };

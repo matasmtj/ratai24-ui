@@ -9,7 +9,6 @@ import {
   PhoneIcon,
   UsersIcon,
   CurrencyDollarIcon,
-  WrenchScrewdriverIcon,
   ScaleIcon,
 } from '@heroicons/react/24/outline';
 import clsx from 'clsx';
@@ -21,7 +20,6 @@ export function AdminDashboard() {
   const tabs = [
     { name: t('contracts'), href: '/admin/contracts', icon: DocumentTextIcon },
     { name: t('cars'), href: '/admin/cars', icon: TruckIcon },
-    { name: t('parts'), href: '/admin/parts', icon: WrenchScrewdriverIcon },
     { name: t('cities'), href: '/admin/cities', icon: MapPinIcon },
     { name: t('contacts'), href: '/admin/contacts', icon: PhoneIcon },
     { name: t('legalPages'), href: '/admin/legal', icon: ScaleIcon },

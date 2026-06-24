@@ -14,8 +14,11 @@ import { CarsPage } from './pages/CarsPage';
 import { CarSalePage } from './pages/CarSalePage';
 import { CarDetailPage } from './pages/CarDetailPage';
 import { CarSaleDetailPage } from './pages/CarSaleDetailPage';
-import { PartsPage } from './pages/PartsPage';
-import { PartDetailPage } from './pages/PartDetailPage';
+// Parts pages are intentionally hidden from the public site for now; keep the
+// imports below commented so the modules are not tree-shaken away while the
+// route registrations are disabled.
+// import { PartsPage } from './pages/PartsPage';
+// import { PartDetailPage } from './pages/PartDetailPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
@@ -28,7 +31,8 @@ import { UserProfilePage } from './pages/UserProfilePage';
 import { AdminDashboard } from './pages/admin/AdminDashboard';
 import { AdminCitiesPage } from './pages/admin/AdminCitiesPage';
 import { AdminCarsPage } from './pages/admin/AdminCarsPage';
-import { AdminPartsPage } from './pages/admin/AdminPartsPage';
+// Parts admin page is hidden along with the public parts pages.
+// import { AdminPartsPage } from './pages/admin/AdminPartsPage';
 import { AdminContractsPage } from './pages/admin/AdminContractsPage';
 import { AdminContactsPage } from './pages/AdminContactsPage';
 import { AdminUsersPage } from './pages/admin/AdminUsersPage';
@@ -71,12 +75,6 @@ function AppRoutes() {
             <Route path={`${slug}/:id`} element={<CarSaleDetailPage />} />
           </Fragment>
         ))}
-        {getAllSlugsForRoute('parts').map((slug) => (
-          <Fragment key={`parts-${slug}`}>
-            <Route path={slug} element={<PartsPage />} />
-            <Route path={`${slug}/:id`} element={<PartDetailPage />} />
-          </Fragment>
-        ))}
         {getAllSlugsForRoute('contacts').map((slug) => (
           <Route key={`contacts-${slug}`} path={slug} element={<ContactsPage />} />
         ))}
@@ -96,8 +94,6 @@ function AppRoutes() {
       <Route path="/rent-cars/:id" element={<LegacyRedirect path="/rent-cars" />} />
       <Route path="/sale-cars" element={<Navigate to={localizedPath(DEFAULT_LANG, '/sale-cars')} replace />} />
       <Route path="/sale-cars/:id" element={<LegacyRedirect path="/sale-cars" />} />
-      <Route path="/parts" element={<Navigate to={localizedPath(DEFAULT_LANG, '/parts')} replace />} />
-      <Route path="/parts/:id" element={<LegacyRedirect path="/parts" />} />
       <Route path="/contacts" element={<Navigate to={localizedPath(DEFAULT_LANG, '/contacts')} replace />} />
       <Route path="/privacy-policy" element={<Navigate to={localizedPath(DEFAULT_LANG, '/privacy-policy')} replace />} />
       <Route path="/rental-terms" element={<Navigate to={localizedPath(DEFAULT_LANG, '/rental-terms')} replace />} />
@@ -142,7 +138,6 @@ function AppRoutes() {
         <Route index element={<Navigate to="/admin/contracts" replace />} />
         <Route path="cities" element={<AdminCitiesPage />} />
         <Route path="cars" element={<AdminCarsPage />} />
-        <Route path="parts" element={<AdminPartsPage />} />
         <Route path="contracts" element={<AdminContractsPage />} />
         <Route path="contacts" element={<AdminContactsPage />} />
         <Route path="legal" element={<AdminLegalPagesPage />} />

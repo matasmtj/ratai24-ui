@@ -1,16 +1,16 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
 import { Button } from '../components/ui/Button';
-import { LoadingPage } from '../components/ui/Loading';
+import { LoadingPage, LoadingSpinner } from '../components/ui/Loading';
 import { Select } from '../components/ui/Select';
 import { Alert } from '../components/ui/Alert';
 import { useLanguage } from '../contexts/useLanguage';
 import { contactsApi } from '../api/contacts';
 import { citiesApi } from '../api/cities';
 import type { ContactUpdate, OperationArea } from '../types/api';
-import { PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
+import { PhotoIcon, PlusIcon, TrashIcon } from '@heroicons/react/24/outline';
 
 export function AdminContactsPage() {
   const { t } = useLanguage();
@@ -56,6 +56,46 @@ export function AdminContactsPage() {
       setError(`${t('contactUpdateFailed')}: ${errorMsg}`);
     },
   });
+
+  const heroFileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const uploadHeroMutation = useMutation({
+    mutationFn: (file: File) => contactsApi.uploadHeroImage(file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      setError(null);
+    },
+    onError: (err: any) => {
+      const errorMsg = err?.response?.data?.error || err?.response?.data?.message || err?.message;
+      setError(`${t('heroImageUploadFailed')}${errorMsg ? `: ${errorMsg}` : ''}`);
+    },
+    onSettled: () => {
+      if (heroFileInputRef.current) heroFileInputRef.current.value = '';
+    },
+  });
+
+  const removeHeroMutation = useMutation({
+    mutationFn: () => contactsApi.deleteHeroImage(),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['contacts'] });
+      setError(null);
+    },
+    onError: (err: any) => {
+      const errorMsg = err?.response?.data?.error || err?.response?.data?.message || err?.message;
+      setError(`${t('heroImageRemoveFailed')}${errorMsg ? `: ${errorMsg}` : ''}`);
+    },
+  });
+
+  const handleHeroFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) uploadHeroMutation.mutate(file);
+  };
+
+  const handleRemoveHero = () => {
+    if (confirm(t('heroImageRemoveConfirm'))) {
+      removeHeroMutation.mutate();
+    }
+  };
 
   const createMutation = useMutation({
     mutationFn: contactsApi.create,
@@ -305,6 +345,72 @@ export function AdminContactsPage() {
           <Alert type="error" message={error} onClose={() => setError(null)} />
         </div>
       )}
+
+      <Card className="p-6 mb-6">
+        <div className="flex items-start gap-3 mb-4">
+          <PhotoIcon className="h-6 w-6 text-primary-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <h2 className="text-lg font-semibold text-gray-900">{t('heroImageTitle')}</h2>
+            <p className="text-sm text-gray-600 mt-1">{t('heroImageHelp')}</p>
+          </div>
+        </div>
+
+        <div className="rounded-lg overflow-hidden border border-gray-200 bg-gray-100 aspect-[21/9] flex items-center justify-center mb-4">
+          {contact?.heroImageUrl ? (
+            <img
+              src={contact.heroImageUrl}
+              alt=""
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="text-sm text-gray-500 text-center px-4">{t('heroImageNone')}</div>
+          )}
+        </div>
+
+        <input
+          ref={heroFileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          className="hidden"
+          onChange={handleHeroFileChange}
+        />
+
+        <div className="flex flex-wrap items-center gap-3">
+          <Button
+            type="button"
+            onClick={() => heroFileInputRef.current?.click()}
+            disabled={uploadHeroMutation.isPending || removeHeroMutation.isPending}
+          >
+            {uploadHeroMutation.isPending ? (
+              <span className="inline-flex items-center gap-2">
+                <LoadingSpinner size="sm" />
+                {t('uploadHeroImage')}
+              </span>
+            ) : contact?.heroImageUrl ? (
+              t('replaceHeroImage')
+            ) : (
+              t('uploadHeroImage')
+            )}
+          </Button>
+          {contact?.heroImageUrl && (
+            <Button
+              type="button"
+              variant="danger"
+              onClick={handleRemoveHero}
+              disabled={uploadHeroMutation.isPending || removeHeroMutation.isPending}
+            >
+              {removeHeroMutation.isPending ? (
+                <span className="inline-flex items-center gap-2">
+                  <LoadingSpinner size="sm" />
+                  {t('removeHeroImage')}
+                </span>
+              ) : (
+                t('removeHeroImage')
+              )}
+            </Button>
+          )}
+        </div>
+      </Card>
 
         <Card className="p-6">
           <form onSubmit={handleSubmit}>
