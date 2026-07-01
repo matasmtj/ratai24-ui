@@ -110,7 +110,6 @@ export function ContactsPage() {
         {(contact.companyName || contact.companyCode || contact.bankAccount || contact.companyEmail || contact.mainAddress) && (
           <Card className="p-8" id="payment-details">
             <h2 className="text-2xl font-bold mb-4">{t('rekvizitai')}</h2>
-            <p className="text-gray-600 mb-4">{t('depositPaymentDetailsHint')}</p>
             <div className="space-y-2 text-gray-700">
               {contact.companyName && <div><span className="text-gray-500">{t('companyName')}:</span> <b>{contact.companyName}</b></div>}
               {contact.companyCode && <div><span className="text-gray-500">{t('companyCode')}:</span> <b>{contact.companyCode}</b></div>}

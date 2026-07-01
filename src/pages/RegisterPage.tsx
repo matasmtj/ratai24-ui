@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
@@ -8,14 +8,17 @@ import { Alert } from '../components/ui/Alert';
 import { ReCaptcha, type ReCaptchaHandle } from '../components/ui/ReCaptcha';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/useLanguage';
-import { UserPlusIcon } from '@heroicons/react/24/outline';
+import {
+  EnvelopeOpenIcon,
+  UserPlusIcon,
+} from '@heroicons/react/24/outline';
 import { PasswordCriteria } from '../components/PasswordCriteria';
 import { passwordMeetsAllRequirements } from '../lib/passwordRequirements';
+import { authApi } from '../api/auth';
 
 export function RegisterPage() {
-  const navigate = useNavigate();
   const { register } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const recaptchaRef = useRef<ReCaptchaHandle>(null);
   const [formData, setFormData] = useState({
     email: '',
@@ -26,8 +29,11 @@ export function RegisterPage() {
     phoneNumber: '',
   });
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState<string | null>(null);
+  const [resendError, setResendError] = useState('');
+  const [resendSent, setResendSent] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -48,7 +54,6 @@ export function RegisterPage() {
       return;
     }
 
-    // Verify reCAPTCHA
     const recaptchaToken = recaptchaRef.current?.getValue();
     if (!recaptchaToken) {
       setError(t('completeRecaptcha'));
@@ -58,20 +63,103 @@ export function RegisterPage() {
     setIsLoading(true);
 
     try {
+      const email = formData.email.trim();
       await register({
-        email: formData.email,
+        email,
         password: formData.password,
+        language,
       });
-      
-      setSuccess(t('registerSuccess'));
-      setTimeout(() => navigate('/login'), 2000);
-    } catch (err: any) {
-      setError(err.response?.data?.error || t('registerFailed'));
+      setRegisteredEmail(email);
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === 'object' && 'response' in err
+          ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+          : undefined;
+      setError(message || t('registerFailed'));
       recaptchaRef.current?.reset();
     } finally {
       setIsLoading(false);
     }
   };
+
+  const handleResend = async () => {
+    if (!registeredEmail || resendLoading) return;
+    setResendError('');
+    setResendLoading(true);
+    try {
+      await authApi.resendVerification({ email: registeredEmail, language });
+      setResendSent(true);
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === 'object' && 'response' in err
+          ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+          : undefined;
+      setResendError(message || t('resendVerificationFailed'));
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
+  if (registeredEmail) {
+    return (
+      <Layout>
+        <div className="min-h-[80vh] flex items-center justify-center px-4 py-12">
+          <Card className="w-full max-w-md p-8">
+            <div className="text-center mb-6">
+              <div className="flex justify-center mb-4">
+                <EnvelopeOpenIcon className="h-12 w-12 text-primary-600" />
+              </div>
+              <h1 className="text-2xl font-bold text-gray-900">
+                {t('registerCheckEmailTitle')}
+              </h1>
+              <p className="text-gray-600 mt-3">
+                {t('registerCheckEmailBody').replace('{email}', registeredEmail)}
+              </p>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-xs text-gray-500 text-center">
+                {t('registerCheckEmailHint')}
+              </p>
+
+              {resendSent ? (
+                <p className="text-sm text-gray-700 text-center">
+                  {t('resendVerificationSent')}
+                </p>
+              ) : (
+                <>
+                  {resendError && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+                      {resendError}
+                    </div>
+                  )}
+                  <Button
+                    type="button"
+                    onClick={handleResend}
+                    className="w-full"
+                    isLoading={resendLoading}
+                    disabled={resendLoading}
+                    variant="secondary"
+                  >
+                    {resendLoading
+                      ? t('resendVerificationSending')
+                      : t('resendVerificationCta')}
+                  </Button>
+                </>
+              )}
+
+              <Link
+                to="/login"
+                className="block w-full text-center rounded-lg bg-primary-600 px-4 py-2 text-white font-medium hover:bg-primary-700"
+              >
+                {t('verifyEmailContinueToLogin')}
+              </Link>
+            </div>
+          </Card>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>
@@ -88,12 +176,6 @@ export function RegisterPage() {
           {error && (
             <div className="mb-4">
               <Alert type="error" message={error} onClose={() => setError('')} />
-            </div>
-          )}
-          
-          {success && (
-            <div className="mb-4">
-              <Alert type="success" message={success} />
             </div>
           )}
 

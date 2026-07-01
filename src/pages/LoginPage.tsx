@@ -9,12 +9,13 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/useLanguage';
 import { isSafeInternalPath } from '../i18n/routes';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
+import { authApi } from '../api/auth';
 
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
   const { login } = useAuth();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const recaptchaRef = useRef<ReCaptchaHandle>(null);
   const [formData, setFormData] = useState({
     email: '',
@@ -22,13 +23,42 @@ export function LoginPage() {
   });
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [resendError, setResendError] = useState('');
+  const [resendSent, setResendSent] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
   const resetBanner =
     (location.state as { passwordResetOk?: boolean } | null)?.passwordResetOk === true;
 
   const handleInputChange = (field: 'email' | 'password', value: string) => {
     setFormData({ ...formData, [field]: value });
-    // Clear error when user starts typing
     if (error) setError('');
+    if (needsVerification) {
+      setNeedsVerification(false);
+      setResendSent(false);
+      setResendError('');
+    }
+  };
+
+  const handleResend = async () => {
+    if (resendLoading || !formData.email.trim()) return;
+    setResendError('');
+    setResendLoading(true);
+    try {
+      await authApi.resendVerification({
+        email: formData.email.trim(),
+        language,
+      });
+      setResendSent(true);
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === 'object' && 'response' in err
+          ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+          : undefined;
+      setResendError(message || t('resendVerificationFailed'));
+    } finally {
+      setResendLoading(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -65,9 +95,15 @@ export function LoginPage() {
       navigate(isSafeInternalPath(from) ? from : '/dashboard', { replace: true });
     } catch (err: any) {
       console.error('Login error:', err);
-      const errorMessage = err.response?.data?.error || t('loginFailed');
-      setError(errorMessage);
-      console.log('Error set:', errorMessage);
+      const errorCode = err.response?.data?.error;
+      if (errorCode === 'EMAIL_NOT_VERIFIED') {
+        setNeedsVerification(true);
+        setResendSent(false);
+        setResendError('');
+        setError('');
+      } else {
+        setError(errorCode || t('loginFailed'));
+      }
       recaptchaRef.current?.reset();
       setIsLoading(false);
     }
@@ -88,6 +124,31 @@ export function LoginPage() {
           {resetBanner && (
             <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
               {t('passwordResetSuccess')}
+            </div>
+          )}
+
+          {needsVerification && (
+            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 text-sm space-y-2">
+              <p>{t('loginEmailNotVerified')}</p>
+              {resendSent ? (
+                <p className="text-amber-900">{t('resendVerificationSent')}</p>
+              ) : (
+                <>
+                  {resendError && (
+                    <p className="text-red-700">{resendError}</p>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleResend}
+                    disabled={resendLoading || !formData.email.trim()}
+                    className="text-sm font-semibold text-primary-700 hover:text-primary-800 underline underline-offset-2 disabled:opacity-50"
+                  >
+                    {resendLoading
+                      ? t('resendVerificationSending')
+                      : t('resendVerificationCta')}
+                  </button>
+                </>
+              )}
             </div>
           )}
 

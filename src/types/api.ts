@@ -284,7 +284,15 @@ export interface ContractComplete {
 export interface RegisterRequest {
   email: string;
   password: string;
-  role?: UserRole;
+  language?: string;
+}
+
+export interface RegisterResponse {
+  id: number;
+  email: string;
+  role: UserRole;
+  emailVerified: boolean;
+  message?: string;
 }
 
 export interface LoginRequest {
@@ -319,6 +327,19 @@ export interface ForgotPasswordResponse {
 export interface ResetPasswordRequest {
   token: string;
   password: string;
+}
+
+export interface VerifyEmailRequest {
+  token: string;
+}
+
+export interface ResendVerificationRequest {
+  email: string;
+  language?: string;
+}
+
+export interface ResendVerificationResponse {
+  message: string;
 }
 
 // Part

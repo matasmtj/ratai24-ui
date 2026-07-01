@@ -39,7 +39,7 @@ export function PendingReservationModal({
 
   if (!contract) return null;
 
-  const paymentReference = `${t('reservationNumber')} #${contract.id}`;
+  const paymentReference = `${t('reservationNumber')} Nr. ${contract.id}`;
   const depositAmount = resolveContractDeposit(contract);
   const hasBankDetails = !!(
     contact &&
