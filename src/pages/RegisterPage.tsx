@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Layout } from '../components/Layout';
 import { Card } from '../components/ui/Card';
 import { Input } from '../components/ui/Input';
@@ -15,9 +15,12 @@ import {
 import { PasswordCriteria } from '../components/PasswordCriteria';
 import { passwordMeetsAllRequirements } from '../lib/passwordRequirements';
 import { authApi } from '../api/auth';
+import { GoogleSignInButton } from '../components/GoogleSignInButton';
+import { AuthDivider } from '../components/AuthDivider';
 
 export function RegisterPage() {
-  const { register } = useAuth();
+  const navigate = useNavigate();
+  const { register, loginWithGoogle } = useAuth();
   const { t, language } = useLanguage();
   const recaptchaRef = useRef<ReCaptchaHandle>(null);
   const [formData, setFormData] = useState({
@@ -34,6 +37,29 @@ export function RegisterPage() {
   const [resendError, setResendError] = useState('');
   const [resendSent, setResendSent] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  const handleGoogleSuccess = async (credential: string) => {
+    if (googleLoading || isLoading) return;
+    setError('');
+    setGoogleLoading(true);
+    try {
+      const response = await loginWithGoogle(credential);
+      if (response.needsPhone) {
+        navigate('/complete-profile', { replace: true });
+      } else {
+        navigate('/dashboard', { replace: true });
+      }
+    } catch (err: unknown) {
+      const message =
+        err && typeof err === 'object' && 'response' in err
+          ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+          : undefined;
+      setError(message || t('googleSignInFailed'));
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -229,10 +255,20 @@ export function RegisterPage() {
               <ReCaptcha ref={recaptchaRef} />
             </div>
 
-            <Button type="submit" className="w-full" isLoading={isLoading}>
+            <Button type="submit" className="w-full" isLoading={isLoading} disabled={isLoading || googleLoading}>
               {t('register')}
             </Button>
           </form>
+
+          <AuthDivider />
+
+          <div className="flex justify-center">
+            <GoogleSignInButton
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError(t('googleSignInFailed'))}
+              disabled={isLoading || googleLoading}
+            />
+          </div>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-gray-600">

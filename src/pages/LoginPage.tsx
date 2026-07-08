@@ -10,11 +10,13 @@ import { useLanguage } from '../contexts/useLanguage';
 import { isSafeInternalPath } from '../i18n/routes';
 import { UserCircleIcon } from '@heroicons/react/24/outline';
 import { authApi } from '../api/auth';
+import { GoogleSignInButton } from '../components/GoogleSignInButton';
+import { AuthDivider } from '../components/AuthDivider';
 
 export function LoginPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const { t, language } = useLanguage();
   const recaptchaRef = useRef<ReCaptchaHandle>(null);
   const [formData, setFormData] = useState({
@@ -27,6 +29,7 @@ export function LoginPage() {
   const [resendError, setResendError] = useState('');
   const [resendSent, setResendSent] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const resetBanner =
     (location.state as { passwordResetOk?: boolean } | null)?.passwordResetOk === true;
 
@@ -68,6 +71,33 @@ export function LoginPage() {
     }
   };
 
+  const navigateAfterAuth = (needsPhone: boolean) => {
+    const from = (location.state as { from?: string } | null)?.from;
+    if (needsPhone) {
+      navigate('/complete-profile', { replace: true, state: { from } });
+      return;
+    }
+    navigate(isSafeInternalPath(from) ? from : '/dashboard', { replace: true });
+  };
+
+  const handleGoogleSuccess = async (credential: string) => {
+    if (googleLoading || isLoading) return;
+    setError('');
+    setGoogleLoading(true);
+    try {
+      const response = await loginWithGoogle(credential);
+      navigateAfterAuth(response.needsPhone === true);
+    } catch (err: unknown) {
+      const code =
+        err && typeof err === 'object' && 'response' in err
+          ? (err as { response?: { data?: { error?: string } } }).response?.data?.error
+          : undefined;
+      setError(code || t('googleSignInFailed'));
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
+
   const handleSubmit = async () => {
     console.log('Submit clicked - starting login flow');
     
@@ -90,9 +120,8 @@ export function LoginPage() {
     console.log('Starting login request...');
 
     try {
-      await login(formData);
-      const from = (location.state as { from?: string } | null)?.from;
-      navigate(isSafeInternalPath(from) ? from : '/dashboard', { replace: true });
+      const response = await login(formData);
+      navigateAfterAuth(response.needsPhone === true);
     } catch (err: any) {
       console.error('Login error:', err);
       const errorCode = err.response?.data?.error;
@@ -101,6 +130,8 @@ export function LoginPage() {
         setResendSent(false);
         setResendError('');
         setError('');
+      } else if (errorCode === 'USE_GOOGLE_SIGNIN') {
+        setError(t('loginUseGoogle'));
       } else {
         setError(errorCode || t('loginFailed'));
       }
@@ -195,10 +226,20 @@ export function LoginPage() {
               onClick={handleSubmit}
               className="w-full" 
               isLoading={isLoading}
-              disabled={isLoading}
+              disabled={isLoading || googleLoading}
             >
               {t('login')}
             </Button>
+          </div>
+
+          <AuthDivider />
+
+          <div className="flex justify-center">
+            <GoogleSignInButton
+              onSuccess={handleGoogleSuccess}
+              onError={() => setError(t('googleSignInFailed'))}
+              disabled={isLoading || googleLoading}
+            />
           </div>
 
           <div className="mt-6 text-center">

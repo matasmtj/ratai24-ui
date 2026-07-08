@@ -1,5 +1,6 @@
 import { Fragment } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
+import { GoogleAuthProvider } from './components/GoogleAuthProvider';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
@@ -24,6 +25,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
 import { ResetPasswordPage } from './pages/ResetPasswordPage';
 import { VerifyEmailPage } from './pages/VerifyEmailPage';
+import { CompleteProfilePage } from './pages/CompleteProfilePage';
 import { ContactsPage } from './pages/ContactsPage';
 import { PrivacyPolicyPage } from './pages/PrivacyPolicyPage';
 import { RentalTermsPage } from './pages/RentalTermsPage';
@@ -109,6 +111,14 @@ function AppRoutes() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/verify-email" element={<VerifyEmailPage />} />
+      <Route
+        path="/complete-profile"
+        element={
+          <ProtectedRoute requiredRole="USER" requirePhone={false}>
+            <CompleteProfilePage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* User routes */}
       <Route
@@ -156,14 +166,16 @@ function AppRoutes() {
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <BrowserRouter>
-          <ScrollToTop />
-          <AppRoutes />
-        </BrowserRouter>
-      </AuthProvider>
-    </QueryClientProvider>
+    <GoogleAuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <BrowserRouter>
+            <ScrollToTop />
+            <AppRoutes />
+          </BrowserRouter>
+        </AuthProvider>
+      </QueryClientProvider>
+    </GoogleAuthProvider>
   );
 }
 

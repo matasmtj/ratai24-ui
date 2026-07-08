@@ -1,5 +1,6 @@
 import api from '../lib/api';
 import type {
+  GoogleAuthRequest,
   LoginRequest,
   LoginResponse,
   RegisterRequest,
@@ -22,6 +23,11 @@ export const authApi = {
 
   login: async (data: LoginRequest): Promise<LoginResponse> => {
     const response = await api.post<LoginResponse>('/auth/login', data);
+    return response.data;
+  },
+
+  loginWithGoogle: async (data: GoogleAuthRequest): Promise<LoginResponse> => {
+    const response = await api.post<LoginResponse>('/auth/google', data);
     return response.data;
   },
 

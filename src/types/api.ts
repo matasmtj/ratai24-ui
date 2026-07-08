@@ -305,6 +305,11 @@ export interface LoginResponse {
   refreshToken: string;
   refreshExpiresAt: string;
   role: UserRole;
+  needsPhone?: boolean;
+}
+
+export interface GoogleAuthRequest {
+  credential: string;
 }
 
 export interface RefreshRequest {

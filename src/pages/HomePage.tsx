@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Layout } from '../components/Layout';
@@ -10,6 +11,11 @@ import { useLocalizedPath } from '../hooks/useLocalizedPath';
 import { citiesApi } from '../api/cities';
 import { carsApi } from '../api/cars';
 import { contactsApi } from '../api/contacts';
+import {
+  getCachedHeroImageUrl,
+  preloadImage,
+  setCachedHeroImageUrl,
+} from '../lib/heroImageCache';
 import { 
   TruckIcon, 
   MapPinIcon, 
@@ -32,36 +38,75 @@ export function HomePage() {
     queryFn: () => carsApi.getAll(),
   });
 
-  const { data: contact } = useQuery({
+  const { data: contact, isLoading: contactsLoading, isFetched: contactsFetched } = useQuery({
     queryKey: ['contacts'],
     queryFn: contactsApi.get,
     staleTime: 5 * 60 * 1000,
   });
 
+  const [heroImageReady, setHeroImageReady] = useState(false);
+  const cachedHeroUrl = getCachedHeroImageUrl();
+  const heroImageUrl = contact?.heroImageUrl ?? null;
+  const resolvedHeroUrl =
+    heroImageUrl ?? (contactsLoading && cachedHeroUrl ? cachedHeroUrl : null);
+
+  useEffect(() => {
+    if (heroImageUrl) {
+      setCachedHeroImageUrl(heroImageUrl);
+    }
+  }, [heroImageUrl]);
+
+  useEffect(() => {
+    if (!resolvedHeroUrl) {
+      setHeroImageReady(true);
+      return;
+    }
+    let cancelled = false;
+    setHeroImageReady(false);
+    preloadImage(resolvedHeroUrl).then(() => {
+      if (!cancelled) setHeroImageReady(true);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [resolvedHeroUrl]);
+
+  const showHeroImage = Boolean(resolvedHeroUrl);
+  const showGradient = contactsFetched && !resolvedHeroUrl;
+  const heroVisible = showHeroImage && heroImageReady;
+
   const featuredCars = cars
     ?.filter((car) => car.state !== 'MAINTENANCE' && car.availableForLease !== false)
     .slice(0, 3);
-
-  const heroImageUrl = contact?.heroImageUrl ?? null;
 
   return (
     <Layout>
       {/* Hero Section */}
       <div
-        className={`relative overflow-hidden text-white ${
-          heroImageUrl ? 'bg-gray-900' : 'bg-gradient-to-r from-primary-600 to-primary-800'
+        className={`relative overflow-hidden text-white min-h-[460px] md:min-h-[560px] ${
+          showGradient
+            ? 'bg-gradient-to-r from-primary-600 to-primary-800'
+            : 'bg-gray-900'
         }`}
       >
-        {heroImageUrl && (
+        {showHeroImage && (
           <>
             <img
-              src={heroImageUrl}
+              src={resolvedHeroUrl!}
               alt=""
               aria-hidden="true"
-              className="absolute inset-0 w-full h-full object-cover"
+              fetchPriority="high"
+              decoding="async"
+              className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-200 ${
+                heroVisible ? 'opacity-100' : 'opacity-0'
+              }`}
             />
-            {/* Dark overlay keeps the headline + button readable on any image */}
-            <div className="absolute inset-0 bg-black/45" aria-hidden="true" />
+            <div
+              className={`absolute inset-0 bg-black/45 transition-opacity duration-200 ${
+                heroVisible ? 'opacity-100' : 'opacity-0'
+              }`}
+              aria-hidden="true"
+            />
           </>
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 min-h-[460px] md:min-h-[560px] flex items-center justify-center">
