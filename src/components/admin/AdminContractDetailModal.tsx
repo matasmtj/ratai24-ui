@@ -212,7 +212,6 @@ export function AdminContractDetailModal({
       setMode('view');
     },
     onError: (error: unknown) => {
-      console.error('Update error:', error);
       const axiosErr = error as { response?: { status?: number; data?: { error?: string; message?: string; details?: { lockedBy?: ContractLockHolder } } } };
       if (axiosErr?.response?.status === 409) {
         setLockHolder(axiosErr.response.data?.details?.lockedBy ?? null);
@@ -233,7 +232,6 @@ export function AdminContractDetailModal({
       onClose();
     },
     onError: (error: any) => {
-      console.error('Complete error:', error);
       const errorMsg = error?.response?.data?.error || error?.response?.data?.message || t('errorCompletingReservation');
       setError(`${t('errorCompletingReservation')}: ${errorMsg}`);
     },
@@ -303,7 +301,6 @@ export function AdminContractDetailModal({
       endDate: endDateTime.toISOString(),
     };
     
-    console.log('Updating contract with data:', dataToUpdate);
     updateMutation.mutate({ id: contract.id, data: dataToUpdate });
   };
 

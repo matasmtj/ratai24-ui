@@ -122,7 +122,6 @@ export function CarDetailPage() {
       setIsBookingModalOpen(false);
       navigate('/dashboard', { state: { reservationCreated: true, contractId: created.id } });
     } catch (error) {
-      console.error('Booking error:', error);
       const apiError = (error as any)?.response?.data?.error;
       setBookingError(
         typeof apiError === 'string' && apiError.trim() !== ''

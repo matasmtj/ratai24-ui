@@ -28,14 +28,10 @@ export async function resolveApiBaseUrl(): Promise<string> {
 
   const localAvailable = await probeHealth(LOCAL_API_URL, LOCAL_PROBE_MS);
   if (localAvailable) {
-    const local = LOCAL_API_URL.replace(/\/$/, '');
-    console.info(`[ratai24] API: local backend (${local})`);
-    return local;
+    return LOCAL_API_URL.replace(/\/$/, '');
   }
 
-  const remote = REMOTE_API_URL.replace(/\/$/, '');
-  console.info(`[ratai24] API: remote backend (${remote}) — local not reachable at ${LOCAL_API_URL}`);
-  return remote;
+  return REMOTE_API_URL.replace(/\/$/, '');
 }
 
 export { REMOTE_API_URL, LOCAL_API_URL };

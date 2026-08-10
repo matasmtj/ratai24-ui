@@ -308,9 +308,6 @@ export function AdminCarsPage() {
                     {car.state === 'AVAILABLE' ? t('availableLabel') : car.state === 'LEASED' ? t('leasedLabel') : t('maintenanceLabel')}
                   </span>
                 </div>
-                <div className="text-xs text-gray-500">
-                  {car.useDynamicPricing ? t('startsFrom') : t('pricePerDay')}
-                </div>
                 <div className="text-primary-600 font-bold mb-2">
                   €{car.useDynamicPricing && car.basePricePerDay ? car.basePricePerDay : car.pricePerDay}{t('perDay')}
                 </div>
@@ -643,8 +640,7 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
 
   const createMutation = useMutation({
     mutationFn: carsApi.create,
-    onSuccess: (createdCar: Car) => {
-      console.log('Car created:', createdCar);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cars'] });
       setError(null);
       onClose();
@@ -657,8 +653,7 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: number; data: Partial<CarCreate> }) => carsApi.update(id, data),
-    onSuccess: (updatedCar: Car) => {
-      console.log('Car updated:', updatedCar);
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['cars'] });
       setError(null);
       onClose();

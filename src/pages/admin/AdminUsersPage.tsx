@@ -313,7 +313,6 @@ function UserFormModal({
       onClose();
     },
     onError: (error: any) => {
-      console.error('Create user error:', error);
       setError(extractApiError(error, t('userCreateError') || 'Failed to create user'));
     },
   });
@@ -327,7 +326,6 @@ function UserFormModal({
       onClose();
     },
     onError: (error: any) => {
-      console.error('Update user error:', error);
       setError(extractApiError(error, t('userUpdateError') || 'Failed to update user'));
     },
   });

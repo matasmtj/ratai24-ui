@@ -44,8 +44,7 @@ export function PricePreviewWidget({
           userId,
         });
         setPrice(data);
-      } catch (err) {
-        console.error('Error calculating price:', err);
+      } catch {
         setError(t('pricing.errors.calculationFailed'));
       } finally {
         setLoading(false);

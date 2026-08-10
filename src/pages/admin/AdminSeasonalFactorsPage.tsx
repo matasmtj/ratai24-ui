@@ -52,8 +52,7 @@ export function AdminSeasonalFactorsPage() {
       ]);
       setFactors(factorsData);
       setCities(citiesData);
-    } catch (err) {
-      console.error('Error fetching data:', err);
+    } catch {
       setError(t('pricing.errors.fetchFailed'));
     } finally {
       setLoading(false);
@@ -112,8 +111,7 @@ export function AdminSeasonalFactorsPage() {
       }
       handleCloseModal();
       await fetchData();
-    } catch (err) {
-      console.error('Error saving seasonal factor:', err);
+    } catch {
       setError(t('pricing.errors.saveFailed'));
     }
   };
@@ -124,8 +122,7 @@ export function AdminSeasonalFactorsPage() {
       setSuccessMessage(t('pricing.admin.seasonalFactorDeleted'));
       setDeleteConfirmFactor(null);
       await fetchData();
-    } catch (err) {
-      console.error('Error deleting seasonal factor:', err);
+    } catch {
       setError(t('pricing.errors.deleteFailed'));
     }
   };

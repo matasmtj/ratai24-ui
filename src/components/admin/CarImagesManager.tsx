@@ -84,10 +84,6 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
       setUploading(false);
     },
     onError: (error: any) => {
-      console.error('Upload error:', error);
-      console.error('Error response:', error.response?.data);
-      console.error('Error status:', error.response?.status);
-      
       let errorMessage = 'Failed to upload images. ';
       if (error.response?.status === 401) {
         errorMessage += 'Authentication failed. Please log in again.';

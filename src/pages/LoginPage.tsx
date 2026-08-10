@@ -99,17 +99,11 @@ export function LoginPage() {
   };
 
   const handleSubmit = async () => {
-    console.log('Submit clicked - starting login flow');
-    
-    // Prevent multiple submissions
     if (isLoading) {
-      console.log('Already loading, preventing duplicate submission');
       return;
     }
 
-    // Verify reCAPTCHA
     const recaptchaToken = recaptchaRef.current?.getValue();
-    console.log('ReCAPTCHA token:', recaptchaToken ? 'present' : 'missing');
     
     if (!recaptchaToken) {
       setError(t('completeRecaptcha'));
@@ -117,13 +111,11 @@ export function LoginPage() {
     }
 
     setIsLoading(true);
-    console.log('Starting login request...');
 
     try {
       const response = await login(formData);
       navigateAfterAuth(response.needsPhone === true);
     } catch (err: any) {
-      console.error('Login error:', err);
       const errorCode = err.response?.data?.error;
       if (errorCode === 'EMAIL_NOT_VERIFIED') {
         setNeedsVerification(true);

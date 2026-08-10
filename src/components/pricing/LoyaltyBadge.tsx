@@ -22,8 +22,7 @@ export function LoyaltyBadge() {
       try {
         const data = await pricingApi.getCustomerLoyalty();
         setLoyalty(data);
-      } catch (error) {
-        console.error('Error fetching loyalty:', error);
+      } catch {
         setLoyalty(GUEST_FALLBACK);
         setFetchError(true);
       } finally {

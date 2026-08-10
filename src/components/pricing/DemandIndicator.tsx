@@ -17,8 +17,8 @@ export function DemandIndicator({ cityId }: DemandIndicatorProps) {
       try {
         const data = await pricingApi.getCityDemand(cityId);
         setDemand(data);
-      } catch (error) {
-        console.error('Error fetching demand:', error);
+      } catch {
+        // demand indicator is optional UI
       } finally {
         setLoading(false);
       }

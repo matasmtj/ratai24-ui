@@ -20,10 +20,6 @@ export const carsApi = {
   getAll: async (cityId?: number): Promise<Car[]> => {
     const params = cityId ? { cityId } : {};
     const response = await api.get<Car[]>('/cars', { params });
-    console.log('Cars API response:', response.data);
-    if (response.data.length > 0) {
-      console.log('First car images:', response.data[0].images);
-    }
     return response.data;
   },
 

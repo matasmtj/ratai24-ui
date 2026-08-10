@@ -235,9 +235,6 @@ export function HomePage() {
                           </span>
                         </div>
                       )}
-                      <div className="text-sm text-gray-500">
-                        {car.useDynamicPricing ? t('startsFrom') : t('pricePerDay')}
-                      </div>
                       <span className="text-2xl font-bold text-primary-600">
                         €{car.useDynamicPricing && car.basePricePerDay ? car.basePricePerDay : car.pricePerDay}{t('perDay')}
                       </span>

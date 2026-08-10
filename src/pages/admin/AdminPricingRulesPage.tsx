@@ -65,8 +65,7 @@ export function AdminPricingRulesPage() {
       setRules(rulesData);
       setCars(carsData);
       setCities(citiesData);
-    } catch (err) {
-      console.error('Error fetching data:', err);
+    } catch {
       setError(t('pricing.errors.fetchFailed'));
     } finally {
       setLoading(false);
@@ -197,7 +196,6 @@ export function AdminPricingRulesPage() {
       handleCloseModal();
       await fetchData();
     } catch (err) {
-      console.error('Error saving rule:', err);
       setModalError(getApiErrorMessage(err));
     }
   };
@@ -208,8 +206,7 @@ export function AdminPricingRulesPage() {
       setSuccessMessage(t('pricing.admin.ruleDeleted'));
       setDeleteConfirmRule(null);
       await fetchData();
-    } catch (err) {
-      console.error('Error deleting rule:', err);
+    } catch {
       setError(t('pricing.errors.deleteFailed'));
     }
   };

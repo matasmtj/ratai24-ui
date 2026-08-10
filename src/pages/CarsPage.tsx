@@ -371,19 +371,15 @@ export function CarsPage() {
                                   {t('dynamicLabel')}
                                 </span>
                               </div>
-                              <div className="text-sm text-gray-500">{t('startsFrom')}</div>
                               <div className="text-2xl font-bold text-primary-600">
                                 €{car.minPricePerDay || car.basePricePerDay || car.pricePerDay}
                                 <span className="text-sm font-normal text-gray-500">{t('perDay')}</span>
                               </div>
                             </>
                           ) : (
-                            <>
-                              <div className="text-sm text-gray-500">{t('pricePerDay')}</div>
-                              <div className="text-2xl font-bold text-primary-600">
-                                €{car.pricePerDay}
-                              </div>
-                            </>
+                            <div className="text-2xl font-bold text-primary-600">
+                              €{car.pricePerDay}{t('perDay')}
+                            </div>
                           )}
                         </div>
                         <Button size="sm">{t('view')}</Button>

@@ -100,8 +100,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (refreshToken) {
       try {
         await authApi.logout({ refreshToken });
-      } catch (error) {
-        console.error('Logout error:', error);
+      } catch {
+        // ignore logout errors
       }
     }
 

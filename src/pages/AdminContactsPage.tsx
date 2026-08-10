@@ -51,7 +51,6 @@ export function AdminContactsPage() {
       setIsEditing(false);
     },
     onError: (error: any) => {
-      console.error('Contact update error:', error);
       const errorMsg = error?.response?.data?.error || error?.response?.data?.message || error.message;
       setError(`${t('contactUpdateFailed')}: ${errorMsg}`);
     },
@@ -104,7 +103,6 @@ export function AdminContactsPage() {
       setError(null);
     },
     onError: (error: any) => {
-      console.error('Contact create error:', error);
       const errorMsg = error?.response?.data?.error || error?.response?.data?.message || error.message;
       setError(`${t('contactCreateFailed')}: ${errorMsg}`);
     },
@@ -195,7 +193,6 @@ export function AdminContactsPage() {
     // If no contact exists, allow admin to create one
     const handleCreate = async (e: React.FormEvent) => {
       e.preventDefault();
-      console.log('Creating contact with data:', formData);
       createMutation.mutate(formData);
     };
 

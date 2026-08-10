@@ -7,9 +7,7 @@ export const contactsApi = {
     try {
       const response = await api.get<Contact>('/contacts');
       return response.data;
-    } catch (error) {
-      // Return null if contacts endpoint doesn't exist yet
-      console.warn('Contacts endpoint not available:', error);
+    } catch {
       return null;
     }
   },

@@ -38,8 +38,7 @@ export function AdminPricingDashboard() {
       ]);
       setAnalytics(analyticsData);
       setPerformance(performanceData);
-    } catch (err) {
-      console.error('Error fetching pricing data:', err);
+    } catch {
       setError(t('pricing.errors.fetchFailed'));
     } finally {
       setAnalyticsLoading(false);
@@ -60,8 +59,7 @@ export function AdminPricingDashboard() {
       await pricingApi.refreshPricingData();
       setSuccessMessage(t('pricing.admin.refreshSuccess'));
       await fetchData();
-    } catch (err) {
-      console.error('Error refreshing pricing:', err);
+    } catch {
       setError(t('pricing.errors.refreshFailed'));
     } finally {
       setRefreshing(false);
