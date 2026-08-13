@@ -22,7 +22,7 @@ export const translations = {
     heroSubtitle: 'Greita, paprasta ir patikima automobilių nuoma jūsų kelionėms',
     viewCars: 'Peržiūrėti automobilius',
     activeCities: 'Mes veikiame šiuose miestuose',
-    whyUs: 'Mašinų privalumai',
+    whyUs: 'Kodėl Ratai24?',
     simpleBooking: 'Paprasta rezervacija',
     simpleBookingDesc: 'Užsiregistruokite, pasirinkite automobilį ir rezervuokite per kelias minutes',
     fastConfirmation: 'Greitas patvirtinimas',
