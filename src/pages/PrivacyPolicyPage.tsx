@@ -12,7 +12,7 @@ export function PrivacyPolicyPage() {
     queryKey: ['contact-info'],
     queryFn: contactsApi.get,
   });
-  const contactEmail = contact?.email?.trim() || contact?.companyEmail?.trim() || 'info@ratai24.lt';
+  const contactEmail = contact?.email?.trim() || contact?.companyEmail?.trim() || 'info@skirvita.lt';
 
   const activeLanguage = language === 'en' || language === 'ru' ? language : 'lt';
   const { data: legalPage } = useQuery({

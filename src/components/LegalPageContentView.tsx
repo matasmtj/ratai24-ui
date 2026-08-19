@@ -14,7 +14,7 @@ function withEmail(text: string, email: string) {
 export function LegalPageContentView({
   content,
   title,
-  email = 'info@ratai24.lt',
+  email = 'info@skirvita.lt',
   className = '',
 }: LegalPageContentViewProps) {
   return (

@@ -1,12 +1,12 @@
 {
   "privacy-policy": {
     "lt": {
-      "intro": "Ši privatumo politika paaiškina, kaip \"Ratai24\" renka, naudoja ir saugo jūsų asmens duomenis, kai naudojatės mūsų svetaine, paskyra ir paslaugomis.",
+      "intro": "Ši privatumo politika paaiškina, kaip \"Skirvita\" renka, naudoja ir saugo jūsų asmens duomenis, kai naudojatės mūsų svetaine, paskyra ir paslaugomis.",
       "sections": [
         {
           "title": "1. Duomenų valdytojas",
           "paragraphs": [
-            "Duomenų valdytojas: Ratai24 (juridinio asmens rekvizitai gali būti pateikti sutartyje). Norėdami įgyvendinti savo teises, kreipkitės el. paštu {email}."
+            "Duomenų valdytojas: Skirvita (juridinio asmens rekvizitai gali būti pateikti sutartyje). Norėdami įgyvendinti savo teises, kreipkitės el. paštu {email}."
           ]
         },
         {
@@ -82,12 +82,12 @@
       ]
     },
     "en": {
-      "intro": "This Privacy Policy explains how \"Ratai24\" collects, uses, and protects your personal data when you use our website, account, and services.",
+      "intro": "This Privacy Policy explains how \"Skirvita\" collects, uses, and protects your personal data when you use our website, account, and services.",
       "sections": [
         {
           "title": "1. Data controller",
           "paragraphs": [
-            "Data controller: Ratai24 (legal entity details may be provided in the rental agreement). To exercise your rights, contact us at {email}."
+            "Data controller: Skirvita (legal entity details may be provided in the rental agreement). To exercise your rights, contact us at {email}."
           ]
         },
         {
@@ -163,12 +163,12 @@
       ]
     },
     "ru": {
-      "intro": "Настоящая политика конфиденциальности объясняет, как \"Ratai24\" собирает, использует и защищает ваши персональные данные при использовании сайта, аккаунта и услуг.",
+      "intro": "Настоящая политика конфиденциальности объясняет, как \"Skirvita\" собирает, использует и защищает ваши персональные данные при использовании сайта, аккаунта и услуг.",
       "sections": [
         {
           "title": "1. Оператор данных",
           "paragraphs": [
-            "Оператор персональных данных: Ratai24 (реквизиты юридического лица могут быть указаны в договоре аренды). Для реализации ваших прав свяжитесь с нами по адресу {email}."
+            "Оператор персональных данных: Skirvita (реквизиты юридического лица могут быть указаны в договоре аренды). Для реализации ваших прав свяжитесь с нами по адресу {email}."
           ]
         },
         {
@@ -246,7 +246,7 @@
   },
   "rental-terms": {
     "lt": {
-      "intro": "Šios sąlygos taikomos rezervuojant ir nuomojant automobilius per Ratai24.",
+      "intro": "Šios sąlygos taikomos rezervuojant ir nuomojant automobilius per Skirvita.",
       "sections": [
         {
           "title": "1. Rezervacija",
@@ -348,7 +348,7 @@
       "note": "Pastaba: konkrečios kainos, nuolaidos ir papildomos paslaugos gali būti nustatomos individualioje sutartyje ar užsakyme."
     },
     "en": {
-      "intro": "These terms apply when reserving and renting vehicles through Ratai24.",
+      "intro": "These terms apply when reserving and renting vehicles through Skirvita.",
       "sections": [
         {
           "title": "1. Reservation",
@@ -450,7 +450,7 @@
       "note": "Note: specific prices, discounts, and additional services may be defined in an individual agreement or booking."
     },
     "ru": {
-      "intro": "Настоящие условия применяются при бронировании и аренде автомобилей через Ratai24.",
+      "intro": "Настоящие условия применяются при бронировании и аренде автомобилей через Skirvita.",
       "sections": [
         {
           "title": "1. Бронирование",

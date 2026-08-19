@@ -35,7 +35,7 @@ export function Layout({ children }: LayoutProps) {
             <div className="col-span-1">
               <div className="flex items-center mb-4">
                 <TruckIcon className="h-8 w-8 text-primary-400" />
-                <span className="ml-2 text-xl font-bold text-white">Ratai24</span>
+                <span className="ml-2 text-xl font-bold text-white">Skirvita</span>
               </div>
               <p className="text-sm text-gray-400">
                 {t('footerTagline')}
@@ -143,7 +143,7 @@ export function Layout({ children }: LayoutProps) {
 
           <div className="border-t border-gray-800 mt-8 pt-8 text-center">
             <p className="text-sm text-gray-400">
-              © {new Date().getFullYear()} Ratai24. {t('footer')}
+              © {new Date().getFullYear()} Skirvita. {t('footer')}
             </p>
           </div>
         </div>

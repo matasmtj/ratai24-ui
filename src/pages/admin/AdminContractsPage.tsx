@@ -11,8 +11,9 @@ import { contractsApi } from '../../api/contracts';
 import { carsApi } from '../../api/cars';
 import { usersApi } from '../../api/users';
 import { format } from 'date-fns';
-import { CheckCircleIcon, XCircleIcon, FunnelIcon, XMarkIcon } from '@heroicons/react/24/outline';
+import { CheckCircleIcon, XCircleIcon, FunnelIcon, XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { AdminContractDetailModal } from '../../components/admin/AdminContractDetailModal';
+import { AdminManualBookingModal } from '../../components/admin/AdminManualBookingModal';
 import type { Contract } from '../../types/api';
 import { PaginationBar } from '../../components/ui/PaginationBar';
 import { slicePage, visibleRange } from '../../lib/pagination';
@@ -27,6 +28,7 @@ export function AdminContractsPage() {
   const [stateFilter, setStateFilter] = useState<string>('');
   const [sortBy, setSortBy] = useState<string>('');
   const [selectedContract, setSelectedContract] = useState<Contract | null>(null);
+  const [manualBookingOpen, setManualBookingOpen] = useState(false);
   const [itemsPerPage, setItemsPerPage] = useState<number>(10);
   const [page, setPage] = useState(1);
   const listAnchorRef = useRef<HTMLDivElement>(null);
@@ -57,7 +59,10 @@ export function AdminContractsPage() {
     const filtered = contracts.filter((contract) => {
       const matchesSearch = 
         contract.id.toString().includes(searchTerm) ||
-        contract.carId.toString().includes(searchTerm);
+        contract.carId.toString().includes(searchTerm) ||
+        (contract.guestName?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false) ||
+        (contract.guestPhone?.includes(searchTerm) ?? false) ||
+        (contract.guestEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false);
       const matchesState = !stateFilter || contract.state === stateFilter;
       return matchesSearch && matchesState;
     });
@@ -159,8 +164,12 @@ export function AdminContractsPage() {
 
   return (
     <div>
-      <div className="mb-6">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <h2 className="text-xl font-semibold">{t('allReservations')}</h2>
+        <Button onClick={() => setManualBookingOpen(true)}>
+          <PlusIcon className="h-5 w-5 mr-2 inline" />
+          {t('manualBooking')}
+        </Button>
       </div>
 
       {/* Filters */}
@@ -368,6 +377,11 @@ export function AdminContractsPage() {
           car={selectedContract.car}
         />
       )}
+
+      <AdminManualBookingModal
+        isOpen={manualBookingOpen}
+        onClose={() => setManualBookingOpen(false)}
+      />
     </div>
   );
 }
@@ -456,12 +470,26 @@ function ContractCard({
               {t('carLabel')}: {car ? `${car.make} ${car.model}` : carError ? <span className="text-red-600 italic">(Deleted Car #{contract.carId})</span> : `#${contract.carId}`}
             </div>
             <div>
-              {t('userLabel')}: #{contract.userId}
-              {user?.email ? (
-                <span className="ml-2 text-gray-800 font-medium">({user.email})</span>
-              ) : userError ? (
-                <span className="ml-2 text-red-600 italic">(Deleted User)</span>
-              ) : null}
+              {contract.userId == null ? (
+                <>
+                  {t('guestLabel')}: {contract.guestName}
+                  {contract.guestPhone ? (
+                    <span className="ml-2 text-gray-800 font-medium">({contract.guestPhone})</span>
+                  ) : null}
+                  {contract.guestEmail ? (
+                    <span className="ml-2 text-gray-600">{contract.guestEmail}</span>
+                  ) : null}
+                </>
+              ) : (
+                <>
+                  {t('userLabel')}: #{contract.userId}
+                  {user?.email ? (
+                    <span className="ml-2 text-gray-800 font-medium">({user.email})</span>
+                  ) : userError ? (
+                    <span className="ml-2 text-red-600 italic">(Deleted User)</span>
+                  ) : null}
+                </>
+              )}
             </div>
             <div>
               {t('datesLabel')}: {format(new Date(contract.startDate), 'yyyy-MM-dd HH:mm')} -{' '}

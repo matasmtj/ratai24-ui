@@ -169,7 +169,10 @@ export interface ContractLockHolder {
 
 export interface Contract {
   id: number;
-  userId: number;
+  userId: number | null;
+  guestName?: string | null;
+  guestPhone?: string | null;
+  guestEmail?: string | null;
   carId: number;
   startDate: string;
   endDate: string;
@@ -213,6 +216,16 @@ export interface ContractCreate {
   endDate: string;
   mileageStartKm: number;
   fuelLevelStartPct: number;
+  notes?: string;
+}
+
+export interface ContractManualCreate {
+  carId: number;
+  startDate: string;
+  endDate: string;
+  guestName: string;
+  guestPhone: string;
+  guestEmail?: string;
   notes?: string;
 }
 

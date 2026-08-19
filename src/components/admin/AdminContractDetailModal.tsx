@@ -451,11 +451,16 @@ export function AdminContractDetailModal({
           <span className={`inline-flex px-3 py-1 rounded-full text-sm font-medium ${getStatusBadge(mode === 'edit' ? editFormData.state! : contract.state)}`}>
             {mode === 'edit' ? getStateLabel(editFormData.state!) : getStateLabel(contract.state)}
           </span>
-          {contract.user && (
+          {contract.user ? (
             <div className="text-sm text-gray-600">
               {t('customer')}: <span className="font-medium">{contract.user.email}</span>
             </div>
-          )}
+          ) : contract.userId == null && contract.guestName ? (
+            <div className="text-sm text-gray-600">
+              {t('guestLabel')}: <span className="font-medium">{contract.guestName}</span>
+              {contract.guestPhone ? ` · ${contract.guestPhone}` : ''}
+            </div>
+          ) : null}
         </div>
 
         {/* Car Information */}

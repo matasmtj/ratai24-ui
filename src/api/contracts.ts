@@ -1,5 +1,5 @@
 import api from '../lib/api';
-import type { Contract, ContractCreate, ContractUpdate, ContractComplete } from '../types/api';
+import type { Contract, ContractCreate, ContractUpdate, ContractComplete, ContractManualCreate } from '../types/api';
 
 export const contractsApi = {
   // Get all contracts (ADMIN only)
@@ -21,6 +21,11 @@ export const contractsApi = {
 
   create: async (data: ContractCreate): Promise<Contract> => {
     const response = await api.post<Contract>('/contracts', data);
+    return response.data;
+  },
+
+  createManual: async (data: ContractManualCreate): Promise<Contract> => {
+    const response = await api.post<Contract>('/contracts/manual', data);
     return response.data;
   },
 
