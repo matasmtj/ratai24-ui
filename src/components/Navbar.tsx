@@ -39,8 +39,12 @@ export function Navbar() {
       <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center gap-6">
-            <Link to={lp('/')} className="flex items-center flex-shrink-0 text-xl font-bold text-gray-900">
-              Ratai24
+            <Link to={lp('/')} className="flex items-center flex-shrink-0">
+              <img
+                src="/skirvita_nuoma.png"
+                alt="Skirvita – automobilių nuoma"
+                className="h-10 w-auto"
+              />
             </Link>
 
             <div className="hidden lg:flex lg:space-x-3">
