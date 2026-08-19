@@ -12,6 +12,7 @@ export type BodyType =
   | 'SEDAN'
   | 'HATCHBACK'
   | 'SUV'
+  | 'MPV'
   | 'WAGON'
   | 'COUPE'
   | 'CONVERTIBLE'
@@ -55,8 +56,8 @@ export interface CarImage {
 // Car
 export interface Car {
   id: number;
-  vin: string;
-  numberPlate: string;
+  vin: string | null;
+  numberPlate: string | null;
   make: string;
   model: string;
   year: number;
@@ -90,8 +91,8 @@ export interface Car {
 }
 
 export interface CarCreate {
-  vin: string;
-  numberPlate: string;
+  vin?: string | null;
+  numberPlate?: string | null;
   make: string;
   model: string;
   year: number;

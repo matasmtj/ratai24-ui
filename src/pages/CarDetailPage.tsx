@@ -311,7 +311,7 @@ export function CarDetailPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <div className="text-sm text-gray-500">{t('licenseNumber')}</div>
-                  <div className="font-medium">{car.numberPlate}</div>
+                  <div className="font-medium">{car.numberPlate ?? '—'}</div>
                 </div>
                 <div>
                   <div className="text-sm text-gray-500">{t('fuelType')}</div>

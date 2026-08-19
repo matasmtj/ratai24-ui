@@ -133,7 +133,7 @@ export function AdminManualBookingModal({ isOpen, onClose }: AdminManualBookingM
             { value: '', label: t('selectCar') },
             ...leaseCars.map((car) => ({
               value: String(car.id),
-              label: `${car.make} ${car.model} (${car.numberPlate})`,
+              label: `${car.make} ${car.model}${car.numberPlate ? ` (${car.numberPlate})` : ''}`,
             })),
           ]}
           required

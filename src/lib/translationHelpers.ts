@@ -17,6 +17,7 @@ export function getBodyTypeKey(bodyType: BodyType): string {
     SEDAN: 'sedan',
     HATCHBACK: 'hatchback',
     SUV: 'suv',
+    MPV: 'mpv',
     WAGON: 'wagon',
     COUPE: 'coupe',
     CONVERTIBLE: 'convertible',

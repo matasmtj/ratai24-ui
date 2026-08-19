@@ -60,7 +60,7 @@ export function AdminCarsPage() {
       const matchesSearch = 
         car.make.toLowerCase().includes(searchTerm.toLowerCase()) ||
         car.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        car.numberPlate.toLowerCase().includes(searchTerm.toLowerCase());
+        (car.numberPlate ?? '').toLowerCase().includes(searchTerm.toLowerCase());
       const matchesCity = !cityFilter || car.cityId.toString() === cityFilter;
       const matchesState = !stateFilter || car.state === stateFilter;
       return matchesSearch && matchesCity && matchesState;
@@ -291,7 +291,7 @@ export function AdminCarsPage() {
                 <h3 className="font-semibold text-lg mb-1">
                   {car.make} {car.model}
                 </h3>
-                <p className="text-gray-600 text-sm mb-2">{car.year} {t('year')} • {car.numberPlate}</p>
+                <p className="text-gray-600 text-sm mb-2">{car.year} {t('year')} • {car.numberPlate ?? '—'}</p>
                 <div className="flex justify-between items-center mb-2">
                   <div className="flex items-center gap-2">
                     {car.useDynamicPricing && (
@@ -451,7 +451,7 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
   
   // VIN validation function
   const validateVIN = (vin: string): { valid: boolean; error?: string } => {
-    if (!vin) return { valid: false, error: t('vinRequired') || 'VIN is required' };
+    if (!vin.trim()) return { valid: true };
     
     // Remove whitespace
     const cleanVIN = vin.trim().toUpperCase();
@@ -487,6 +487,8 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
     | 'applyUtilizationPricing'
     | 'utilizationMultiplierOverride'
   > & {
+    vin: string;
+    numberPlate: string;
     year: number;
     pricePerDay: string | number;
     cityId: number;
@@ -551,8 +553,8 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
       const fmt = (n: number) => (Number.isFinite(n) ? String(round2(n)) : '');
 
       setFormData({
-        vin: car.vin,
-        numberPlate: car.numberPlate,
+        vin: car.vin ?? '',
+        numberPlate: car.numberPlate ?? '',
         make: car.make,
         model: car.model,
         year: car.year,
@@ -711,6 +713,8 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
     // Convert string values to numbers for API
     const submitData: CarCreate = {
       ...formData,
+      vin: formData.vin.trim() || null,
+      numberPlate: formData.numberPlate.trim() || null,
       pricePerDay: typeof formData.pricePerDay === 'string' ? Number(formData.pricePerDay) : formData.pricePerDay,
       salePrice: formData.salePrice === null || formData.salePrice === '' 
         ? null 
@@ -959,9 +963,8 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
             }}
             maxLength={17}
             placeholder="17 characters (e.g., 1HGBH41JXMN109186)"
-            required 
           />
-          <Input label={t('numberPlate')} value={formData.numberPlate} onChange={(e) => setFormData({ ...formData, numberPlate: e.target.value })} required />
+          <Input label={t('numberPlate')} value={formData.numberPlate} onChange={(e) => setFormData({ ...formData, numberPlate: e.target.value })} />
           <SearchableSelect 
             label={t('yearField')} 
             value={String(formData.year)} 
@@ -1005,6 +1008,7 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
             { value: 'SEDAN', label: t('sedan') },
             { value: 'HATCHBACK', label: t('hatchback') },
             { value: 'SUV', label: t('suv') },
+            { value: 'MPV', label: t('mpv') },
             { value: 'WAGON', label: t('wagon') },
             { value: 'COUPE', label: t('coupe') },
             { value: 'CONVERTIBLE', label: t('convertible') },

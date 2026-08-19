@@ -420,7 +420,7 @@ export function AdminPricingRulesPage() {
                 <div className="max-h-48 overflow-y-auto space-y-1">
                   {cars
                     .filter((car) =>
-                      `${car.make} ${car.model} ${car.numberPlate}`
+                      `${car.make} ${car.model}${car.numberPlate ? ` ${car.numberPlate}` : ''}`
                         .toLowerCase()
                         .includes(carSearch.toLowerCase())
                     )
@@ -442,7 +442,7 @@ export function AdminPricingRulesPage() {
                               );
                             }}
                           />
-                          <span>{`${car.make} ${car.model} - ${car.numberPlate}`}</span>
+                          <span>{`${car.make} ${car.model}${car.numberPlate ? ` - ${car.numberPlate}` : ''}`}</span>
                         </label>
                       );
                     })}

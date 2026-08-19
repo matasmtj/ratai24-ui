@@ -10,6 +10,12 @@ services:
     buildCommand: npm install && npm run build
     staticPublishPath: dist
     routes:
+      - type: rewrite
+        source: /sitemap.xml
+        destination: /sitemap.xml
+      - type: rewrite
+        source: /robots.txt
+        destination: /robots.txt
       # So /login, /dashboard, etc. serve index.html on refresh (client router handles path)
       - type: rewrite
         source: /*

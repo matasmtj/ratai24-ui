@@ -229,6 +229,7 @@ export function CarSalePage() {
                   { value: 'SEDAN', label: t('sedan') },
                   { value: 'HATCHBACK', label: t('hatchback') },
                   { value: 'SUV', label: t('suv') },
+                  { value: 'MPV', label: t('mpv') },
                   { value: 'WAGON', label: t('wagon') },
                   { value: 'COUPE', label: t('coupe') },
                   { value: 'CONVERTIBLE', label: t('convertible') },

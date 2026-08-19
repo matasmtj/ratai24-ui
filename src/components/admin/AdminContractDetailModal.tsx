@@ -470,7 +470,7 @@ export function AdminContractDetailModal({
             <div className="grid grid-cols-2 gap-2 text-sm">
               <div><span className="text-gray-600">{t('vehicle')}:</span> {car.make} {car.model}</div>
               <div><span className="text-gray-600">{t('yearLabel')}:</span> {car.year}</div>
-              <div><span className="text-gray-600">{t('plate')}:</span> {car.numberPlate}</div>
+              <div><span className="text-gray-600">{t('plate')}:</span> {car.numberPlate ?? '—'}</div>
               <div><span className="text-gray-600">{t('pricePerDayLabel')}:</span> €{car.pricePerDay}</div>
             </div>
           </div>
