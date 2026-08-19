@@ -2,11 +2,14 @@ import { useEffect } from 'react';
 import { Outlet, useParams, Navigate, useLocation } from 'react-router-dom';
 import { useLanguage } from '../contexts/useLanguage';
 import { DEFAULT_LANG, getCanonicalRedirectPath, isSupportedLang, stripLangPrefix } from '../i18n/routes';
+import { resolveRouteKeyFromSlug } from '../i18n/routeSlugs';
+import { PageMeta } from './PageMeta';
+import { getSeoTranslationKeys } from '../lib/seo';
 
 export function LocaleLayout() {
   const { lang } = useParams<{ lang: string }>();
   const location = useLocation();
-  const { setLanguage } = useLanguage();
+  const { setLanguage, t } = useLanguage();
 
   useEffect(() => {
     if (isSupportedLang(lang)) {
@@ -25,5 +28,19 @@ export function LocaleLayout() {
     return <Navigate to={canonical} replace />;
   }
 
-  return <Outlet />;
+  const firstSegment = pathWithoutLang.split('/').filter(Boolean)[0] ?? '';
+  const routeKey = firstSegment ? resolveRouteKeyFromSlug(firstSegment) : null;
+  const seoKeys = getSeoTranslationKeys(routeKey);
+  const canonicalPath = `/${lang}${pathWithoutLang === '/' ? '' : pathWithoutLang.split('?')[0]}`;
+
+  return (
+    <>
+      <PageMeta
+        title={t(seoKeys.title)}
+        description={t(seoKeys.description)}
+        path={canonicalPath}
+      />
+      <Outlet />
+    </>
+  );
 }

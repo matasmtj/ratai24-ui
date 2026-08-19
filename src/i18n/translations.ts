@@ -16,6 +16,20 @@ export const translations = {
     privacyPolicyTitle: 'Privatumo politika',
     rentalTermsTitle: 'Nuomos sąlygos',
     cancellationPolicyNote: 'Rezervaciją galima atšaukti tik likus bent 24 val. iki jos pradžios.',
+
+    // SEO (search engines & social previews)
+    seoHomeTitle: 'Ratai24 – mikroautobusų ir lengvųjų automobilių nuoma',
+    seoHomeDescription: 'Greita, paprasta ir patikima automobilių nuoma. Peržiūrėkite katalogą, rezervuokite online ir keliaukite be rūpesčių.',
+    seoRentCarsTitle: 'Automobilių nuoma – Ratai24',
+    seoRentCarsDescription: 'Išnuomokite mikroautobusą ar lengvąjį automobilį. Platus pasirinkimas, aiškios kainos, rezervacija online.',
+    seoSaleCarsTitle: 'Automobilių pardavimas – Ratai24',
+    seoSaleCarsDescription: 'Peržiūrėkite parduodamus automobilius. Ratai24 – patikimas pasirinkimas.',
+    seoContactsTitle: 'Kontaktai – Ratai24',
+    seoContactsDescription: 'Susisiekite su Ratai24 dėl automobilių nuomos. Adresai, telefonas ir darbo laikas.',
+    seoPrivacyTitle: 'Privatumo politika – Ratai24',
+    seoPrivacyDescription: 'Ratai24 privatumo politika – kaip tvarkome jūsų asmens duomenis.',
+    seoRentalTermsTitle: 'Nuomos sąlygos – Ratai24',
+    seoRentalTermsDescription: 'Automobilių nuomos sąlygos ir taisyklės – Ratai24.',
     
     // Home Page
     heroTitle: 'Mikroautobusų ir lengvųjų automobilių nuoma',
@@ -846,6 +860,20 @@ export const translations = {
     privacyPolicyTitle: 'Privacy Policy',
     rentalTermsTitle: 'Rental Terms',
     cancellationPolicyNote: 'You can cancel only if more than 24 hours remain before the start time.',
+
+    // SEO (search engines & social previews)
+    seoHomeTitle: 'Ratai24 – minibus and car rental',
+    seoHomeDescription: 'Fast, simple and reliable car rental. Browse our catalog, book online, and hit the road with confidence.',
+    seoRentCarsTitle: 'Car rental – Ratai24',
+    seoRentCarsDescription: 'Rent a minibus or car with clear pricing and online booking.',
+    seoSaleCarsTitle: 'Cars for sale – Ratai24',
+    seoSaleCarsDescription: 'Browse cars for sale at Ratai24.',
+    seoContactsTitle: 'Contacts – Ratai24',
+    seoContactsDescription: 'Get in touch with Ratai24 for car rental. Address, phone, and business hours.',
+    seoPrivacyTitle: 'Privacy policy – Ratai24',
+    seoPrivacyDescription: 'Ratai24 privacy policy – how we handle your personal data.',
+    seoRentalTermsTitle: 'Rental terms – Ratai24',
+    seoRentalTermsDescription: 'Car rental terms and conditions – Ratai24.',
     
     // Home Page
     heroTitle: 'Minibus and car rental',
@@ -1675,6 +1703,20 @@ export const translations = {
     privacyPolicyTitle: 'Политика конфиденциальности',
     rentalTermsTitle: 'Условия аренды',
     cancellationPolicyNote: 'Отменить можно, если до начала бронирования осталось более 24 часов.',
+
+    // SEO (search engines & social previews)
+    seoHomeTitle: 'Ratai24 – аренда микроавтобусов и легковых автомобилей',
+    seoHomeDescription: 'Быстрая, простая и надёжная аренда автомобилей. Просмотрите каталог, забронируйте онлайн и отправляйтесь в путь.',
+    seoRentCarsTitle: 'Аренда автомобилей – Ratai24',
+    seoRentCarsDescription: 'Арендуйте микроавтобус или легковой автомобиль с понятными ценами и онлайн-бронированием.',
+    seoSaleCarsTitle: 'Продажа автомобилей – Ratai24',
+    seoSaleCarsDescription: 'Просмотрите автомобили на продажу на Ratai24.',
+    seoContactsTitle: 'Контакты – Ratai24',
+    seoContactsDescription: 'Свяжитесь с Ratai24 по вопросам аренды автомобилей.',
+    seoPrivacyTitle: 'Политика конфиденциальности – Ratai24',
+    seoPrivacyDescription: 'Политика конфиденциальности Ratai24.',
+    seoRentalTermsTitle: 'Условия аренды – Ratai24',
+    seoRentalTermsDescription: 'Условия и правила аренды автомобилей – Ratai24.',
     // Home Page
     heroTitle: 'Аренда микроавтобусов и легковых автомобилей',
     heroSubtitle: 'Быстрая, простая и надежная аренда автомобилей для ваших поездок',
