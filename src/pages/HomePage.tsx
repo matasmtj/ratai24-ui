@@ -111,10 +111,10 @@ export function HomePage() {
         )}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 min-h-[460px] md:min-h-[560px] flex items-center justify-center">
           <div className="text-center">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 drop-shadow-sm">
+            <h1 className="text-3xl md:text-6xl font-bold mb-6 drop-shadow-sm px-2">
               {t('heroTitle')}
             </h1>
-            <p className="text-xl md:text-2xl mb-8 text-primary-100 drop-shadow-sm">
+            <p className="text-lg sm:text-xl md:text-2xl mb-8 text-primary-100 drop-shadow-sm px-2">
               {t('heroSubtitle')}
             </p>
             <Link to={lp('/rent-cars')}>

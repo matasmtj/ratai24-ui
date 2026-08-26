@@ -23,7 +23,10 @@ export const translations = {
     seoRentCarsTitle: 'Automobilių nuoma – Skirvita',
     seoRentCarsDescription: 'Išnuomokite mikroautobusą ar lengvąjį automobilį. Platus pasirinkimas, aiškios kainos, rezervacija online.',
     seoSaleCarsTitle: 'Automobilių pardavimas – Skirvita',
-    seoSaleCarsDescription: 'Peržiūrėkite parduodamus automobilius. Skirvita – patikimas pasirinkimas.',
+    seoSaleCarsDescription:
+      'Parduodami automobiliai Lietuvoje: lengvieji, mikroautobusai ir komerciniai modeliai. Peržiūrėkite katalogą, filtruokite pagal miestą ir kainą. Skirvita – patikimas automobilių pardavimas su aiškia informacija.',
+    saleCarsSeoIntro:
+      'Skirvita siūlo parduodamus automobilius nuomos ir pardavimo klientams visoje Lietuvoje. Kataloge rasite lengvuosius automobilius, mikroautobusus ir kitus modelius su nuotraukomis, technine informacija ir pardavimo kaina. Naudokite filtrus pagal miestą, kuro tipą, kėbulo tipą ir kitus parametrus, kad greitai rastumėte tinkamą automobilį.',
     seoContactsTitle: 'Kontaktai – Skirvita',
     seoContactsDescription: 'Susisiekite su Skirvita dėl automobilių nuomos. Adresai, telefonas ir darbo laikas.',
     seoPrivacyTitle: 'Privatumo politika – Skirvita',
@@ -304,6 +307,7 @@ export const translations = {
     manufacturer: 'Gamintojas',
     model: 'Modelis',
     vin: 'VIN kodas',
+    vinPlaceholder: 'Palikite tuščią, jei automobilis neregistruotas',
     vinRequired: 'VIN kodas yra privalomas',
     vinLength: 'VIN kodas turi būti lygiai 17 simbolių',
     vinInvalidChars: 'VIN kode yra netinkamų simbolių. Naudokite tik raides (išskyrus I, O, Q) ir skaičius',
@@ -347,7 +351,7 @@ export const translations = {
     // Image Manager
     manageImages: 'Valdyti nuotraukas',
     uploadImages: 'Įkelti nuotraukas',
-    uploadImagesDesc: 'PNG, JPG, GIF, WebP iki 5MB kiekviena (maks. 10 nuotraukų)',
+    uploadImagesDesc: 'PNG, JPG, GIF, WebP iki 10MB kiekviena (maks. 10 nuotraukų)',
     dropFilesHere: 'Nutemkite failus čia',
     selectFiles: 'Pasirinkti failus',
     filesSelected: 'failų pasirinkta',
@@ -880,7 +884,10 @@ export const translations = {
     seoRentCarsTitle: 'Car rental – Skirvita',
     seoRentCarsDescription: 'Rent a minibus or car with clear pricing and online booking.',
     seoSaleCarsTitle: 'Cars for sale – Skirvita',
-    seoSaleCarsDescription: 'Browse cars for sale at Skirvita.',
+    seoSaleCarsDescription:
+      'Cars for sale in Lithuania: passenger cars, minibuses and commercial vehicles. Browse the catalog, filter by city and price. Skirvita offers reliable car sales with clear listings.',
+    saleCarsSeoIntro:
+      'Skirvita lists vehicles available for purchase alongside our rental fleet across Lithuania. Browse photos, specifications and sale prices. Use filters for city, fuel type, body type and more to find the right car quickly.',
     seoContactsTitle: 'Contacts – Skirvita',
     seoContactsDescription: 'Get in touch with Skirvita for car rental. Address, phone, and business hours.',
     seoPrivacyTitle: 'Privacy policy – Skirvita',
@@ -1161,6 +1168,7 @@ export const translations = {
     manufacturer: 'Manufacturer',
     model: 'Model',
     vin: 'VIN Code',
+    vinPlaceholder: 'Leave blank if the car is not registered',
     vinRequired: 'VIN is required',
     vinLength: 'VIN must be exactly 17 characters',
     vinInvalidChars: 'VIN contains invalid characters. Use only letters (except I, O, Q) and numbers',
@@ -1204,7 +1212,7 @@ export const translations = {
     // Image Manager
     manageImages: 'Manage Images',
     uploadImages: 'Upload Images',
-    uploadImagesDesc: 'PNG, JPG, GIF, WebP up to 5MB each (max 10 images)',
+    uploadImagesDesc: 'PNG, JPG, GIF, WebP up to 10MB each (max 10 images)',
     dropFilesHere: 'Drop files here',
     selectFiles: 'Select Files',
     filesSelected: 'files selected',
@@ -1736,7 +1744,10 @@ export const translations = {
     seoRentCarsTitle: 'Аренда автомобилей – Skirvita',
     seoRentCarsDescription: 'Арендуйте микроавтобус или легковой автомобиль с понятными ценами и онлайн-бронированием.',
     seoSaleCarsTitle: 'Продажа автомобилей – Skirvita',
-    seoSaleCarsDescription: 'Просмотрите автомобили на продажу на Skirvita.',
+    seoSaleCarsDescription:
+      'Автомобили на продажу в Литве: легковые, микроавтобусы и коммерческие модели. Просмотрите каталог, фильтруйте по городу и цене. Skirvita — надёжная продажа автомобилей.',
+    saleCarsSeoIntro:
+      'Skirvita предлагает автомобили для покупки наряду с арендным парком по всей Литве. В каталоге — фото, характеристики и цены. Используйте фильтры по городу, типу топлива и кузова, чтобы быстро найти подходящий автомобиль.',
     seoContactsTitle: 'Контакты – Skirvita',
     seoContactsDescription: 'Свяжитесь с Skirvita по вопросам аренды автомобилей.',
     seoPrivacyTitle: 'Политика конфиденциальности – Skirvita',
@@ -2016,6 +2027,7 @@ export const translations = {
     manufacturer: 'Производитель',
     model: 'Модель',
     vin: 'VIN код',
+    vinPlaceholder: 'Оставьте пустым, если автомобиль не зарегистрирован',
     vinRequired: 'VIN код обязателен',
     vinLength: 'VIN код должен быть ровно 17 символов',
     vinInvalidChars: 'VIN код содержит недопустимые символы. Используйте только буквы (кроме I, O, Q) и цифры',
@@ -2059,7 +2071,7 @@ export const translations = {
     // Image Manager
     manageImages: 'Управление изображениями',
     uploadImages: 'Загрузить изображения',
-    uploadImagesDesc: 'PNG, JPG, GIF, WebP до 5МБ каждый (макс. 10 изображений)',
+    uploadImagesDesc: 'PNG, JPG, GIF, WebP до 10МБ каждый (макс. 10 изображений)',
     dropFilesHere: 'Перетащите файлы сюда',
     selectFiles: 'Выбрать файлы',
     filesSelected: 'файлов выбрано',

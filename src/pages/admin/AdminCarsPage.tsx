@@ -219,8 +219,8 @@ export function AdminCarsPage() {
         </div>
         
         {/* Rows per page selector */}
-        <div className="flex items-center gap-2 mt-4">
-          <label className="text-sm font-medium text-gray-700 whitespace-nowrap">{t('rowsPerPage')}:</label>
+        <div className="flex flex-wrap items-center gap-2 mt-4">
+          <label className="text-sm font-medium text-gray-700">{t('rowsPerPage')}:</label>
           <div className="w-20">
             <Select
               value={rowsPerPage.toString()}
@@ -788,7 +788,7 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
         {/* Availability Section */}
         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
           <h4 className="font-semibold text-blue-900 mb-3">{t('availability')}</h4>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <label className="flex items-center space-x-2 cursor-pointer">
               <input
                 type="checkbox"
@@ -814,7 +814,7 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
         {formData.availableForSale && (
           <div className="bg-green-50 p-4 rounded-lg border border-green-200">
             <h4 className="font-semibold text-green-900 mb-3">{t('saleInformation')}</h4>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Input 
                 label={t('salePriceField')} 
                 type="number" 
@@ -857,7 +857,7 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
           </div>
           
           {formData.useDynamicPricing && (
-            <div className="grid grid-cols-3 gap-4 mt-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-4">
               <Input 
                 label={t('basePricePerDay') || 'Base Price (€/day)'}
                 type="number"
@@ -925,7 +925,7 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <SearchableSelect 
             label={t('manufacturer')} 
             value={formData.make} 
@@ -946,25 +946,21 @@ function CarFormModal({ isOpen, onClose, car, cities }: {
             required 
           />
           <Input 
-            label={t('vin')} 
+            label={`${t('vin')} (${t('optional')})`}
             value={formData.vin} 
             onChange={(e) => {
               const newVin = e.target.value.toUpperCase();
               setFormData({ ...formData, vin: newVin });
-              // Clear error when user starts typing
               if (error) setError(null);
             }}
-            onBlur={() => {
-              // Validate on blur to give immediate feedback
-              const vinValidation = validateVIN(formData.vin);
-              if (!vinValidation.valid && formData.vin) {
-                setError(vinValidation.error!);
-              }
-            }}
             maxLength={17}
-            placeholder="17 characters (e.g., 1HGBH41JXMN109186)"
+            placeholder={t('vinPlaceholder')}
           />
-          <Input label={t('numberPlate')} value={formData.numberPlate} onChange={(e) => setFormData({ ...formData, numberPlate: e.target.value })} />
+          <Input
+            label={`${t('numberPlate')} (${t('optional')})`}
+            value={formData.numberPlate}
+            onChange={(e) => setFormData({ ...formData, numberPlate: e.target.value })}
+          />
           <SearchableSelect 
             label={t('yearField')} 
             value={String(formData.year)} 

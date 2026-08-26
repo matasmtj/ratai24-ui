@@ -4,18 +4,40 @@
 
 @layer base {
   html {
-    @apply overflow-x-hidden;
+    width: 100%;
+    -webkit-text-size-adjust: 100%;
   }
-  
+
   body {
-    @apply bg-gray-50 text-gray-900 overflow-x-hidden;
+    @apply bg-gray-50 text-gray-900;
     width: 100%;
-    max-width: 100vw;
+    max-width: 100%;
+    overflow-x: hidden;
   }
-  
+
   #root {
-    @apply overflow-x-hidden;
     width: 100%;
-    max-width: 100vw;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  img,
+  video,
+  canvas,
+  svg {
+    max-width: 100%;
+  }
+}
+
+@layer components {
+  /* Horizontal nav strips (e.g. admin tabs) scroll inside the page on small screens */
+  .mobile-scroll-x {
+    @apply w-full overflow-x-auto overscroll-x-contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobile-scroll-x > nav,
+  .mobile-scroll-x > div {
+    @apply min-w-0 sm:min-w-full;
   }
 }

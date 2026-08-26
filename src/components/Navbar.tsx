@@ -35,15 +35,15 @@ export function Navbar() {
   };
 
   return (
-    <nav className="bg-white shadow-sm border-b border-gray-200">
-      <div className="max-w-screen-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <div className="flex items-center gap-6">
-            <Link to={lp('/')} className="flex items-center flex-shrink-0">
+    <nav className="bg-white shadow-sm border-b border-gray-200 w-full min-w-0">
+      <div className="max-w-screen-2xl mx-auto px-3 sm:px-4 lg:px-8 w-full min-w-0">
+        <div className="flex justify-between items-center h-14 sm:h-16 gap-2 min-w-0">
+          <div className="flex items-center gap-3 sm:gap-6 min-w-0 flex-1">
+            <Link to={lp('/')} className="flex items-center flex-shrink-0 min-w-0">
               <img
                 src="/skirvita_nuoma.png"
                 alt="Skirvita – automobilių nuoma"
-                className="h-10 w-auto"
+                className="h-8 sm:h-10 w-auto max-w-[9.5rem] sm:max-w-none object-contain object-left"
               />
             </Link>
 
@@ -75,7 +75,7 @@ export function Navbar() {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 flex-shrink-0">
+          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="lg:hidden inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none"
@@ -111,7 +111,7 @@ export function Navbar() {
             )}
 
             {!isAuthenticated && (
-              <Link to="/login" className="inline-flex">
+              <Link to="/login" className="hidden sm:inline-flex">
                 <Button variant="secondary" size="sm" className="border border-gray-300 shadow-sm">
                   {t('login')}
                 </Button>
@@ -119,9 +119,8 @@ export function Navbar() {
             )}
 
             <Menu as="div" className="relative">
-              <Menu.Button className="inline-flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md border border-gray-200 gap-2">
-                <Bars3Icon className="h-5 w-5 lg:hidden" aria-hidden />
-                <UserCircleIcon className="h-5 w-5" />
+              <Menu.Button className="inline-flex items-center px-2 sm:px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50 rounded-md border border-gray-200 gap-1.5 sm:gap-2">
+                <UserCircleIcon className="h-5 w-5 flex-shrink-0" />
                 <span className="hidden sm:inline">{t('account')}</span>
               </Menu.Button>
               <Menu.Items className="absolute right-0 mt-2 w-56 origin-top-right bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-50 divide-y divide-gray-100">

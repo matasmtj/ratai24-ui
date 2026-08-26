@@ -83,20 +83,23 @@ export function CarImagesManager({ carId, isOpen, onClose }: CarImagesManagerPro
       setError(null);
       setUploading(false);
     },
-    onError: (error: any) => {
+    onError: (error: unknown) => {
+      const axiosError = error as { response?: { status?: number; data?: { error?: string; message?: string } } };
       let errorMessage = 'Failed to upload images. ';
-      if (error.response?.status === 401) {
+      if (axiosError.response?.status === 401) {
         errorMessage += 'Authentication failed. Please log in again.';
-      } else if (error.response?.status === 403) {
+      } else if (axiosError.response?.status === 403) {
         errorMessage += 'You do not have permission to upload images.';
-      } else if (error.response?.status === 413) {
+      } else if (axiosError.response?.status === 413) {
         errorMessage += 'Files are too large. Maximum size is 10MB per file.';
-      } else if (error.response?.data?.message) {
-        errorMessage += error.response.data.message;
+      } else if (axiosError.response?.data?.error) {
+        errorMessage += axiosError.response.data.error;
+      } else if (axiosError.response?.data?.message) {
+        errorMessage += axiosError.response.data.message;
       } else {
         errorMessage += 'Please check the console for details.';
       }
-      
+
       setError(errorMessage);
       setUploading(false);
     },

@@ -46,7 +46,7 @@ export function Modal({ isOpen, onClose, title, children, size = 'md' }: ModalPr
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel
-                className={`w-full ${sizeClasses[size]} transform overflow-visible rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all`}
+                className={`w-full max-w-[calc(100vw-2rem)] ${sizeClasses[size]} transform overflow-visible rounded-2xl bg-white p-4 sm:p-6 text-left align-middle shadow-xl transition-all`}
               >
                 <div className="flex items-center justify-between mb-4">
                   <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900">

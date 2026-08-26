@@ -277,8 +277,8 @@ export function CarsPage() {
           )}
           
           {/* Rows per page selector */}
-          <div className="flex items-center gap-2 mt-4 pt-4 border-t">
-            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">{t('rowsPerPage')}:</label>
+          <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t">
+            <label className="text-sm font-medium text-gray-700">{t('rowsPerPage')}:</label>
             <div className="w-20">
               <Select
                 value={rowsPerPage.toString()}

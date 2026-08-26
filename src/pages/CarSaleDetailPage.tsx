@@ -115,7 +115,7 @@ export function CarSaleDetailPage() {
               )}
             </Card>
             {carImages.length > 0 && (
-              <div className="grid grid-cols-5 gap-2">
+              <div className="grid grid-cols-4 sm:grid-cols-5 gap-2">
                 {carImages.slice(0, 5).map((image, index) => (
                   <button
                     key={image.id}
@@ -141,7 +141,7 @@ export function CarSaleDetailPage() {
           {/* Car Details */}
           <div>
             <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 break-words">
                 {car.make} {car.model}
               </h1>
               <p className="text-xl text-gray-600">{car.year} {t('year')}</p>

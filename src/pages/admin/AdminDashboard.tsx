@@ -38,8 +38,8 @@ export function AdminDashboard() {
           <p className="text-gray-600">{t('adminPanelDesc')}</p>
         </div>
 
-        <div className="border-b border-gray-200 mb-6">
-          <nav className="-mb-px flex space-x-8">
+        <div className="border-b border-gray-200 mb-6 mobile-scroll-x">
+          <nav className="-mb-px flex gap-4 sm:gap-8 whitespace-nowrap sm:whitespace-normal">
             {tabs.map((tab) => {
               const isActive = location.pathname === tab.href || 
                               (tab.href === '/admin/contracts' && location.pathname === '/admin') ||
@@ -71,8 +71,8 @@ export function AdminDashboard() {
 
         {/* Pricing Sub-navigation */}
         {location.pathname.startsWith('/admin/pricing') && (
-          <div className="border-b border-gray-200 mb-6">
-            <nav className="-mb-px flex space-x-4">
+          <div className="border-b border-gray-200 mb-6 mobile-scroll-x">
+            <nav className="-mb-px flex gap-3 sm:gap-4 whitespace-nowrap sm:whitespace-normal">
               {[
                 { name: t('pricing.admin.analytics'), href: '/admin/pricing' },
                 { name: t('pricing.admin.pricingRules'), href: '/admin/pricing/rules' },

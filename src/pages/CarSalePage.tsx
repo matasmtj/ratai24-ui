@@ -139,7 +139,8 @@ export function CarSalePage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{t('carSaleCatalog')}</h1>
-          <p className="text-gray-600">{t('findPerfectCarForSale')}</p>
+          <p className="text-gray-600 mb-2">{t('findPerfectCarForSale')}</p>
+          <p className="text-gray-600 text-sm leading-relaxed max-w-3xl">{t('saleCarsSeoIntro')}</p>
         </div>
 
         {/* Filters */}
@@ -275,8 +276,8 @@ export function CarSalePage() {
           )}
           
           {/* Rows per page selector */}
-          <div className="flex items-center gap-2 mt-4">
-            <label className="text-sm font-medium text-gray-700 whitespace-nowrap">{t('rowsPerPage')}:</label>
+          <div className="flex flex-wrap items-center gap-2 mt-4">
+            <label className="text-sm font-medium text-gray-700">{t('rowsPerPage')}:</label>
             <div className="w-20">
               <Select
                 value={rowsPerPage.toString()}
