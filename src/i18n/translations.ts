@@ -240,6 +240,8 @@ export const translations = {
     closed: 'Nedirbame',
     contacts: 'Kontaktai',
     contactManagement: 'Kontaktų valdymas',
+    reservationNotifyEmailsHint:
+      'Naujų rezervacijų pranešimai el. paštu siunčiami į pagrindinį el. paštą ir įmonės el. paštą (jei nurodytas).',
     manageContactInfo: 'Valdykite įmonės kontaktinę informaciją',
     heroImageTitle: 'Pagrindinio puslapio nuotrauka',
     heroImageHelp: 'Rekomenduojama plati nuotrauka (pvz. 2400×1000 px). Nuotrauka apkarpoma, kad užpildytų ekraną. Jei nuotrauka nenustatyta, rodomas numatytasis mėlynas fonas.',
@@ -1101,6 +1103,8 @@ export const translations = {
     closed: 'Closed',
     contacts: 'Contacts',
     contactManagement: 'Contact Management',
+    reservationNotifyEmailsHint:
+      'New reservation alerts are emailed to the primary address and the company email (when set).',
     manageContactInfo: 'Manage company contact information',
     heroImageTitle: 'Landing page image',
     heroImageHelp: 'Recommended: a wide image (e.g. 2400×1000 px). The image is cropped to fill the screen. When no image is uploaded, the default blue background is shown.',
@@ -1960,6 +1964,8 @@ export const translations = {
     closed: 'Закрыто',
     contacts: 'Контакты',
     contactManagement: 'Управление контактами',
+    reservationNotifyEmailsHint:
+      'Уведомления о новых бронированиях отправляются на основной и корпоративный email (если указан).',
     manageContactInfo: 'Управление контактной информацией компании',
     heroImageTitle: 'Изображение главной страницы',
     heroImageHelp: 'Рекомендуется широкое изображение (например, 2400×1000 px). Изображение обрезается, чтобы заполнить экран. Если изображение не загружено, показывается фон по умолчанию.',

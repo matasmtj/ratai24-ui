@@ -201,6 +201,7 @@ export function AdminContactsPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{t('contactManagement')}</h1>
           <p className="text-gray-600 mt-2">{t('noContactInfoYet')}</p>
+          <p className="text-sm text-gray-500 mt-1">{t('reservationNotifyEmailsHint')}</p>
         </div>
 
         <Card className="p-6">
@@ -335,6 +336,7 @@ export function AdminContactsPage() {
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900">{t('contactManagement')}</h1>
         <p className="text-gray-600 mt-2">{t('manageContactInfo')}</p>
+        <p className="text-sm text-gray-500 mt-1">{t('reservationNotifyEmailsHint')}</p>
       </div>
 
       {error && (
